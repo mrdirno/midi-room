@@ -9,16 +9,24 @@ import sys
 
 root=Path(__file__).resolve().parents[1]
 dist=root/'dist'
+def canonical_surface(page, instrument):
+    if page.count('<head>')!=1:raise ValueError('Expected one surface document head: '+instrument)
+    return page.replace('<head>', '<head>\n<link rel="canonical" href="https://persona500.com/midi-room/instruments/'+instrument+'.html">',1)
 (dist/'instruments').mkdir(parents=True,exist_ok=True)
-(dist/'instruments/field-keys.html').write_text((root/'src/surface/field-keys.html').read_text())
+(dist/'instruments/field-keys.html').write_text(canonical_surface((root/'src/surface/field-keys.html').read_text(),'field-keys'))
 subprocess.run([sys.executable,str(root/'src/triton/build-triton.py')],check=True)
 if (root/'src/lucky/build-lucky.py').exists(): subprocess.run([sys.executable,str(root/'src/lucky/build-lucky.py')],check=True)
 router=(dist/'surface-router.js').read_text()
 mapping=router[:router.index('/** Private-port identities')]
 mapping=re.sub(r'^export ', '', mapping, flags=re.M)
 pad=(root/'src/surface/pad.html').read_text().replace('<!--PAD_SCRIPT-->','<script>\n'+mapping+'\n'+(root/'src/surface/pad.js').read_text()+'\n</script>')
-(dist/'instruments/drum-pad.html').write_text(pad)
+(dist/'instruments/drum-pad.html').write_text(canonical_surface(pad,'drum-pad'))
 subprocess.run([sys.executable,str(root/'src/rack/build-rack.py')],check=True)
+for instrument in ['triton-rack','improvisator','lucky-dreamer','drum-pad','field-keys','dsp-rack']:
+    head=(dist/'instruments'/f'{instrument}.html').read_text().split('</head>',1)[0]
+    canonical=f'<link rel="canonical" href="https://persona500.com/midi-room/instruments/{instrument}.html">'
+    if head.count('rel="canonical"')!=1 or canonical not in head:
+        raise ValueError('Standalone canonical missing or ambiguous: '+instrument)
 
 def module(filename,exports,prelude=''):
     source=(dist/filename).read_text()

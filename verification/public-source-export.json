@@ -54,33 +54,33 @@
     },
     {
       "path": "dist/instruments/drum-pad.html",
-      "bytes": 27676,
-      "sha256": "f40cbd92cc19a46ff68498dd03fcb2ef0be483962bb4b9c26753cbca60528656"
+      "bytes": 27765,
+      "sha256": "1edc3e15c6dc0c49035b6f6ac5fb2e54a58d660ff0c360c2781196d8de938f38"
     },
     {
       "path": "dist/instruments/dsp-rack.html",
-      "bytes": 195708,
-      "sha256": "02c62a40d0348df7bf7d73779239b435cf3f702b2b331b016f5aa1c8aa7bf240"
+      "bytes": 195797,
+      "sha256": "9ae76236b3bf5a33e3cf4dca8247a8f84e1c15d90c9dc55500e7597586c878ab"
     },
     {
       "path": "dist/instruments/field-keys.html",
-      "bytes": 24577,
-      "sha256": "ffafeffaac634f4dbcf52304c80063a4e1c49655852fdb82c24360f67998ee89"
+      "bytes": 24668,
+      "sha256": "9d2cdea8b940c3c2144332b9b6d6ede7022066174c1c71871e721355cedd8a12"
     },
     {
       "path": "dist/instruments/improvisator.html",
-      "bytes": 776145,
-      "sha256": "d69b41236c3a45e37cd5946295947d85fa19bfa4bd7e868121b718da0fb4c510"
+      "bytes": 776238,
+      "sha256": "3ced270c9c96a64a5531f9d4cf5d15a24194abb0edabfa3d3dbc9545aa1595be"
     },
     {
       "path": "dist/instruments/lucky-dreamer.html",
-      "bytes": 1131083,
-      "sha256": "2b3503797b1ee52e8fb911fe588eb4c8dff6a2c4401544e11312fb8007fb3f04"
+      "bytes": 1131177,
+      "sha256": "8601bc4db9f437bd121337f6c4ee8c5d6e1f1bc2cb0465e424351aa5ea99f9a3"
     },
     {
       "path": "dist/instruments/triton-rack.html",
-      "bytes": 776148,
-      "sha256": "dc1e6d673281b9de6393eb6ce945ad91cbbaf60b3c8a8b058528329ab21a44e0"
+      "bytes": 776240,
+      "sha256": "c68e0dc55cf64bbd33420cadb0e099b44ed93d175a4b5c0af11ddd01b544eee0"
     },
     {
       "path": "dist/licenses/FAUST-COPYING.txt",
@@ -104,8 +104,8 @@
     },
     {
       "path": "dist/midi-room-local.html",
-      "bytes": 3300835,
-      "sha256": "6cc222593662e73b3408907036cadd3a162e73b0ed901325cc47f43fb33536eb"
+      "bytes": 3301443,
+      "sha256": "4feb0f5636cee881564952863c629da04bb5087ff5413bfedf37efa5b77970f8"
     },
     {
       "path": "dist/midi.js",
@@ -130,7 +130,7 @@
     {
       "path": "dist/sw.js",
       "bytes": 1836,
-      "sha256": "bc0c6c53b6cfee90c624468bb673e9822a8105a5917d18b0d132fc65ea3c5cf8"
+      "sha256": "adae409655b0bebe578310b279f6558bb77ce2b4b18e2581de547c140d68d046"
     },
     {
       "path": "dist/wish-config.js",
@@ -199,8 +199,8 @@
     },
     {
       "path": "src/build-slice.py",
-      "bytes": 4056,
-      "sha256": "fb7b0f787ad63f3a689b744e2f80f0cb1022384c3dbcac7a6b1bb54ee20ac541"
+      "bytes": 4845,
+      "sha256": "b1abb1ae4ecb8b5a2e69169d9e48b0fa94238ddd3b0211fb93afe93a4c674504"
     },
     {
       "path": "src/ensemble/audio-dom-doubles.cjs",
@@ -219,8 +219,8 @@
     },
     {
       "path": "src/lucky/build-lucky.py",
-      "bytes": 2271,
-      "sha256": "1050b52bc6818b8ea8103ded6062e821fff28e705f485595e5ed4405b4b7c685"
+      "bytes": 2580,
+      "sha256": "480fc0418fd807bd255bc62a1f7d27cfda84ee22503b701dfec31423d1fca44a"
     },
     {
       "path": "src/lucky/composition.js",
@@ -289,8 +289,8 @@
     },
     {
       "path": "src/rack/build-rack.py",
-      "bytes": 2009,
-      "sha256": "27ed6d4999dabf136ac8c2ded86f6e60a64372f5383fde263151d0e07faa4ac8"
+      "bytes": 2221,
+      "sha256": "67266c4b8a137ec53ea5deb9b6468c624ab1f32e7e7bad8922e79f9a376f5fd9"
     },
     {
       "path": "src/rack/engine.js",
@@ -354,8 +354,8 @@
     },
     {
       "path": "src/triton/build-triton.py",
-      "bytes": 12666,
-      "sha256": "4a8bf02a04dd2048cd1ee24cfdbeaeab58b2a50616e7e40161a8f9d20423a59b"
+      "bytes": 12967,
+      "sha256": "6d14a37c1647d033ac5fe30eaf82e96e7301f16e55bfadbbc897dbe82f4632fc"
     },
     {
       "path": "src/triton/inherited-runtime.html",
@@ -418,14 +418,19 @@
       "sha256": "91566735d2d1512f55727a643d19baae18067e25278ec417926ae21a27645406"
     },
     {
+      "path": "tests/canonical.test.mjs",
+      "bytes": 726,
+      "sha256": "c87837539dcbab0423d2f19da3661c8c36a9833501431dfb7017c4f99e924c01"
+    },
+    {
       "path": "tests/catalog.test.mjs",
       "bytes": 1038,
       "sha256": "2eebd0a0cf583030a745189c0b83f35c78d4e5280fb5732d2403f62cea91c7d7"
     },
     {
       "path": "tests/field-keys.test.mjs",
-      "bytes": 12201,
-      "sha256": "b14807f939dd6d0d99b79b3c91f66b840396b30fa343453460ab3492b16b1add"
+      "bytes": 12349,
+      "sha256": "e4425422f9a1a262396031adfc644d03d3f1d7caa56801642f194f7c4d3370ac"
     },
     {
       "path": "tests/instrument-bus.test.mjs",
@@ -439,8 +444,8 @@
     },
     {
       "path": "tests/midi.test.mjs",
-      "bytes": 14547,
-      "sha256": "9d25bade4a0cfbf63507e2fb3f01ac9b5b00fc7b3b5c35069e99e011bea1b7dc"
+      "bytes": 14923,
+      "sha256": "b8d4167188d531328fff81280fd944b93315ad0c49ab37de515c43ec0f51bdba"
     },
     {
       "path": "tests/player.test.mjs",

@@ -1,8 +1,8 @@
 {
   "format": "midi-room.production-handoff/1",
-  "generated_at": "2026-09-05T19:37:27.772914+00:00",
+  "generated_at": "2026-09-05T19:45:28.221061+00:00",
   "status": "Combined public release candidate validated locally; final GitHub CI and Pages deployment pending.",
-  "cache_version": "d899a9d05d6423ad",
+  "cache_version": "0cfb8c5007ca55b0",
   "canonical_page": "https://persona500.com/midi-room/",
   "wish_card_id": "midi-room-card",
   "builtins": [
@@ -57,33 +57,33 @@
     },
     {
       "path": "instruments/drum-pad.html",
-      "bytes": 27676,
-      "sha256": "f40cbd92cc19a46ff68498dd03fcb2ef0be483962bb4b9c26753cbca60528656"
+      "bytes": 27765,
+      "sha256": "1edc3e15c6dc0c49035b6f6ac5fb2e54a58d660ff0c360c2781196d8de938f38"
     },
     {
       "path": "instruments/dsp-rack.html",
-      "bytes": 195708,
-      "sha256": "02c62a40d0348df7bf7d73779239b435cf3f702b2b331b016f5aa1c8aa7bf240"
+      "bytes": 195797,
+      "sha256": "9ae76236b3bf5a33e3cf4dca8247a8f84e1c15d90c9dc55500e7597586c878ab"
     },
     {
       "path": "instruments/field-keys.html",
-      "bytes": 24577,
-      "sha256": "ffafeffaac634f4dbcf52304c80063a4e1c49655852fdb82c24360f67998ee89"
+      "bytes": 24668,
+      "sha256": "9d2cdea8b940c3c2144332b9b6d6ede7022066174c1c71871e721355cedd8a12"
     },
     {
       "path": "instruments/improvisator.html",
-      "bytes": 776145,
-      "sha256": "d69b41236c3a45e37cd5946295947d85fa19bfa4bd7e868121b718da0fb4c510"
+      "bytes": 776238,
+      "sha256": "3ced270c9c96a64a5531f9d4cf5d15a24194abb0edabfa3d3dbc9545aa1595be"
     },
     {
       "path": "instruments/lucky-dreamer.html",
-      "bytes": 1131083,
-      "sha256": "2b3503797b1ee52e8fb911fe588eb4c8dff6a2c4401544e11312fb8007fb3f04"
+      "bytes": 1131177,
+      "sha256": "8601bc4db9f437bd121337f6c4ee8c5d6e1f1bc2cb0465e424351aa5ea99f9a3"
     },
     {
       "path": "instruments/triton-rack.html",
-      "bytes": 776148,
-      "sha256": "dc1e6d673281b9de6393eb6ce945ad91cbbaf60b3c8a8b058528329ab21a44e0"
+      "bytes": 776240,
+      "sha256": "c68e0dc55cf64bbd33420cadb0e099b44ed93d175a4b5c0af11ddd01b544eee0"
     },
     {
       "path": "licenses/FAUST-COPYING.txt",
@@ -107,8 +107,8 @@
     },
     {
       "path": "midi-room-local.html",
-      "bytes": 3300835,
-      "sha256": "6cc222593662e73b3408907036cadd3a162e73b0ed901325cc47f43fb33536eb"
+      "bytes": 3301443,
+      "sha256": "4feb0f5636cee881564952863c629da04bb5087ff5413bfedf37efa5b77970f8"
     },
     {
       "path": "midi.js",
@@ -133,7 +133,7 @@
     {
       "path": "sw.js",
       "bytes": 1836,
-      "sha256": "bc0c6c53b6cfee90c624468bb673e9822a8105a5917d18b0d132fc65ea3c5cf8"
+      "sha256": "adae409655b0bebe578310b279f6558bb77ce2b4b18e2581de547c140d68d046"
     },
     {
       "path": "wish-config.js",
@@ -147,7 +147,7 @@
     }
   ],
   "verification": {
-    "public_host_node_tests": 138,
+    "public_host_node_tests": 139,
     "triton_runtime_tests": 20,
     "lucky_focused_tests": 17,
     "p5_playback_component_tests": 4,
@@ -165,7 +165,8 @@
     "copy_after_functional_browser_checks": "Final header actions, canonical and card links verified at 320/390/768/1280 in both engines, zero wish submissions. Wish close explicitly restores invoking control focus. Final faceplate typography avoids the value dial and inset edge. DSP scoped-CSP reproduction and source-only byte-identical rebuild passed.",
     "production_csp": "Chromium and Playwright WebKit: parent script-src data exception is MIDI Room scoped; worker-src self/blob, sandbox unchanged; both engines play DSP, release temporary URLs, handle cancelled/timed-out/failed worker admission and Stop.",
     "header_check_records": 10,
-    "visible_wish_marker": "data-wish-well is on the visible header Wish It Better button"
+    "visible_wish_marker": "data-wish-well is on the visible header Wish It Better button",
+    "standalone_canonicals": "All six generated instrument documents contain exactly one own canonical URL, checked by build and host regression."
   },
   "limits": [
     "Playwright WebKit is not installed Safari, physical iPhone, hardware MIDI, OS installation UI or human listening verification.",

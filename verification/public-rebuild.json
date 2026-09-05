@@ -5,42 +5,42 @@
   "artifacts": [
     {
       "path": "dist/instruments/drum-pad.html",
-      "sha256": "f40cbd92cc19a46ff68498dd03fcb2ef0be483962bb4b9c26753cbca60528656",
+      "sha256": "1edc3e15c6dc0c49035b6f6ac5fb2e54a58d660ff0c360c2781196d8de938f38",
       "matches_original_build": true
     },
     {
       "path": "dist/instruments/dsp-rack.html",
-      "sha256": "02c62a40d0348df7bf7d73779239b435cf3f702b2b331b016f5aa1c8aa7bf240",
+      "sha256": "9ae76236b3bf5a33e3cf4dca8247a8f84e1c15d90c9dc55500e7597586c878ab",
       "matches_original_build": true
     },
     {
       "path": "dist/instruments/field-keys.html",
-      "sha256": "ffafeffaac634f4dbcf52304c80063a4e1c49655852fdb82c24360f67998ee89",
+      "sha256": "9d2cdea8b940c3c2144332b9b6d6ede7022066174c1c71871e721355cedd8a12",
       "matches_original_build": true
     },
     {
       "path": "dist/instruments/improvisator.html",
-      "sha256": "d69b41236c3a45e37cd5946295947d85fa19bfa4bd7e868121b718da0fb4c510",
+      "sha256": "3ced270c9c96a64a5531f9d4cf5d15a24194abb0edabfa3d3dbc9545aa1595be",
       "matches_original_build": true
     },
     {
       "path": "dist/instruments/lucky-dreamer.html",
-      "sha256": "2b3503797b1ee52e8fb911fe588eb4c8dff6a2c4401544e11312fb8007fb3f04",
+      "sha256": "8601bc4db9f437bd121337f6c4ee8c5d6e1f1bc2cb0465e424351aa5ea99f9a3",
       "matches_original_build": true
     },
     {
       "path": "dist/instruments/triton-rack.html",
-      "sha256": "dc1e6d673281b9de6393eb6ce945ad91cbbaf60b3c8a8b058528329ab21a44e0",
+      "sha256": "c68e0dc55cf64bbd33420cadb0e099b44ed93d175a4b5c0af11ddd01b544eee0",
       "matches_original_build": true
     },
     {
       "path": "dist/midi-room-local.html",
-      "sha256": "6cc222593662e73b3408907036cadd3a162e73b0ed901325cc47f43fb33536eb",
+      "sha256": "4feb0f5636cee881564952863c629da04bb5087ff5413bfedf37efa5b77970f8",
       "matches_original_build": true
     },
     {
       "path": "dist/sw.js",
-      "sha256": "bc0c6c53b6cfee90c624468bb673e9822a8105a5917d18b0d132fc65ea3c5cf8",
+      "sha256": "adae409655b0bebe578310b279f6558bb77ce2b4b18e2581de547c140d68d046",
       "matches_original_build": true
     }
   ]

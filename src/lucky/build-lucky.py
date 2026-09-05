@@ -32,6 +32,10 @@ for marker, value in [('<!--LUCKY_ENGINE-->', '<script id="lucky-engine">\n' + e
     page = page.replace(marker, value)
 if re.search(r'<(?:script|link)\b[^>]+(?:src|href)="(?:https?:|/|\./)', page):
     raise SystemExit('Standalone player has a runtime network dependency')
+# A canonical is document identity metadata, not a fetched runtime dependency.
+if page.count('<head>') != 1:
+    raise SystemExit('Expected one standalone document head')
+page = page.replace('<head>', '<head>\n<link rel="canonical" href="https://persona500.com/midi-room/instruments/lucky-dreamer.html">', 1)
 target = root / 'dist/instruments/lucky-dreamer.html'
 target.parent.mkdir(parents=True, exist_ok=True)
 target.write_text(page)

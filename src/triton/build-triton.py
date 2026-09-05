@@ -107,11 +107,13 @@ html=html.replace('ctx.state==="suspended"','(ctx.state==="suspended"||ctx.state
 html=re.sub(r'<!--(?!\[if)[\s\S]*?-->', '', html)
 html=html.replace('</head>','<style>'+(root/'views.css').read_text()+'</style></head>')
 html=re.sub(r'<title>.*?</title>', '<title>TRITON Rack · MIDI Room</title>', html,count=1)
+replace('<head>', '<head>\n<link rel="canonical" href="https://persona500.com/midi-room/instruments/triton-rack.html">')
 out=project/'dist/instruments/triton-rack.html'
 out.parent.mkdir(parents=True,exist_ok=True)
 html=html.replace('<body class="soulMode">','<body class="soulMode engineOpen" data-instrument="triton-rack">')
 out.write_text(html)
 improvisator=html.replace('<body class="soulMode engineOpen" data-instrument="triton-rack">','<body class="soulMode" data-instrument="improvisator">').replace('<title>TRITON Rack · MIDI Room</title>','<title>Improvisator · MIDI Room</title>').replace('<h1>TRITON Rack</h1>','<h1>Improvisator ∞</h1>').replace('<strong>TRITON Rack</strong>','<strong>Improvisator</strong>')
+improvisator=improvisator.replace('href="https://persona500.com/midi-room/instruments/triton-rack.html"','href="https://persona500.com/midi-room/instruments/improvisator.html"',1)
 (project/'dist/instruments/improvisator.html').write_text(improvisator)
 proof={'originalSourceSha256':provenance['original_sha256'],'source':source.name,'sourceSha256':hashlib.sha256(raw).hexdigest(),'artifact':str(out.relative_to(project)), 'artifactSha256':hashlib.sha256(out.read_bytes()).hexdigest(),'bytes':out.stat().st_size,'countedPatches':patches,'donorChanges':['idempotent Soul start','cancel future pitched/drum source audio, including transients'],'notAdopted':['Ensemble conductor','Ensemble sound defaults','LiveKeys UI','unverified history claims']}
 (project/'verification').mkdir(exist_ok=True)

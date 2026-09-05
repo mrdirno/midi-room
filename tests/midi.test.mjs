@@ -3,6 +3,13 @@ import assert from 'node:assert/strict';
 import { MidiBroker, validChannelMessage } from '../dist/midi.js';
 
 const tick = () => new Promise(resolve => setImmediate(resolve));
+async function waitUntil(predicate, timeout = 1000) {
+  const deadline = Date.now() + timeout;
+  while (!predicate()) {
+    assert.ok(Date.now() < deadline, 'MIDI state did not settle before the test deadline');
+    await new Promise(resolve => setTimeout(resolve, 5));
+  }
+}
 class Port extends EventTarget {
   constructor(id, access) { super(); this.id = id; this.name = 'Controller ' + id; this.manufacturer = 'Test'; this.state = 'connected'; this.connection = 'closed'; this.access = access; this.opens = 0; this.closes = 0; this.rejectOpen = false; }
   open() { this.opens++; if (this.rejectOpen) return Promise.reject(new Error('Device is busy.')); if (this.connection !== 'open') { this.connection = 'open'; this.access.dispatchEvent(new Event('statechange')); } return Promise.resolve(this); }
@@ -169,14 +176,15 @@ test('transient port failure retries without selecting a device or duplicating m
   const a = r.access.inputs.get('a'); a.rejectOpen = true; await r.broker.connect(); await tick();
   assert.deepEqual(r.broker.getState().inputs.map(port => port.id), ['b']);
   assert.equal(r.broker.getState().inputErrors.length, 1); assert.equal(r.broker.getState().pendingInputs.length, 1);
-  a.rejectOpen = false; await new Promise(resolve => setTimeout(resolve, 20));
+  a.rejectOpen = false; await waitUntil(() => a.opens >= 2 && r.broker.getState().pendingInputs.length === 0);
   assert.equal(a.opens, 2); assert.equal(r.broker.getState().error, null);
   a.play([0x90, 60, 100]); assert.equal(r.messages.length, 1);
 });
 
-test('automatic retries are bounded, can be restarted explicitly, and cancel on disposal', async () => {
+test('automatic retries are bounded, can be restarted explicitly, and cancel on disposal', async t => {
   const r = rig(['a'], { retryDelays: [1, 1] }); const a = r.access.inputs.get('a'); a.rejectOpen = true;
-  await r.broker.connect(); await new Promise(resolve => setTimeout(resolve, 20));
+  t.after(() => r.broker.dispose());
+  await r.broker.connect(); await waitUntil(() => a.opens >= 3 && r.broker.getState().pendingInputs.length === 0);
   assert.equal(a.opens, 3); assert.equal(r.broker.getState().pendingInputs.length, 0);
   a.rejectOpen = false; await r.broker.connect(); await tick();
   assert.equal(a.opens, 4); assert.equal(r.broker.getState().inputs.length, 1); r.broker.dispose();

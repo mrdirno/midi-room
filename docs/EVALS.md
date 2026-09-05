@@ -4,7 +4,7 @@ This is the September 5, 2026 local qualification record. Passing it does not es
 
 | Check | Passed / attempted | Evidence or reproduction |
 | --- | --- | --- |
-| Host unit and contract tests | 138 / 138 | `npm test` (host test group) |
+| Host unit and contract tests | 139 / 139 | `npm test` (host test group) |
 | TRITON scheduling, tempo, ownership and export regressions | 20 / 20 | `verification/triton-regressions.json`; `npm test` |
 | Lucky composition, PCM renderer, MIDI and public-only build regressions | 17 / 17 | `npm test` (Lucky test group) |
 | Delete and rebuild six instruments, portable page and service worker without private references | 8 / 8 byte-identical artifacts | `verification/public-rebuild.json` |

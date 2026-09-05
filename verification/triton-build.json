@@ -3,8 +3,8 @@
   "source": "inherited-runtime.html",
   "sourceSha256": "4eced0d8da0d9623c11014a29ba57ecb9751ff735ea1c5bd647478177a219404",
   "artifact": "dist/instruments/triton-rack.html",
-  "artifactSha256": "dc1e6d673281b9de6393eb6ce945ad91cbbaf60b3c8a8b058528329ab21a44e0",
-  "bytes": 776148,
+  "artifactSha256": "c68e0dc55cf64bbd33420cadb0e099b44ed93d175a4b5c0af11ddd01b544eee0",
+  "bytes": 776240,
   "countedPatches": [
     {
       "anchor": "<h1>KORG TRITON-Rack</h1>",
@@ -172,6 +172,10 @@
     },
     {
       "anchor": "if(e.repeat||e.metaKey||e.ctrlKey||e.altKey) return;",
+      "count": 1
+    },
+    {
+      "anchor": "<head>",
       "count": 1
     }
   ],

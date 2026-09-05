@@ -24,5 +24,7 @@ for p in [root/'dist/plugin-contract.js',source/'engine.js',source/'ui.js']:
     scripts+=code+'\n'
 scripts=re.sub(r'</script',r'<\\/script',scripts,flags=re.I)
 page=(source/'rack.html').read_text().replace('<!--RACK_STATE-->',js(rack)).replace('<!--RACK_SCRIPTS-->','<script>\n'+scripts+'\n</script>')
+if page.count('<head>')!=1:raise ValueError('Expected one DSP Rack document head')
+page=page.replace('<head>','<head>\n<link rel="canonical" href="https://persona500.com/midi-room/instruments/dsp-rack.html">',1)
 (root/'dist/instruments/dsp-rack.html').write_text(page)
 print('Built shared DSP Rack with pinned Bloom + Soft Drive engines')

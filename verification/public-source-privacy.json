@@ -1,6 +1,6 @@
 {
   "scope": "Targeted scan of all tracked files and reviewed source/JSON additions. Test screenshots, local auditions, dependencies and git metadata excluded. No universal private-data detection claim.",
-  "text_files": 123,
+  "text_files": 124,
   "findings": {
     "absolute_private_path": [],
     "embedded_manuscript": [],

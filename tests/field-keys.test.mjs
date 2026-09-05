@@ -123,7 +123,8 @@ test('opening room controls releases local fingers while wire and hardware owner
 });
 
 test('artifact is self-contained with fixed readout space and sixteen touch pads',()=>{
-  assert.equal(/<(?:script|link|img|iframe)\b[^>]*(?:src|href)\s*=\s*["']https?:/i.test(html),false);
+  const withoutCanonical=html.replace('<link rel="canonical" href="https://persona500.com/midi-room/instruments/field-keys.html">','');
+  assert.equal(/<(?:script|link|img|iframe)\b[^>]*(?:src|href)\s*=\s*["']https?:/i.test(withoutCanonical),false);
   assert.match(html,/height:71px/);assert.match(html,/height:3\.5em/);assert.match(html,/index < 16/);new vm.Script(source);
 });
 
