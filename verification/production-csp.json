@@ -1,0 +1,731 @@
+{
+  "scope": "Actual opaque sandbox DSP Rack with app-scoped inline worklet script-src data allowance; worker-src remains self blob only.",
+  "csp": "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https: ws: wss:; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'inline-speculation-rules' blob: data: https://static.cloudflareinsights.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https: ws: wss:; media-src 'self' data: blob: https:;",
+  "runs": [
+    {
+      "browser": "chromium",
+      "errors": [],
+      "violations": [],
+      "ready": {
+        "ready": true,
+        "disposed": false,
+        "rate": 48000,
+        "contextState": "running",
+        "held": 0,
+        "modules": 2,
+        "baseLatency": 0.005333333333333333,
+        "outputLatency": 0,
+        "receipts": [
+          {
+            "instanceId": "bloom-one",
+            "integrity": {
+              "format": "midi-room.compatibility/1",
+              "pluginId": "bloom-oscillator",
+              "pluginVersion": "1.0.0",
+              "engine": "faust-wasm/1",
+              "status": "artifact-verified",
+              "rackCompatible": true,
+              "hashes": {
+                "source": "45b86ee25f3f68528fb5806dd3bf82ed6cf9f7e067fa143ad70e951a131e6482",
+                "c": "1b66d6fae7a2fabd5a758d5ee2e323e53e1a6abc0daa5c99873c3ada5d043e8f",
+                "header": "5e8a6378013f0c073c44257da0d7db94a2a46349c943511fe8f3721b35aa7e79",
+                "wasm": "43a07ba9a6d07dcc6e522d5960b58237d86b4c1fe67edfc311db3587a89d72df"
+              },
+              "checks": [
+                "Source, C, header, Wasm and card identity hashes match",
+                "Bounded metadata and supported Wasm ABI",
+                "Wasm compiled without instantiation"
+              ],
+              "wasm": {
+                "bytes": 5172,
+                "imports": [
+                  {
+                    "module": "env",
+                    "name": "_powf",
+                    "kind": "function"
+                  },
+                  {
+                    "module": "env",
+                    "name": "_sinf",
+                    "kind": "function"
+                  }
+                ],
+                "exports": [
+                  {
+                    "name": "compute",
+                    "kind": "function"
+                  },
+                  {
+                    "name": "getNumInputs",
+                    "kind": "function"
+                  },
+                  {
+                    "name": "getNumOutputs",
+                    "kind": "function"
+                  },
+                  {
+                    "name": "getParamValue",
+                    "kind": "function"
+                  },
+                  {
+                    "name": "getSampleRate",
+                    "kind": "function"
+                  },
+                  {
+                    "name": "init",
+                    "kind": "function"
+                  },
+                  {
+                    "name": "instanceClear",
+                    "kind": "function"
+                  },
+                  {
+                    "name": "instanceConstants",
+                    "kind": "function"
+                  },
+                  {
+                    "name": "instanceInit",
+                    "kind": "function"
+                  },
+                  {
+                    "name": "instanceResetUserInterface",
+                    "kind": "function"
+                  },
+                  {
+                    "name": "setParamValue",
+                    "kind": "function"
+                  },
+                  {
+                    "name": "memory",
+                    "kind": "memory"
+                  }
+                ]
+              },
+              "limitations": [
+                "Hashes establish artifact identity, not trust, DSP correctness or real-time safety.",
+                "No audio render, MIDI behavior, timing or native/FPGA parity was measured by intake.",
+                "Run only reviewed DSP: a worklet isolates audio execution but cannot guarantee deadlines for hostile or pathological code."
+              ]
+            },
+            "probe": {
+              "ok": true,
+              "frames": 4096,
+              "rate": 48000,
+              "peak": 0.1229366585612297
+            }
+          },
+          {
+            "instanceId": "drive-one",
+            "integrity": {
+              "format": "midi-room.compatibility/1",
+              "pluginId": "soft-drive",
+              "pluginVersion": "1.0.0",
+              "engine": "faust-wasm/1",
+              "status": "artifact-verified",
+              "rackCompatible": true,
+              "hashes": {
+                "source": "faaac902102825a524624b527f8c7234782de53c91a3896462d8b80474f18359",
+                "c": "56ed9391210450412ebdfef44b9189b04761f233ab6dbc83bcc298de29402b4e",
+                "header": "d2391b7815db0c85b6eea994e8085b5117120dd286a8181d4ee618795e7c06b7",
+                "wasm": "4c261d44d45b671995285b480826c59da06fbabe28dea2529a9522a31d579846"
+              },
+              "checks": [
+                "Source, C, header, Wasm and card identity hashes match",
+                "Bounded metadata and supported Wasm ABI",
+                "Wasm compiled without instantiation"
+              ],
+              "wasm": {
+                "bytes": 5513,
+                "imports": [
+                  {
+                    "module": "env",
+                    "name": "_powf",
+                    "kind": "function"
+                  },
+                  {
+                    "module": "env",
+                    "name": "_tanf",
+                    "kind": "function"
+                  },
+                  {
+                    "module": "env",
+                    "name": "_tanhf",
+                    "kind": "function"
+                  }
+                ],
+                "exports": [
+                  {
+                    "name": "compute",
+                    "kind": "function"
+                  },
+                  {
+                    "name": "getNumInputs",
+                    "kind": "function"
+                  },
+                  {
+                    "name": "getNumOutputs",
+                    "kind": "function"
+                  },
+                  {
+                    "name": "getParamValue",
+                    "kind": "function"
+                  },
+                  {
+                    "name": "getSampleRate",
+                    "kind": "function"
+                  },
+                  {
+                    "name": "init",
+                    "kind": "function"
+                  },
+                  {
+                    "name": "instanceClear",
+                    "kind": "function"
+                  },
+                  {
+                    "name": "instanceConstants",
+                    "kind": "function"
+                  },
+                  {
+                    "name": "instanceInit",
+                    "kind": "function"
+                  },
+                  {
+                    "name": "instanceResetUserInterface",
+                    "kind": "function"
+                  },
+                  {
+                    "name": "setParamValue",
+                    "kind": "function"
+                  },
+                  {
+                    "name": "memory",
+                    "kind": "memory"
+                  }
+                ]
+              },
+              "limitations": [
+                "Hashes establish artifact identity, not trust, DSP correctness or real-time safety.",
+                "No audio render, MIDI behavior, timing or native/FPGA parity was measured by intake.",
+                "Run only reviewed DSP: a worklet isolates audio execution but cannot guarantee deadlines for hostile or pathological code."
+              ]
+            },
+            "probe": {
+              "ok": true,
+              "frames": 4096,
+              "rate": 48000,
+              "peak": 0.000046019074943615124
+            }
+          }
+        ]
+      },
+      "audio": {
+        "peak": 0.033840760588645935,
+        "sampleRate": 48000
+      },
+      "admission": {
+        "cancel": "DSP preflight cancelled.",
+        "timeout": "DSP preflight exceeded its time budget.",
+        "construction": "test construction failure"
+      },
+      "urls": {
+        "created": 7,
+        "revoked": 7,
+        "unreleased": []
+      },
+      "pass": true
+    },
+    {
+      "browser": "webkit",
+      "errors": [],
+      "violations": [],
+      "consoleErrors": [
+        "The source list for Content Security Policy directive 'script-src' contains an invalid source: ''inline-speculation-rules''. It will be ignored.",
+        "The source list for Content Security Policy directive 'script-src' contains an invalid source: ''inline-speculation-rules''. It will be ignored.",
+        "The source list for Content Security Policy directive 'script-src' contains an invalid source: ''inline-speculation-rules''. It will be ignored.",
+        "The source list for Content Security Policy directive 'script-src' contains an invalid source: ''inline-speculation-rules''. It will be ignored.",
+        "The source list for Content Security Policy directive 'script-src' contains an invalid source: ''inline-speculation-rules''. It will be ignored.",
+        "The source list for Content Security Policy directive 'script-src' contains an invalid source: ''inline-speculation-rules''. It will be ignored.",
+        "The source list for Content Security Policy directive 'script-src' contains an invalid source: ''inline-speculation-rules''. It will be ignored."
+      ],
+      "ready": {
+        "ready": true,
+        "disposed": false,
+        "rate": 48000,
+        "contextState": "running",
+        "held": 0,
+        "modules": 2,
+        "baseLatency": 0.0026666666666666666,
+        "outputLatency": 0.16,
+        "receipts": [
+          {
+            "instanceId": "bloom-one",
+            "integrity": {
+              "format": "midi-room.compatibility/1",
+              "pluginId": "bloom-oscillator",
+              "pluginVersion": "1.0.0",
+              "engine": "faust-wasm/1",
+              "status": "artifact-verified",
+              "rackCompatible": true,
+              "hashes": {
+                "source": "45b86ee25f3f68528fb5806dd3bf82ed6cf9f7e067fa143ad70e951a131e6482",
+                "c": "1b66d6fae7a2fabd5a758d5ee2e323e53e1a6abc0daa5c99873c3ada5d043e8f",
+                "header": "5e8a6378013f0c073c44257da0d7db94a2a46349c943511fe8f3721b35aa7e79",
+                "wasm": "43a07ba9a6d07dcc6e522d5960b58237d86b4c1fe67edfc311db3587a89d72df"
+              },
+              "checks": [
+                "Source, C, header, Wasm and card identity hashes match",
+                "Bounded metadata and supported Wasm ABI",
+                "Wasm compiled without instantiation"
+              ],
+              "wasm": {
+                "bytes": 5172,
+                "imports": [
+                  {
+                    "module": "env",
+                    "name": "_powf",
+                    "kind": "function",
+                    "type": {
+                      "parameters": [
+                        "f32",
+                        "f32"
+                      ],
+                      "results": [
+                        "f32"
+                      ]
+                    }
+                  },
+                  {
+                    "module": "env",
+                    "name": "_sinf",
+                    "kind": "function",
+                    "type": {
+                      "parameters": [
+                        "f32"
+                      ],
+                      "results": [
+                        "f32"
+                      ]
+                    }
+                  }
+                ],
+                "exports": [
+                  {
+                    "name": "compute",
+                    "kind": "function",
+                    "type": {
+                      "parameters": [
+                        "i32",
+                        "i32",
+                        "i32",
+                        "i32"
+                      ],
+                      "results": []
+                    }
+                  },
+                  {
+                    "name": "getNumInputs",
+                    "kind": "function",
+                    "type": {
+                      "parameters": [
+                        "i32"
+                      ],
+                      "results": [
+                        "i32"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "getNumOutputs",
+                    "kind": "function",
+                    "type": {
+                      "parameters": [
+                        "i32"
+                      ],
+                      "results": [
+                        "i32"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "getParamValue",
+                    "kind": "function",
+                    "type": {
+                      "parameters": [
+                        "i32",
+                        "i32"
+                      ],
+                      "results": [
+                        "f32"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "getSampleRate",
+                    "kind": "function",
+                    "type": {
+                      "parameters": [
+                        "i32"
+                      ],
+                      "results": [
+                        "i32"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "init",
+                    "kind": "function",
+                    "type": {
+                      "parameters": [
+                        "i32",
+                        "i32"
+                      ],
+                      "results": []
+                    }
+                  },
+                  {
+                    "name": "instanceClear",
+                    "kind": "function",
+                    "type": {
+                      "parameters": [
+                        "i32"
+                      ],
+                      "results": []
+                    }
+                  },
+                  {
+                    "name": "instanceConstants",
+                    "kind": "function",
+                    "type": {
+                      "parameters": [
+                        "i32",
+                        "i32"
+                      ],
+                      "results": []
+                    }
+                  },
+                  {
+                    "name": "instanceInit",
+                    "kind": "function",
+                    "type": {
+                      "parameters": [
+                        "i32",
+                        "i32"
+                      ],
+                      "results": []
+                    }
+                  },
+                  {
+                    "name": "instanceResetUserInterface",
+                    "kind": "function",
+                    "type": {
+                      "parameters": [
+                        "i32"
+                      ],
+                      "results": []
+                    }
+                  },
+                  {
+                    "name": "setParamValue",
+                    "kind": "function",
+                    "type": {
+                      "parameters": [
+                        "i32",
+                        "i32",
+                        "f32"
+                      ],
+                      "results": []
+                    }
+                  },
+                  {
+                    "name": "memory",
+                    "kind": "memory",
+                    "type": {
+                      "maximum": 1008,
+                      "minimum": 8,
+                      "shared": false
+                    }
+                  }
+                ]
+              },
+              "limitations": [
+                "Hashes establish artifact identity, not trust, DSP correctness or real-time safety.",
+                "No audio render, MIDI behavior, timing or native/FPGA parity was measured by intake.",
+                "Run only reviewed DSP: a worklet isolates audio execution but cannot guarantee deadlines for hostile or pathological code."
+              ]
+            },
+            "probe": {
+              "ok": true,
+              "frames": 4096,
+              "rate": 48000,
+              "peak": 0.1229366585612297
+            }
+          },
+          {
+            "instanceId": "drive-one",
+            "integrity": {
+              "format": "midi-room.compatibility/1",
+              "pluginId": "soft-drive",
+              "pluginVersion": "1.0.0",
+              "engine": "faust-wasm/1",
+              "status": "artifact-verified",
+              "rackCompatible": true,
+              "hashes": {
+                "source": "faaac902102825a524624b527f8c7234782de53c91a3896462d8b80474f18359",
+                "c": "56ed9391210450412ebdfef44b9189b04761f233ab6dbc83bcc298de29402b4e",
+                "header": "d2391b7815db0c85b6eea994e8085b5117120dd286a8181d4ee618795e7c06b7",
+                "wasm": "4c261d44d45b671995285b480826c59da06fbabe28dea2529a9522a31d579846"
+              },
+              "checks": [
+                "Source, C, header, Wasm and card identity hashes match",
+                "Bounded metadata and supported Wasm ABI",
+                "Wasm compiled without instantiation"
+              ],
+              "wasm": {
+                "bytes": 5513,
+                "imports": [
+                  {
+                    "module": "env",
+                    "name": "_powf",
+                    "kind": "function",
+                    "type": {
+                      "parameters": [
+                        "f32",
+                        "f32"
+                      ],
+                      "results": [
+                        "f32"
+                      ]
+                    }
+                  },
+                  {
+                    "module": "env",
+                    "name": "_tanf",
+                    "kind": "function",
+                    "type": {
+                      "parameters": [
+                        "f32"
+                      ],
+                      "results": [
+                        "f32"
+                      ]
+                    }
+                  },
+                  {
+                    "module": "env",
+                    "name": "_tanhf",
+                    "kind": "function",
+                    "type": {
+                      "parameters": [
+                        "f32"
+                      ],
+                      "results": [
+                        "f32"
+                      ]
+                    }
+                  }
+                ],
+                "exports": [
+                  {
+                    "name": "compute",
+                    "kind": "function",
+                    "type": {
+                      "parameters": [
+                        "i32",
+                        "i32",
+                        "i32",
+                        "i32"
+                      ],
+                      "results": []
+                    }
+                  },
+                  {
+                    "name": "getNumInputs",
+                    "kind": "function",
+                    "type": {
+                      "parameters": [
+                        "i32"
+                      ],
+                      "results": [
+                        "i32"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "getNumOutputs",
+                    "kind": "function",
+                    "type": {
+                      "parameters": [
+                        "i32"
+                      ],
+                      "results": [
+                        "i32"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "getParamValue",
+                    "kind": "function",
+                    "type": {
+                      "parameters": [
+                        "i32",
+                        "i32"
+                      ],
+                      "results": [
+                        "f32"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "getSampleRate",
+                    "kind": "function",
+                    "type": {
+                      "parameters": [
+                        "i32"
+                      ],
+                      "results": [
+                        "i32"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "init",
+                    "kind": "function",
+                    "type": {
+                      "parameters": [
+                        "i32",
+                        "i32"
+                      ],
+                      "results": []
+                    }
+                  },
+                  {
+                    "name": "instanceClear",
+                    "kind": "function",
+                    "type": {
+                      "parameters": [
+                        "i32"
+                      ],
+                      "results": []
+                    }
+                  },
+                  {
+                    "name": "instanceConstants",
+                    "kind": "function",
+                    "type": {
+                      "parameters": [
+                        "i32",
+                        "i32"
+                      ],
+                      "results": []
+                    }
+                  },
+                  {
+                    "name": "instanceInit",
+                    "kind": "function",
+                    "type": {
+                      "parameters": [
+                        "i32",
+                        "i32"
+                      ],
+                      "results": []
+                    }
+                  },
+                  {
+                    "name": "instanceResetUserInterface",
+                    "kind": "function",
+                    "type": {
+                      "parameters": [
+                        "i32"
+                      ],
+                      "results": []
+                    }
+                  },
+                  {
+                    "name": "setParamValue",
+                    "kind": "function",
+                    "type": {
+                      "parameters": [
+                        "i32",
+                        "i32",
+                        "f32"
+                      ],
+                      "results": []
+                    }
+                  },
+                  {
+                    "name": "memory",
+                    "kind": "memory",
+                    "type": {
+                      "maximum": 1004,
+                      "minimum": 4,
+                      "shared": false
+                    }
+                  }
+                ]
+              },
+              "limitations": [
+                "Hashes establish artifact identity, not trust, DSP correctness or real-time safety.",
+                "No audio render, MIDI behavior, timing or native/FPGA parity was measured by intake.",
+                "Run only reviewed DSP: a worklet isolates audio execution but cannot guarantee deadlines for hostile or pathological code."
+              ]
+            },
+            "probe": {
+              "ok": true,
+              "frames": 4096,
+              "rate": 48000,
+              "peak": 0.000046019074943615124
+            }
+          }
+        ]
+      },
+      "audio": {
+        "peak": 0.03389165177941322,
+        "sampleRate": 48000
+      },
+      "admission": {
+        "cancel": "DSP preflight cancelled.",
+        "timeout": "DSP preflight exceeded its time budget.",
+        "construction": "test construction failure"
+      },
+      "urls": {
+        "created": 7,
+        "revoked": 7,
+        "unreleased": []
+      },
+      "pass": true
+    }
+  ],
+  "routePolicies": [
+    {
+      "pathname": "/midi-room",
+      "scriptAllowsData": true,
+      "worker": "'self' blob:"
+    },
+    {
+      "pathname": "/midi-room/",
+      "scriptAllowsData": true,
+      "worker": "'self' blob:"
+    },
+    {
+      "pathname": "/midi-room/instruments/dsp-rack.html",
+      "scriptAllowsData": true,
+      "worker": "'self' blob:"
+    },
+    {
+      "pathname": "/run-this-game/",
+      "scriptAllowsData": false,
+      "worker": "'self' blob:"
+    },
+    {
+      "pathname": "/midi-roomish",
+      "scriptAllowsData": false,
+      "worker": "'self' blob:"
+    },
+    {
+      "pathname": "/nested/midi-room/",
+      "scriptAllowsData": false,
+      "worker": "'self' blob:"
+    }
+  ]
+}

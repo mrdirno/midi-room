@@ -33,3 +33,11 @@ Serve `sw.js` and `manifest.webmanifest` with revalidation (`Cache-Control: no-c
 - `node tools/production-offline-check.mjs`
 
 Browser scripts launch isolated contexts and close them. They start their own temporary local server.
+
+## Parent CSP and opaque WebKit worklets
+
+DSP preflight uses a temporary `blob:` dedicated Worker. Both successful admission and cancellation, timeout, or constructor failure revoke that URL. AudioWorklet initialization first tries a temporary `blob:` URL and always revokes it. Playwright WebKit rejects `blob:null` worklet modules inside an opaque frame; the runtime then uses an inline `data:` worklet module. The isolated iframe and its restrictive content policy stay intact.
+
+Persona500 permits `data:` in `script-src` only for the exact `/midi-room` path and paths starting `/midi-room/`. Its `worker-src` stays `'self' blob:`. Other pages retain their original script policy. A host applying its own restrictive CSP must permit this inline worklet fallback on the MIDI Room route; moving hosting or adding a PWA does not change Web MIDI support.
+
+Run `npm run test:csp` for actual Chromium and Playwright WebKit DSP playback in the opaque host frame with this parent policy. It also checks unrelated route policies, audible generated sample peaks, worker admission cancellation/timeouts/construction failures, temporary URL cleanup, and Stop. `CSP_INLINE_WORKLET=0` intentionally reproduces the WebKit limitation without the approved route exception. The test is a deployment-policy reproduction; production header verification remains a separate live check.

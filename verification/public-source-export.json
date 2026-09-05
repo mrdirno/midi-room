@@ -3,14 +3,19 @@
   "boundary": "Allowlisted source and generated app; no original reference tree, manuscripts, user songs, source prompts, private repo or environment files. README, network manifests and Git metadata are release-owner files and not overwritten.",
   "files": [
     {
+      "path": ".github/workflows/ci-pages.yml",
+      "bytes": 7460,
+      "sha256": "6d91d40a60dc6cf74c684e383b691eb7b0205c6280b03bfc888ee8d8251d9f54"
+    },
+    {
       "path": "LICENSE",
-      "bytes": 1439,
-      "sha256": "82692049ae6c2832600819157720673d7e5baafe8ddbb8d7249c34daaa498c6d"
+      "bytes": 1079,
+      "sha256": "f9f1e8c9f0b40952fecfc67915b8c01ac4d464823261ba97f5fa4614e009b7a9"
     },
     {
       "path": "dist/app.js",
-      "bytes": 45486,
-      "sha256": "ff4d9f163880752e7f7709331668c695cc204dd97c2cf7e1bc26132d81ce3c24"
+      "bytes": 45580,
+      "sha256": "158c4095e592011047db81864ee8513d3204fc86a7c1e67fd9afe72e270ec6e5"
     },
     {
       "path": "dist/bridge.js",
@@ -39,8 +44,8 @@
     },
     {
       "path": "dist/index.html",
-      "bytes": 12368,
-      "sha256": "1e1daa28f18ef5bd32b505f79fd94dc315265b90b403e56526d78766d55eef19"
+      "bytes": 12660,
+      "sha256": "95c222539fb99672da4c6a45ccb47bfbadd8b87b75c386fcdefb3bd84880ca4b"
     },
     {
       "path": "dist/instrument-bus.js",
@@ -54,8 +59,8 @@
     },
     {
       "path": "dist/instruments/dsp-rack.html",
-      "bytes": 195085,
-      "sha256": "4769db6aa5f324358e6d8c6076dc3e7f81e2e14a88b618ea79af668754397673"
+      "bytes": 195708,
+      "sha256": "02c62a40d0348df7bf7d73779239b435cf3f702b2b331b016f5aa1c8aa7bf240"
     },
     {
       "path": "dist/instruments/field-keys.html",
@@ -64,8 +69,8 @@
     },
     {
       "path": "dist/instruments/improvisator.html",
-      "bytes": 776062,
-      "sha256": "1ccc863bde7d5b55871c6f15afa185cbbb7088bd58f8f2a496ce6c7724c3caf1"
+      "bytes": 776145,
+      "sha256": "d69b41236c3a45e37cd5946295947d85fa19bfa4bd7e868121b718da0fb4c510"
     },
     {
       "path": "dist/instruments/lucky-dreamer.html",
@@ -74,8 +79,8 @@
     },
     {
       "path": "dist/instruments/triton-rack.html",
-      "bytes": 776070,
-      "sha256": "fe970bd96d0a1eee22b0a02364a5eae9cd3062c7bc6e7275c3b305386892ad5a"
+      "bytes": 776148,
+      "sha256": "dc1e6d673281b9de6393eb6ce945ad91cbbaf60b3c8a8b058528329ab21a44e0"
     },
     {
       "path": "dist/licenses/FAUST-COPYING.txt",
@@ -99,8 +104,8 @@
     },
     {
       "path": "dist/midi-room-local.html",
-      "bytes": 3298760,
-      "sha256": "cf06e17fe5325f6b0b98ffc9b4fdeba0ad6341b63cd48138a97f5bea1fea3131"
+      "bytes": 3300835,
+      "sha256": "6cc222593662e73b3408907036cadd3a162e73b0ed901325cc47f43fb33536eb"
     },
     {
       "path": "dist/midi.js",
@@ -114,8 +119,8 @@
     },
     {
       "path": "dist/style.css",
-      "bytes": 14965,
-      "sha256": "599ea0f719a0f3d1bdec18f6cf3fecea8ab8d1d1128f230d6262241b0b47ff8c"
+      "bytes": 15860,
+      "sha256": "7e2b7eda83d0ab11ba647fd5989386aeffb42e12741e1d942997fa1761573524"
     },
     {
       "path": "dist/surface-router.js",
@@ -125,7 +130,7 @@
     {
       "path": "dist/sw.js",
       "bytes": 1836,
-      "sha256": "8ffbbec1496f8d7a26fc2e048c2c355e6c82f05cc5b00eb6ffa7ff94cc951de1"
+      "sha256": "bc0c6c53b6cfee90c624468bb673e9822a8105a5917d18b0d132fc65ea3c5cf8"
     },
     {
       "path": "dist/wish-config.js",
@@ -154,18 +159,18 @@
     },
     {
       "path": "docs/PRODUCTION-COMPATIBILITY.md",
-      "bytes": 4581,
-      "sha256": "8cf390e4bb38cc4187a8b806a2792fa21e53d5ce4be070b4ba4d6dadec585800"
+      "bytes": 5949,
+      "sha256": "427d2cc565ca19ead2a08ff403846ea5f5aa6b1895109203000fb5e9a8483c94"
     },
     {
       "path": "docs/PRODUCTION-LICENSE-INVENTORY.md",
-      "bytes": 4605,
-      "sha256": "99b1794fb7471a0de6afee3a7d926344506a78bfe3f889aa7da88bc9f1558e08"
+      "bytes": 4617,
+      "sha256": "1d8ef2b1c53e199b9ed77c134132afc0f32ad2ec317b057bff7f802aff28fc38"
     },
     {
       "path": "package.json",
-      "bytes": 819,
-      "sha256": "1eff14b3605c065b31b5fc4eb1e08c0fb32f49e7cb1314e42d9063ac61d8abba"
+      "bytes": 935,
+      "sha256": "63490056b40e1070a507a29f3153113517e7d0d1dae70a9bf8b9d0d42b8b6609"
     },
     {
       "path": "plugin-examples/bloom-drive.rack.json",
@@ -279,8 +284,8 @@
     },
     {
       "path": "src/lucky/tests/render-evaluation.cjs",
-      "bytes": 4184,
-      "sha256": "4e6edd3154715aeb050b7f38d8cc7a4d706040ed8628815695350d9ab83c46e7"
+      "bytes": 4587,
+      "sha256": "4cd30e5f5d5dc4f352a8b347eecfd15ccd119209d87ec1778096cd0c6662f584"
     },
     {
       "path": "src/rack/build-rack.py",
@@ -289,8 +294,8 @@
     },
     {
       "path": "src/rack/engine.js",
-      "bytes": 12394,
-      "sha256": "8df200d0ba0a9b83adbb70419ffb6c7d94d0b78e8b4d8ef0c7c7e5f079779ce9"
+      "bytes": 13017,
+      "sha256": "c6065709f0be7bdd76bea6d605104c4f7236ce6ed3ae5867ba825a46429b4bd4"
     },
     {
       "path": "src/rack/rack.html",
@@ -349,8 +354,8 @@
     },
     {
       "path": "src/triton/build-triton.py",
-      "bytes": 11535,
-      "sha256": "d49e58143164f94dc01debf3e5da4e06ce18c29c6aed0513c5eedad0b6b91476"
+      "bytes": 12666,
+      "sha256": "4a8bf02a04dd2048cd1ee24cfdbeaeab58b2a50616e7e40161a8f9d20423a59b"
     },
     {
       "path": "src/triton/inherited-runtime.html",
@@ -478,14 +483,24 @@
       "sha256": "25586fe98b9054ad909a4a24c6a2965ceee40ade954e100f0618c00bfa6bbd8d"
     },
     {
+      "path": "tools/production-csp-check.mjs",
+      "bytes": 6759,
+      "sha256": "0fab0d86a5a0bb8eeb241247f8dca3f820b034821cd8f128066ec4eed25bd347"
+    },
+    {
+      "path": "tools/production-header-check.mjs",
+      "bytes": 4161,
+      "sha256": "0a90e77f1b786fd78442f6fdc49c096ae08e2eb23b6a682411b17a57304f2d45"
+    },
+    {
       "path": "tools/production-lifecycle-check.mjs",
       "bytes": 6881,
       "sha256": "b24d27e757382eada233c44ae7fe2dcef7756bd3c5dad3f45b53a6c5df1b1917"
     },
     {
       "path": "tools/production-offline-check.mjs",
-      "bytes": 4723,
-      "sha256": "a38a1ee6a6548c4b9189b06a212f5d52091f50fa4eeb403e231dc01666259639"
+      "bytes": 5239,
+      "sha256": "98dc9a06fb9655f25cc67902c32ac1e15bff851f2b9f2edd9f082466e3b056db"
     }
   ]
 }

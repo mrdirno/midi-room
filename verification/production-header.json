@@ -1,0 +1,239 @@
+{
+  "scope": "Local final header and branding only; no wishes submitted and no audio playback.",
+  "checks": [
+    {
+      "browser": "chromium",
+      "width": 320,
+      "geometry": {
+        "viewport": 320,
+        "scroll": 320,
+        "wish": {
+          "x": 12,
+          "y": 52,
+          "width": 106.515625,
+          "height": 44,
+          "right": 118.515625,
+          "bottom": 96
+        },
+        "shape": {
+          "x": 187.71875,
+          "y": 52,
+          "width": 120.28125,
+          "height": 44,
+          "right": 308,
+          "bottom": 96
+        }
+      },
+      "wishEscapeFocus": true
+    },
+    {
+      "browser": "chromium",
+      "width": 390,
+      "geometry": {
+        "viewport": 390,
+        "scroll": 390,
+        "wish": {
+          "x": 12,
+          "y": 52,
+          "width": 106.515625,
+          "height": 44,
+          "right": 118.515625,
+          "bottom": 96
+        },
+        "shape": {
+          "x": 257.71875,
+          "y": 52,
+          "width": 120.28125,
+          "height": 44,
+          "right": 378,
+          "bottom": 96
+        }
+      },
+      "wishEscapeFocus": true
+    },
+    {
+      "browser": "chromium",
+      "width": 768,
+      "geometry": {
+        "viewport": 768,
+        "scroll": 768,
+        "wish": {
+          "x": 202.328125,
+          "y": 13.5,
+          "width": 118.515625,
+          "height": 44,
+          "right": 320.84375,
+          "bottom": 57.5
+        },
+        "shape": {
+          "x": 332.84375,
+          "y": 13.5,
+          "width": 132.28125,
+          "height": 44,
+          "right": 465.125,
+          "bottom": 57.5
+        }
+      },
+      "wishEscapeFocus": true
+    },
+    {
+      "browser": "chromium",
+      "width": 1280,
+      "geometry": {
+        "viewport": 1280,
+        "scroll": 1280,
+        "wish": {
+          "x": 458.328125,
+          "y": 13.5,
+          "width": 118.515625,
+          "height": 44,
+          "right": 576.84375,
+          "bottom": 57.5
+        },
+        "shape": {
+          "x": 588.84375,
+          "y": 13.5,
+          "width": 132.28125,
+          "height": 44,
+          "right": 721.125,
+          "bottom": 57.5
+        }
+      },
+      "wishEscapeFocus": true
+    },
+    {
+      "browser": "chromium",
+      "brand": {
+        "heading": "TRITON Rack",
+        "brand": "DRINOMAN",
+        "logo": {
+          "left": 964,
+          "right": 1076
+        },
+        "dial": {
+          "left": 860,
+          "right": 956
+        },
+        "overlap": false
+      },
+      "posts": 0
+    },
+    {
+      "browser": "webkit",
+      "width": 320,
+      "geometry": {
+        "viewport": 320,
+        "scroll": 320,
+        "wish": {
+          "x": 12,
+          "y": 52,
+          "width": 104.109375,
+          "height": 44,
+          "right": 116.109375,
+          "bottom": 96
+        },
+        "shape": {
+          "x": 187.671875,
+          "y": 52,
+          "width": 120.328125,
+          "height": 44,
+          "right": 308,
+          "bottom": 96
+        }
+      },
+      "wishEscapeFocus": true
+    },
+    {
+      "browser": "webkit",
+      "width": 390,
+      "geometry": {
+        "viewport": 390,
+        "scroll": 390,
+        "wish": {
+          "x": 12,
+          "y": 52,
+          "width": 104.109375,
+          "height": 44,
+          "right": 116.109375,
+          "bottom": 96
+        },
+        "shape": {
+          "x": 257.671875,
+          "y": 52,
+          "width": 120.328125,
+          "height": 44,
+          "right": 378,
+          "bottom": 96
+        }
+      },
+      "wishEscapeFocus": true
+    },
+    {
+      "browser": "webkit",
+      "width": 768,
+      "geometry": {
+        "viewport": 768,
+        "scroll": 768,
+        "wish": {
+          "x": 203.53125,
+          "y": 13.5,
+          "width": 116.109375,
+          "height": 44,
+          "right": 319.640625,
+          "bottom": 57.5
+        },
+        "shape": {
+          "x": 331.640625,
+          "y": 13.5,
+          "width": 132.328125,
+          "height": 44,
+          "right": 463.96875,
+          "bottom": 57.5
+        }
+      },
+      "wishEscapeFocus": true
+    },
+    {
+      "browser": "webkit",
+      "width": 1280,
+      "geometry": {
+        "viewport": 1280,
+        "scroll": 1280,
+        "wish": {
+          "x": 459.53125,
+          "y": 13.5,
+          "width": 116.109375,
+          "height": 44,
+          "right": 575.640625,
+          "bottom": 57.5
+        },
+        "shape": {
+          "x": 587.640625,
+          "y": 13.5,
+          "width": 132.328125,
+          "height": 44,
+          "right": 719.96875,
+          "bottom": 57.5
+        }
+      },
+      "wishEscapeFocus": true
+    },
+    {
+      "browser": "webkit",
+      "brand": {
+        "heading": "TRITON Rack",
+        "brand": "DRINOMAN",
+        "logo": {
+          "left": 964,
+          "right": 1076
+        },
+        "dial": {
+          "left": 860,
+          "right": 956
+        },
+        "overlap": false
+      },
+      "posts": 0
+    }
+  ]
+}

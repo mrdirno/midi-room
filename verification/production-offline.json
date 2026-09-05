@@ -1,5 +1,5 @@
 {
-  "at": "2026-09-05T19:06:40.269Z",
+  "at": "2026-09-05T19:33:04.375Z",
   "scope": "Real Playwright browser offline cache and waiting-update checks. App installation OS prompts not exercised.",
   "checks": [
     {
@@ -7,19 +7,22 @@
       "check": "six built-ins and catalog reopen offline",
       "networkMode": "Browser offline flag plus origin unavailable",
       "cache": [
-        "midi-room:/midi-room/:9fc791f85bb8d621"
+        "midi-room:/midi-room/:b36b89ce6e57a39b"
       ],
       "files": 24
     },
     {
       "browser": "chromium",
-      "check": "new worker waits while conductor keeps playing"
+      "check": "new worker waits while conductor keeps playing",
+      "updateRequest": {
+        "resolved": true
+      }
     },
     {
       "browser": "chromium",
       "check": "explicit update reloads stopped, retires old version cache",
       "caches": [
-        "midi-room:/midi-room/:offline-test-update-9fc791f85bb8d621"
+        "midi-room:/midi-room/:offline-test-update-b36b89ce6e57a39b"
       ]
     },
     {
@@ -27,19 +30,22 @@
       "check": "six built-ins and catalog reopen offline",
       "networkMode": "Origin unavailable; Playwright WebKit offline flag produced an internal navigation error",
       "cache": [
-        "midi-room:/midi-room/:9fc791f85bb8d621"
+        "midi-room:/midi-room/:b36b89ce6e57a39b"
       ],
       "files": 24
     },
     {
       "browser": "webkit",
-      "check": "new worker waits while conductor keeps playing"
+      "check": "new worker waits while conductor keeps playing",
+      "updateRequest": {
+        "resolved": true
+      }
     },
     {
       "browser": "webkit",
       "check": "explicit update reloads stopped, retires old version cache",
       "caches": [
-        "midi-room:/midi-room/:offline-test-update-9fc791f85bb8d621"
+        "midi-room:/midi-room/:offline-test-update-b36b89ce6e57a39b"
       ]
     }
   ],

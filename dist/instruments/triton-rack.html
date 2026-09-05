@@ -107,9 +107,9 @@ h1,h2,h3{font-weight:600;letter-spacing:.02em;}
 .blabel{position:absolute;font-size:8px;font-weight:700;letter-spacing:.1em;color:var(--print);text-transform:uppercase;text-align:center;}
 
 /* logo block */
-.logo{position:absolute;right:64px;top:30px;text-align:right;color:var(--print);}
-.logo .korg{font-weight:800;font-size:26px;letter-spacing:.14em;color:#3d3117;}
-.logo .model{font-weight:700;font-size:15px;letter-spacing:.06em;margin-top:2px;}
+.logo{position:absolute;right:44px;top:30px;max-width:112px;text-align:right;color:var(--print);}
+.logo .korg{font-weight:800;font-size:15px;letter-spacing:.06em;color:#3d3117;}
+.logo .model{font-weight:700;font-size:13px;letter-spacing:.06em;margin-top:2px;}
 .logo .tag{font-size:8px;letter-spacing:.14em;margin-top:3px;color:var(--print-dim);}
 .midi-led{position:absolute;width:7px;height:7px;border-radius:50%;background:var(--led-off);}
 .midi-led.on{background:var(--led-red);box-shadow:0 0 7px var(--led-red);}
@@ -525,7 +525,7 @@ body[data-instrument="improvisator"] h1{font-size:clamp(2rem,7vw,3.4rem)}
 
 <div class="masthead">
   <div class="eyebrow">Web Audio Recreation · Single File · Soul Pilot</div>
-  <h1>KORG TRITON-Rack</h1>
+  <h1>TRITON Rack</h1>
   <p>HI Module · conducted by Improvisator ∞</p>
 </div>
 
@@ -688,8 +688,8 @@ body[data-instrument="improvisator"] h1{font-size:clamp(2rem,7vw,3.4rem)}
 
   
   <div class="logo">
-    <div class="korg">KORG</div>
-    <div class="model">TRITON-Rack</div>
+    <div class="korg">DRINOMAN</div>
+    <div class="model">TRITON Rack</div>
     <div class="tag">EXPANDABLE HI MODULE / SAMPLER</div>
   </div>
   <div class="sect-label" style="right:64px;top:120px;">Midi</div>
@@ -886,7 +886,7 @@ body[data-instrument="improvisator"] h1{font-size:clamp(2rem,7vw,3.4rem)}
     <li><a href="https://archive.org/details/korg-triton-rack-service-manual" target="_blank" rel="noopener">Service manual (Internet Archive)</a> — circuit diagrams, diagnostics, parts list</li>
     <li><a href="https://www.manualslib.com/manual/463500/Korg-Triton-Rack.html" target="_blank" rel="noopener">Basic manual (ManualsLib)</a> — the 118-page owner's guide</li>
   </ul>
-  <p class="fine">Honesty note: every sound here is synthesized live in your browser with the Web Audio API, modeling the HI signal flow (oscillator → resonant filter → amp, with envelopes, LFOs, dual arpeggiator, insert and master effects, 62-voice cap and voice stealing). No Korg ROM samples or firmware are included — those belong to Korg. Panel behavior follows the TRITON-Rack basic manual's mode structure; the test-mode key combos mirror the ones documented in Triton-family service manuals.</p>
+  <p class="fine">Honesty note: every sound here is synthesized live in your browser with the Web Audio API, modeling the HI signal flow (oscillator → resonant filter → amp, with envelopes, LFOs, dual arpeggiator, insert and master effects, 62-voice cap and voice stealing). This independent DRINOMAN project is not affiliated with Korg. No Korg ROM samples or firmware are included — those belong to Korg. Panel behavior follows the TRITON-Rack basic manual's mode structure; the test-mode key combos mirror the ones documented in Triton-family service manuals.</p>
 </div>
 
 <div class="pane" id="pane-export">

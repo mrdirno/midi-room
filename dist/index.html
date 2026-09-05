@@ -6,6 +6,7 @@
   <meta name="theme-color" content="#101114">
   <meta name="description" content="Six instruments by DRINOMAN. Play with touch or computer keys; connect hardware MIDI where supported.">
   <title>MIDI Room</title>
+  <link rel="canonical" href="https://persona500.com/midi-room/">
   <link rel="icon" href="./icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="./icon-192.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -16,6 +17,10 @@
 <body data-default-instrument="catalog">
   <header class="toolbar">
     <a class="brand" href="./" aria-label="MIDI Room home"><svg viewBox="0 0 28 28" aria-hidden="true"><path d="M4 6h20v17H4zM10 6v17M17 6v17"/><path class="fill" d="M8 6h4v10H8zM15 6h4v10h-4z"/></svg><span>MIDI<span class="brand-soft"> ROOM</span></span></a>
+    <nav class="room-actions" aria-label="Make this room yours">
+      <button id="wishButton" type="button" data-wish-well aria-haspopup="dialog">Wish It Better <span aria-hidden="true">✧</span></button>
+      <a href="https://persona500.com/midi-room-card" data-build-your-own>Shape your own <span aria-hidden="true">↗</span></a>
+    </nav>
     <div class="tools">
       <button id="midiButton" class="midi-button" type="button" aria-label="Connect MIDI"><i id="midiLight"></i><span id="midiLabel">MIDI</span></button>
       <button id="openButton" class="open-button" type="button"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 4h6l2 3h6v10H3zM10 10v5M7.5 12.5h5"/></svg><span>Open</span></button>
@@ -65,7 +70,6 @@
     <button class="row-button" id="savePortable" type="button">Save portable MIDI Room <span aria-hidden="true">↓</span></button>
     <button class="row-button" id="closeInstrument" type="button" disabled>Close instrument <span aria-hidden="true">×</span></button>
     <button class="row-button" id="roomCheck" type="button">Connection log <span aria-hidden="true">↗</span></button>
-    <button class="row-button" id="wishButton" type="button">Wish It Better <span aria-hidden="true">✧</span></button>
     <details><summary>Local files &amp; compatibility</summary><p>Open reads a saved standalone HTML instrument, DSP plugin or rack JSON on this device. The file is not uploaded. DSP Rack shares audio among compiled instruments and effects; ordinary HTML instruments keep separate audio engines.</p><p>Save portable MIDI Room keeps this player and all six built-in instruments in one HTML file. The installed room also keeps its built-ins available offline after the first complete visit.</p><p>Touch and computer keys use Web Audio. Hardware MIDI is optional and requires a browser that offers Web MIDI. If hardware MIDI is unavailable, you can still play the built-in instruments.</p><p>Imported files that need separate assets, internet access, MIDI output or SysEx are not supported here. Stop cancels active performances and notes. Use the instrument’s Play control or keys to start again.</p></details>
   </dialog>
   <dialog id="unsupported" aria-labelledby="unsupportedTitle">

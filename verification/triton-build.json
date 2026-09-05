@@ -3,9 +3,37 @@
   "source": "inherited-runtime.html",
   "sourceSha256": "4eced0d8da0d9623c11014a29ba57ecb9751ff735ea1c5bd647478177a219404",
   "artifact": "dist/instruments/triton-rack.html",
-  "artifactSha256": "fe970bd96d0a1eee22b0a02364a5eae9cd3062c7bc6e7275c3b305386892ad5a",
-  "bytes": 776070,
+  "artifactSha256": "dc1e6d673281b9de6393eb6ce945ad91cbbaf60b3c8a8b058528329ab21a44e0",
+  "bytes": 776148,
   "countedPatches": [
+    {
+      "anchor": "<h1>KORG TRITON-Rack</h1>",
+      "count": 1
+    },
+    {
+      "anchor": "<div class=\"korg\">KORG</div>",
+      "count": 1
+    },
+    {
+      "anchor": ".logo{position:absolute;right:64px;top:30px;text-align:right;color:var(--print);}",
+      "count": 1
+    },
+    {
+      "anchor": ".logo .korg{font-weight:800;font-size:26px;letter-spacing:.14em;color:#3d3117;}",
+      "count": 1
+    },
+    {
+      "anchor": "<div class=\"model\">TRITON-Rack</div>",
+      "count": 1
+    },
+    {
+      "anchor": ".logo .model{font-weight:700;font-size:15px;letter-spacing:.06em;margin-top:2px;}",
+      "count": 1
+    },
+    {
+      "anchor": "No Korg ROM samples or firmware are included \u2014 those belong to Korg.",
+      "count": 1
+    },
     {
       "anchor": "let activeVoices=0, voiceList=[]",
       "count": 1

@@ -9,6 +9,8 @@ This is the September 5, 2026 local qualification record. Passing it does not es
 | Lucky composition, PCM renderer, MIDI and public-only build regressions | 17 / 17 | `npm test` (Lucky test group) |
 | Delete and rebuild six instruments, portable page and service worker without private references | 8 / 8 byte-identical artifacts | `verification/public-rebuild.json` |
 | Host catalog, six instrument launches/play/Stop, and responsive widths | 20 / 20 check records: 10 per browser engine | `verification/production-browser.json` |
+| Visible wish access, focus return, header routes and narrow-screen branding | 10 / 10 check records: 5 per engine | `verification/production-header.json`; `npm run test:header` |
+| Scoped content-security policy and DSP worker lifecycle | 6 / 6 route policies; 2 / 2 browser engine runs | `verification/production-csp.json`; `npm run test:csp` |
 | Touch, generated MIDI save tray, imported sandbox, teardown and conductor stop | 16 / 16: 8 per engine | `verification/production-lifecycle.json` |
 | Cached reopening, waiting worker, explicit stopped update | 6 / 6: 3 per engine; reopening covers all six instruments | `verification/production-offline.json` |
 | Lucky standalone interaction and lifecycle | 22 / 22: 11 per engine | `node src/lucky/tests/browser-check.cjs` |
@@ -24,7 +26,7 @@ Lucky's development seeds were 42, 731 and 20260905. An initial 528-world sweep 
 
 An earlier sample sweep found two failures caused by extreme metallic-oscillator ratios at low sample rates. Those seeds became explicit regressions; the repaired renderer passed a fresh 22-style sweep. Its maximum measured peak was 0.550047, minimum RMS 0.055430, with zero non-finite samples and zero output-protection clamps. This covers the sampled durations and rates, not every possible seed or an indefinitely running session.
 
-Six separate 16-second audition excerpts were generated for review. No subjective listening verdict was established. CI can regenerate these temporary WAVs, but its uploaded reports and Pages artifact exclude them. Structure, nonzero signal and clean stops do not prove musical taste, cultural authenticity, rights clearance, physical output quality or acceptable device latency.
+Six separate 16-second audition excerpts were generated for review. No subjective listening verdict was established. These excerpts have no extra assertions and are not a CI quality check: CI uses `npm run test:lucky:audio -- --skip-auditions`, retaining all 22 asserted PCM holdouts. The normal local command still generates the audition WAVs. Uploaded reports and the Pages artifact exclude them. Structure, nonzero signal and clean stops do not prove musical taste, cultural authenticity, rights clearance, physical output quality or acceptable device latency.
 
 Installed Safari, physical iPhones/iPads, hardware MIDI controllers and OS installation prompts were not tested. Playwright WebKit is not a substitute for those checks. Chromium used its offline flag plus an unavailable origin; WebKit used an unavailable origin because its simulated offline flag failed internally. This establishes cache reopening in those runners, not an iOS airplane-mode result.
 

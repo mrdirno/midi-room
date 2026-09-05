@@ -12,7 +12,9 @@
     "test:lifecycle": "node tools/production-lifecycle-check.mjs",
     "test:offline": "node tools/production-offline-check.mjs",
     "test:lucky:heldout": "node src/lucky/tests/held-out-evaluation.cjs",
-    "test:lucky:audio": "node src/lucky/tests/render-evaluation.cjs"
+    "test:lucky:audio": "node src/lucky/tests/render-evaluation.cjs",
+    "test:csp": "node tools/production-csp-check.mjs",
+    "test:header": "node tools/production-header-check.mjs"
   },
   "devDependencies": {
     "playwright": "1.62.1"

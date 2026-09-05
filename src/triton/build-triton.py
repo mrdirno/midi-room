@@ -22,6 +22,16 @@ def replace(old, new, count=1):
     html = html.replace(old, new)
     patches.append({'anchor': old[:110], 'count': count})
 
+# Public faceplate identifies this independent DRINOMAN instrument. Historical
+# hardware references remain in its source and explanatory notes.
+replace('<h1>KORG TRITON-Rack</h1>', '<h1>TRITON Rack</h1>')
+replace('<div class="korg">KORG</div>', '<div class="korg">DRINOMAN</div>')
+replace('.logo{position:absolute;right:64px;top:30px;text-align:right;color:var(--print);}', '.logo{position:absolute;right:44px;top:30px;max-width:112px;text-align:right;color:var(--print);}')
+replace('.logo .korg{font-weight:800;font-size:26px;letter-spacing:.14em;color:#3d3117;}', '.logo .korg{font-weight:800;font-size:15px;letter-spacing:.06em;color:#3d3117;}')
+replace('<div class="model">TRITON-Rack</div>', '<div class="model">TRITON Rack</div>')
+replace('.logo .model{font-weight:700;font-size:15px;letter-spacing:.06em;margin-top:2px;}', '.logo .model{font-weight:700;font-size:13px;letter-spacing:.06em;margin-top:2px;}')
+replace('No Korg ROM samples or firmware are included — those belong to Korg.', 'This independent DRINOMAN project is not affiliated with Korg. No Korg ROM samples or firmware are included — those belong to Korg.')
+
 replace('let activeVoices=0, voiceList=[]', (root/'transport.js').read_text()+'\nlet activeVoices=0, voiceList=[]')
 replace('state.tempo=Math.min(240,Math.max(40,state.tempo+d));', 'TritonTransport.set(Math.min(240,Math.max(40,state.tempo+d)),{reason:"rack tempo control"});')
 replace('if(!dreaming) state.tempo=cur.tempo||100;', 'TritonTransport.preference(cur.tempo||100,"factory patch preference");', 2)
@@ -101,7 +111,7 @@ out=project/'dist/instruments/triton-rack.html'
 out.parent.mkdir(parents=True,exist_ok=True)
 html=html.replace('<body class="soulMode">','<body class="soulMode engineOpen" data-instrument="triton-rack">')
 out.write_text(html)
-improvisator=html.replace('<body class="soulMode engineOpen" data-instrument="triton-rack">','<body class="soulMode" data-instrument="improvisator">').replace('<title>TRITON Rack · MIDI Room</title>','<title>Improvisator · MIDI Room</title>').replace('<h1>KORG TRITON-Rack</h1>','<h1>Improvisator ∞</h1>').replace('<strong>TRITON Rack</strong>','<strong>Improvisator</strong>')
+improvisator=html.replace('<body class="soulMode engineOpen" data-instrument="triton-rack">','<body class="soulMode" data-instrument="improvisator">').replace('<title>TRITON Rack · MIDI Room</title>','<title>Improvisator · MIDI Room</title>').replace('<h1>TRITON Rack</h1>','<h1>Improvisator ∞</h1>').replace('<strong>TRITON Rack</strong>','<strong>Improvisator</strong>')
 (project/'dist/instruments/improvisator.html').write_text(improvisator)
 proof={'originalSourceSha256':provenance['original_sha256'],'source':source.name,'sourceSha256':hashlib.sha256(raw).hexdigest(),'artifact':str(out.relative_to(project)), 'artifactSha256':hashlib.sha256(out.read_bytes()).hexdigest(),'bytes':out.stat().st_size,'countedPatches':patches,'donorChanges':['idempotent Soul start','cancel future pitched/drum source audio, including transients'],'notAdopted':['Ensemble conductor','Ensemble sound defaults','LiveKeys UI','unverified history claims']}
 (project/'verification').mkdir(exist_ok=True)

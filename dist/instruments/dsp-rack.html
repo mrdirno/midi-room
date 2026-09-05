@@ -124,9 +124,9 @@ async function verifyPlugin(value){
 // Author: Aldrin Payopay. One AudioContext owns a bounded DSP graph.
 
 function moduleURL(source) {
-  const bytes=new TextEncoder().encode(source); let binary='';
-  for (const b of bytes) binary+=String.fromCharCode(b);
-  return 'data:text/javascript;base64,'+btoa(binary);
+  // Blob URLs retain the creating context and work with the host's worker-src
+  // policy. Callers revoke each URL after admission/module loading settles.
+  return URL.createObjectURL(new Blob([source],{type:'text/javascript'}));
 }
 
 /** Run a new engine off the UI/audio threads before admitting it to the rack. */
@@ -145,14 +145,16 @@ function preflightPlugin(plugin,runtimeSource,rate,timeout=5000,signal=null) {
   }catch(error){postMessage({ok:false,error:error.message});}};`;
   return new Promise((resolve,reject)=>{
     if(signal?.aborted){reject(new Error('DSP preflight cancelled.'));return;}
-    const worker=new Worker(moduleURL(code));
+    const url=moduleURL(code);
+    let worker;
+    try{worker=new Worker(url);}catch(error){URL.revokeObjectURL(url);reject(error);return;}
     let settled=false;
     const timer=setTimeout(()=>finish(new Error('DSP preflight exceeded its time budget.')),timeout);
     const abort=()=>finish(new Error('DSP preflight cancelled.'));signal?.addEventListener('abort',abort,{once:true});
-    function finish(error,result){if(settled)return;settled=true;clearTimeout(timer);signal?.removeEventListener('abort',abort);worker.terminate();error?reject(error):resolve(result);}
+    function finish(error,result){if(settled)return;settled=true;clearTimeout(timer);signal?.removeEventListener('abort',abort);worker.terminate();URL.revokeObjectURL(url);error?reject(error):resolve(result);}
     worker.onerror=()=>finish(new Error('DSP preflight worker failed.'));
     worker.onmessage=e=>e.data.ok?finish(null,e.data):finish(new Error(e.data.error));
-    worker.postMessage({build:plugin.engine.build,rate});
+    try{worker.postMessage({build:plugin.engine.build,rate});}catch(error){finish(error);}
   });
 }
 
@@ -221,7 +223,15 @@ class RackAudio {
         const code='const CARD_METADATA='+JSON.stringify(meta)+';\nconst CARD_PARAMETERS=CARD_METADATA.parameters;\n'+this.runtimeSource+'\n'+this.workletSource.replace("registerProcessor('dsp-card',DspCardProcessor)",'registerProcessor('+JSON.stringify(name)+',DspCardProcessor)');
         const module=await WebAssembly.compile(Uint8Array.from(atob(build.wasm),c=>c.charCodeAt(0)));
         if(this.disposed)throw Error('Rack initialization cancelled.');
-        await context.audioWorklet.addModule(moduleURL(code));
+        const workletURL=moduleURL(code);
+        try{
+          try{await context.audioWorklet.addModule(workletURL);}
+          catch(error){
+            // WebKit can reject blob:null worklets in an opaque frame with a
+            // CORS error. Its inline worklet path retains sandbox isolation.
+            await context.audioWorklet.addModule('data:text/javascript;charset=utf-8,'+encodeURIComponent(code));
+          }
+        }finally{URL.revokeObjectURL(workletURL);}
         if(this.disposed)throw Error('Rack initialization cancelled.');
         const node=this.track(new AudioWorkletNode(context,name,{numberOfInputs:meta.inputs?1:0,numberOfOutputs:1,outputChannelCount:[meta.outputs],channelCount:Math.max(1,meta.inputs),channelCountMode:'explicit',processorOptions:{module}}));
         node.onprocessorerror=()=>this.fault('A DSP processor stopped. The rack was muted.');

@@ -1,7 +1,7 @@
 {
-  "at": "2026-09-05T19:03:45.822Z",
+  "at": "2026-09-05T19:32:44.726Z",
   "scope": "Real Playwright Chromium and WebKit rendering/audio with scripted trusted pointer/keyboard gestures. No physical hardware MIDI, installed Safari app, iPhone or subjective listening claim.",
-  "base": "http://127.0.0.1:64826/nested/midi-room/",
+  "base": "http://127.0.0.1:53580/nested/midi-room/",
   "checks": [
     {
       "browser": "chromium",
@@ -20,8 +20,8 @@
       "sandbox": "allow-scripts allow-downloads allow-modals",
       "audio": {
         "state": "running",
-        "time": 0.4106666666666667,
-        "peak": 0.39870989322662354,
+        "time": 0.3413333333333333,
+        "peak": 0.3966030478477478,
         "sampleRate": 48000
       },
       "active": {
@@ -72,7 +72,7 @@
                 "effective": 132,
                 "accepted": false,
                 "revision": 0,
-                "at": 1788635026685
+                "at": 1788636766045
               }
             ]
           },
@@ -102,8 +102,8 @@
       "sandbox": "allow-scripts allow-downloads allow-modals",
       "audio": {
         "state": "running",
-        "time": 0.336,
-        "peak": 0.4145191013813019,
+        "time": 0.192,
+        "peak": 0.30306321382522583,
         "sampleRate": 48000
       },
       "active": {
@@ -148,7 +148,7 @@
               "effective": 132,
               "accepted": false,
               "revision": 0,
-              "at": 1788635027929
+              "at": 1788636767486
             }
           ]
         },
@@ -211,7 +211,7 @@
                 "effective": 132,
                 "accepted": false,
                 "revision": 0,
-                "at": 1788635027929
+                "at": 1788636767486
               }
             ]
           },
@@ -302,7 +302,7 @@
               "note": 48,
               "start": 0.005333333333333333,
               "held": false,
-              "releaseAt": 0.19333333333333336
+              "releaseAt": 0.07066666666666667
             }
           ],
           "field": {
@@ -323,8 +323,8 @@
       "sandbox": "allow-scripts allow-downloads allow-modals",
       "audio": {
         "state": "running",
-        "time": 0.304,
-        "peak": 0.028023388236761093,
+        "time": 0.010666666666666666,
+        "peak": 0.0003356801171321422,
         "sampleRate": 48000
       },
       "active": {
@@ -335,7 +335,7 @@
         "held": 1,
         "modules": 2,
         "baseLatency": 0.005333333333333333,
-        "outputLatency": 0.024,
+        "outputLatency": 0,
         "receipts": [
           {
             "instanceId": "bloom-one",
@@ -558,8 +558,8 @@
         "state": "running",
         "mode": "worklet",
         "playing": true,
-        "time": 0.27466666666666667,
-        "peak": 0.18290159106254578,
+        "time": 0.25333333333333335,
+        "peak": 0.19968399703502654,
         "nonFinite": 0
       },
       "active": {
@@ -578,17 +578,17 @@
         },
         "playing": true,
         "bar": 0,
-        "time": 0.27466666666666667,
+        "time": 0.25333333333333335,
         "mode": "worklet",
         "audioState": "running",
         "destroyed": false,
         "stats": {
           "playing": true,
-          "clock": 13056,
-          "peak": 0.18290159106254578,
+          "clock": 12032,
+          "peak": 0.19968399703502654,
           "nonFinite": 0,
           "clamped": 0,
-          "recoveries": 1,
+          "recoveries": 0,
           "liveNotes": 0,
           "cpuLoad": 0.35
         },
@@ -612,17 +612,17 @@
           },
           "playing": false,
           "bar": 0,
-          "time": 0.27466666666666667,
+          "time": 0.25333333333333335,
           "mode": "worklet",
           "audioState": "suspended",
           "destroyed": false,
           "stats": {
             "playing": true,
-            "clock": 13056,
-            "peak": 0.18290159106254578,
+            "clock": 12032,
+            "peak": 0.19968399703502654,
             "nonFinite": 0,
             "clamped": 0,
-            "recoveries": 1,
+            "recoveries": 0,
             "liveNotes": 0,
             "cpuLoad": 0.35
           },
@@ -666,8 +666,8 @@
       "sandbox": "allow-scripts allow-downloads allow-modals",
       "audio": {
         "state": "running",
-        "time": 0.408,
-        "peak": 0.3961493670940399,
+        "time": 0.296,
+        "peak": 0.39911776781082153,
         "sampleRate": 48000
       },
       "active": {
@@ -718,7 +718,7 @@
                 "effective": 132,
                 "accepted": false,
                 "revision": 0,
-                "at": 1788635033305
+                "at": 1788636804638
               }
             ]
           },
@@ -748,8 +748,8 @@
       "sandbox": "allow-scripts allow-downloads allow-modals",
       "audio": {
         "state": "running",
-        "time": 0.31733333333333336,
-        "peak": 0.418024480342865,
+        "time": 0.21066666666666667,
+        "peak": 0.2512175142765045,
         "sampleRate": 48000
       },
       "active": {
@@ -794,7 +794,7 @@
               "effective": 132,
               "accepted": false,
               "revision": 0,
-              "at": 1788635034524
+              "at": 1788636806144
             }
           ]
         },
@@ -857,7 +857,7 @@
                 "effective": 132,
                 "accepted": false,
                 "revision": 0,
-                "at": 1788635034524
+                "at": 1788636806144
               }
             ]
           },
@@ -925,7 +925,7 @@
             "owner": "touch:key:0",
             "channel": 0,
             "note": 48,
-            "start": 0.005333333333333333,
+            "start": 0.032,
             "held": true,
             "releaseAt": null
           }
@@ -946,9 +946,9 @@
               "owner": "touch:key:0",
               "channel": 0,
               "note": 48,
-              "start": 0.005333333333333333,
+              "start": 0.032,
               "held": false,
-              "releaseAt": 0.17733333333333334
+              "releaseAt": 0.22
             }
           ],
           "field": {
@@ -969,8 +969,8 @@
       "sandbox": "allow-scripts allow-downloads allow-modals",
       "audio": {
         "state": "running",
-        "time": 0.312,
-        "peak": 0.02946663089096546,
+        "time": 0.04,
+        "peak": 0.017986156046390533,
         "sampleRate": 48000
       },
       "active": {
@@ -981,7 +981,7 @@
         "held": 1,
         "modules": 2,
         "baseLatency": 0.0026666666666666666,
-        "outputLatency": 0.015625,
+        "outputLatency": 0.16,
         "receipts": [
           {
             "instanceId": "bloom-one",
@@ -1422,8 +1422,8 @@
         "state": "running",
         "mode": "worklet",
         "playing": true,
-        "time": 0.304,
-        "peak": 0.15279166251420973,
+        "time": 0.25333333333333335,
+        "peak": 0.19968399703502654,
         "nonFinite": 0
       },
       "active": {
@@ -1442,17 +1442,17 @@
         },
         "playing": true,
         "bar": 0,
-        "time": 0.304,
+        "time": 0.25333333333333335,
         "mode": "worklet",
         "audioState": "running",
         "destroyed": false,
         "stats": {
           "playing": true,
-          "clock": 14464,
-          "peak": 0.15279166251420973,
+          "clock": 12032,
+          "peak": 0.19968399703502654,
           "nonFinite": 0,
           "clamped": 0,
-          "recoveries": 1,
+          "recoveries": 0,
           "liveNotes": 0,
           "cpuLoad": 0.35
         },
@@ -1476,17 +1476,17 @@
           },
           "playing": false,
           "bar": 0,
-          "time": 0.3546666666666667,
+          "time": 0.304,
           "mode": "worklet",
           "audioState": "suspended",
           "destroyed": false,
           "stats": {
             "playing": true,
-            "clock": 14464,
-            "peak": 0.15279166251420973,
+            "clock": 12032,
+            "peak": 0.19968399703502654,
             "nonFinite": 0,
             "clamped": 0,
-            "recoveries": 1,
+            "recoveries": 0,
             "liveNotes": 0,
             "cpuLoad": 0.35
           },

@@ -1,8 +1,8 @@
 {
   "format": "midi-room.production-handoff/1",
-  "generated_at": "2026-09-05T19:07:58.671350+00:00",
-  "status": "Local staged build and public source ready. No deployment or external repository write performed by this agent.",
-  "cache_version": "9fc791f85bb8d621",
+  "generated_at": "2026-09-05T19:37:27.772914+00:00",
+  "status": "Combined public release candidate validated locally; final GitHub CI and Pages deployment pending.",
+  "cache_version": "d899a9d05d6423ad",
   "canonical_page": "https://persona500.com/midi-room/",
   "wish_card_id": "midi-room-card",
   "builtins": [
@@ -17,8 +17,8 @@
   "files": [
     {
       "path": "app.js",
-      "bytes": 45486,
-      "sha256": "ff4d9f163880752e7f7709331668c695cc204dd97c2cf7e1bc26132d81ce3c24"
+      "bytes": 45580,
+      "sha256": "158c4095e592011047db81864ee8513d3204fc86a7c1e67fd9afe72e270ec6e5"
     },
     {
       "path": "bridge.js",
@@ -47,8 +47,8 @@
     },
     {
       "path": "index.html",
-      "bytes": 12368,
-      "sha256": "1e1daa28f18ef5bd32b505f79fd94dc315265b90b403e56526d78766d55eef19"
+      "bytes": 12660,
+      "sha256": "95c222539fb99672da4c6a45ccb47bfbadd8b87b75c386fcdefb3bd84880ca4b"
     },
     {
       "path": "instrument-bus.js",
@@ -62,8 +62,8 @@
     },
     {
       "path": "instruments/dsp-rack.html",
-      "bytes": 195085,
-      "sha256": "4769db6aa5f324358e6d8c6076dc3e7f81e2e14a88b618ea79af668754397673"
+      "bytes": 195708,
+      "sha256": "02c62a40d0348df7bf7d73779239b435cf3f702b2b331b016f5aa1c8aa7bf240"
     },
     {
       "path": "instruments/field-keys.html",
@@ -72,8 +72,8 @@
     },
     {
       "path": "instruments/improvisator.html",
-      "bytes": 776062,
-      "sha256": "1ccc863bde7d5b55871c6f15afa185cbbb7088bd58f8f2a496ce6c7724c3caf1"
+      "bytes": 776145,
+      "sha256": "d69b41236c3a45e37cd5946295947d85fa19bfa4bd7e868121b718da0fb4c510"
     },
     {
       "path": "instruments/lucky-dreamer.html",
@@ -82,8 +82,8 @@
     },
     {
       "path": "instruments/triton-rack.html",
-      "bytes": 776070,
-      "sha256": "fe970bd96d0a1eee22b0a02364a5eae9cd3062c7bc6e7275c3b305386892ad5a"
+      "bytes": 776148,
+      "sha256": "dc1e6d673281b9de6393eb6ce945ad91cbbaf60b3c8a8b058528329ab21a44e0"
     },
     {
       "path": "licenses/FAUST-COPYING.txt",
@@ -107,8 +107,8 @@
     },
     {
       "path": "midi-room-local.html",
-      "bytes": 3298760,
-      "sha256": "cf06e17fe5325f6b0b98ffc9b4fdeba0ad6341b63cd48138a97f5bea1fea3131"
+      "bytes": 3300835,
+      "sha256": "6cc222593662e73b3408907036cadd3a162e73b0ed901325cc47f43fb33536eb"
     },
     {
       "path": "midi.js",
@@ -122,8 +122,8 @@
     },
     {
       "path": "style.css",
-      "bytes": 14965,
-      "sha256": "599ea0f719a0f3d1bdec18f6cf3fecea8ab8d1d1128f230d6262241b0b47ff8c"
+      "bytes": 15860,
+      "sha256": "7e2b7eda83d0ab11ba647fd5989386aeffb42e12741e1d942997fa1761573524"
     },
     {
       "path": "surface-router.js",
@@ -133,7 +133,7 @@
     {
       "path": "sw.js",
       "bytes": 1836,
-      "sha256": "8ffbbec1496f8d7a26fc2e048c2c355e6c82f05cc5b00eb6ffa7ff94cc951de1"
+      "sha256": "bc0c6c53b6cfee90c624468bb673e9822a8105a5917d18b0d132fc65ea3c5cf8"
     },
     {
       "path": "wish-config.js",
@@ -162,7 +162,10 @@
     "offline_update_lifecycle": "waiting worker preserves active conductor; explicit update stops/reloads and retires scoped old cache",
     "public_rebuild": "All six instruments, portable page and SW deleted and rebuilt byte-identically without reference/",
     "privacy_scan": "No targeted private-path, manuscript, private-prompt-marker or external executable dependency findings; public client configuration explicitly allowed",
-    "copy_after_functional_browser_checks": "TRITON document title, compatibility help, and Lucky Keep feedback wording only; runtime unchanged. Final offline/update and public rebuild rerun on current bytes."
+    "copy_after_functional_browser_checks": "Final header actions, canonical and card links verified at 320/390/768/1280 in both engines, zero wish submissions. Wish close explicitly restores invoking control focus. Final faceplate typography avoids the value dial and inset edge. DSP scoped-CSP reproduction and source-only byte-identical rebuild passed.",
+    "production_csp": "Chromium and Playwright WebKit: parent script-src data exception is MIDI Room scoped; worker-src self/blob, sandbox unchanged; both engines play DSP, release temporary URLs, handle cancelled/timed-out/failed worker admission and Stop.",
+    "header_check_records": 10,
+    "visible_wish_marker": "data-wish-well is on the visible header Wish It Better button"
   },
   "limits": [
     "Playwright WebKit is not installed Safari, physical iPhone, hardware MIDI, OS installation UI or human listening verification.",

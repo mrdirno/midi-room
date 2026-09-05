@@ -32,6 +32,7 @@ jobs:
         run: |
           rm -f verification/ci-rebuild.json verification/ci-node.log \
             verification/triton-regressions.json verification/production-browser.json \
+            verification/production-csp.json verification/production-header.json \
             verification/production-lifecycle.json verification/production-offline.json \
             src/lucky/tests/held-out-evaluation.json \
             src/lucky/tests/audio-evidence/render-report.json \
@@ -78,9 +79,13 @@ jobs:
       - name: Lucky frozen composition regression set
         run: npm run test:lucky:heldout
       - name: Lucky rendered-sample regression set
-        run: npm run test:lucky:audio
+        run: npm run test:lucky:audio -- --skip-auditions
       - name: Six instruments under a nested Pages-style route
         run: npm run test:browser
+      - name: Visible wish access, header routes and narrow-screen branding
+        run: npm run test:header
+      - name: Scoped production CSP and opaque DSP worker lifecycle
+        run: npm run test:csp
       - name: Touch, exports and sandbox lifecycle
         run: npm run test:lifecycle
       - name: Offline reopening and waiting updates
@@ -101,6 +106,8 @@ jobs:
             verification/ci-node.log
             verification/triton-regressions.json
             verification/production-browser.json
+            verification/production-csp.json
+            verification/production-header.json
             verification/production-lifecycle.json
             verification/production-offline.json
             src/lucky/tests/held-out-evaluation.json

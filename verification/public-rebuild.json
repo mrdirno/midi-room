@@ -1,26 +1,16 @@
 {
-  "check": "Delete and rebuild all six generated instruments, portable page, and service worker with no private reference tree.",
+  "check": "Rebuild all six generated instruments, portable page and service worker from public runtime-only sources; repeat build is byte-identical.",
   "private_reference_present": false,
   "byte_identical": true,
   "artifacts": [
     {
-      "path": "dist/instruments/triton-rack.html",
-      "sha256": "fe970bd96d0a1eee22b0a02364a5eae9cd3062c7bc6e7275c3b305386892ad5a",
-      "matches_original_build": true
-    },
-    {
-      "path": "dist/instruments/improvisator.html",
-      "sha256": "1ccc863bde7d5b55871c6f15afa185cbbb7088bd58f8f2a496ce6c7724c3caf1",
-      "matches_original_build": true
-    },
-    {
-      "path": "dist/instruments/lucky-dreamer.html",
-      "sha256": "2b3503797b1ee52e8fb911fe588eb4c8dff6a2c4401544e11312fb8007fb3f04",
-      "matches_original_build": true
-    },
-    {
       "path": "dist/instruments/drum-pad.html",
       "sha256": "f40cbd92cc19a46ff68498dd03fcb2ef0be483962bb4b9c26753cbca60528656",
+      "matches_original_build": true
+    },
+    {
+      "path": "dist/instruments/dsp-rack.html",
+      "sha256": "02c62a40d0348df7bf7d73779239b435cf3f702b2b331b016f5aa1c8aa7bf240",
       "matches_original_build": true
     },
     {
@@ -29,18 +19,28 @@
       "matches_original_build": true
     },
     {
-      "path": "dist/instruments/dsp-rack.html",
-      "sha256": "4769db6aa5f324358e6d8c6076dc3e7f81e2e14a88b618ea79af668754397673",
+      "path": "dist/instruments/improvisator.html",
+      "sha256": "d69b41236c3a45e37cd5946295947d85fa19bfa4bd7e868121b718da0fb4c510",
+      "matches_original_build": true
+    },
+    {
+      "path": "dist/instruments/lucky-dreamer.html",
+      "sha256": "2b3503797b1ee52e8fb911fe588eb4c8dff6a2c4401544e11312fb8007fb3f04",
+      "matches_original_build": true
+    },
+    {
+      "path": "dist/instruments/triton-rack.html",
+      "sha256": "dc1e6d673281b9de6393eb6ce945ad91cbbaf60b3c8a8b058528329ab21a44e0",
       "matches_original_build": true
     },
     {
       "path": "dist/midi-room-local.html",
-      "sha256": "cf06e17fe5325f6b0b98ffc9b4fdeba0ad6341b63cd48138a97f5bea1fea3131",
+      "sha256": "6cc222593662e73b3408907036cadd3a162e73b0ed901325cc47f43fb33536eb",
       "matches_original_build": true
     },
     {
       "path": "dist/sw.js",
-      "sha256": "8ffbbec1496f8d7a26fc2e048c2c355e6c82f05cc5b00eb6ffa7ff94cc951de1",
+      "sha256": "bc0c6c53b6cfee90c624468bb673e9822a8105a5917d18b0d132fc65ea3c5cf8",
       "matches_original_build": true
     }
   ]

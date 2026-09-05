@@ -2,8 +2,10 @@
 const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
 const load=require('./original-engine-loader.cjs'),x=load(),baseline=load(false);
 const out=path.join(__dirname,'audio-evidence');fs.mkdirSync(out,{recursive:true});
+// CI keeps all asserted PCM holdouts; audition excerpts are for local listening.
+const skipAuditions=process.argv.includes('--skip-auditions');
 const tables=x.buildWavetables(),baseTables=baseline.buildWavetables();
-const report={date:'2026-09-05',scope:'Fresh final 22 held-out seeds/styles, 6 seconds each from bar 3 at 24 kHz; separate 16-second audition excerpts at 44.1 kHz',priorEvaluation:'render-report-initial.json retained two failures from extreme metal ratios; those seeds are now explicit regressions in audio.test.cjs.',sourceHashes:Object.fromEntries(['composition.js','audio-runtime.js','engine.original.js'].map(f=>[f,crypto.createHash('sha256').update(fs.readFileSync(path.join(__dirname,'..',f))).digest('hex')])),results:[],auditions:[],failures:[],listeningStatus:'Rendered files are available for audition. This agent cannot receive audio input, so no subjective listening preference has been verified. Measurements below are sample/render checks only.'};
+const report={date:'2026-09-05',scope:'Frozen final 22 qualification seeds/styles, 6 seconds each from bar 3 at 24 kHz'+(skipAuditions?'; local-listening audition excerpts skipped':'; separate 16-second audition excerpts at 44.1 kHz'),priorEvaluation:'render-report-initial.json retained two failures from extreme metal ratios; those seeds are now explicit regressions in audio.test.cjs.',sourceHashes:Object.fromEntries(['composition.js','audio-runtime.js','engine.original.js'].map(f=>[f,crypto.createHash('sha256').update(fs.readFileSync(path.join(__dirname,'..',f))).digest('hex')])),results:[],auditions:[],auditionsSkipped:skipAuditions,failures:[],listeningStatus:skipAuditions?'Audition excerpts were explicitly skipped; all 22 asserted PCM holdouts still ran. No subjective listening preference is established by this report.':'Rendered files are available for audition. No subjective listening preference has been verified by this script. Measurements below are sample/render checks only.'};
 function metrics(L,R){let peak=0,sum=0,dc=0,maxDelta=0,zeros=0;for(let i=0;i<L.length;i++){peak=Math.max(peak,Math.abs(L[i]),Math.abs(R[i]));sum+=L[i]*L[i]+R[i]*R[i];dc+=L[i]+R[i];if(i)maxDelta=Math.max(maxDelta,Math.abs(L[i]-L[i-1]),Math.abs(R[i]-R[i-1]));if(L[i]===0&&R[i]===0)zeros++;}return {peak,rms:Math.sqrt(sum/(2*L.length)),dc:dc/(2*L.length),maxDelta,silentFrames:zeros,totalFrames:L.length};}
 function render(world,sr,seconds,old=false){
  const frames=Math.ceil(seconds*sr),L=new Float32Array(frames),R=new Float32Array(frames);
@@ -23,7 +25,7 @@ for(const style of x.KSTYLE_KEYS){
  console.log(style,JSON.stringify({rms:m.rms,peak:m.peak,nonFinite:r.stats.nonFinite,clamped:r.stats.clamped,seconds:entry.wallSeconds}));
  fs.writeFileSync(path.join(out,'render-report.json'),JSON.stringify(report,null,2));
 }
-for(const [style,seed] of [['knock',20260905],['bap',731],['house',42],['bembe',731]]){
+if(!skipAuditions)for(const [style,seed] of [['knock',20260905],['bap',731],['house',42],['bembe',731]]){
  for(const old of (['knock','bap'].includes(style)?[true,false]:[false])){
   const w=old?baseline.buildBand(seed,{style}):x.luckyCompose(seed,{style});const r=render(w,44100,16,old),name=`${style}-${seed}-${old?'original':'candidate'}.wav`;
   const bytes=x.encodeWav(r.L,r.R,44100,x.makeRng(seed));fs.writeFileSync(path.join(out,name),Buffer.from(bytes));report.auditions.push({file:name,style,seed,version:old?'original':'candidate',sampleRate:44100,seconds:16,startsAtBar:3,...metrics(r.L,r.R)});console.log('Audition',name);
