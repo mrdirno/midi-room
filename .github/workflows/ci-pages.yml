@@ -74,6 +74,8 @@ jobs:
           print(f'Two public builds match across {len(second)} files')
           PY
           git diff --exit-code -- dist
+      - name: Offline reopening and waiting updates
+        run: npm run test:offline
       - name: Host, TRITON and Lucky regression tests
         run: npm test | tee verification/ci-node.log
       - name: Lucky frozen composition regression set
@@ -88,8 +90,6 @@ jobs:
         run: npm run test:csp
       - name: Touch, exports and sandbox lifecycle
         run: npm run test:lifecycle
-      - name: Offline reopening and waiting updates
-        run: npm run test:offline
       - name: Lucky standalone controls and audio in both browser engines
         run: node src/lucky/tests/browser-check.cjs
       - name: Lucky full-band audio across every style in both browser engines

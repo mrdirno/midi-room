@@ -5,7 +5,7 @@
     {
       "path": ".github/workflows/ci-pages.yml",
       "bytes": 7460,
-      "sha256": "6d91d40a60dc6cf74c684e383b691eb7b0205c6280b03bfc888ee8d8251d9f54"
+      "sha256": "1048e6bc9097e79a0044603fb0dd56331c6b2cfdd6be0f3cec7fff54875aed15"
     },
     {
       "path": "LICENSE",
@@ -504,8 +504,8 @@
     },
     {
       "path": "tools/production-offline-check.mjs",
-      "bytes": 5239,
-      "sha256": "98dc9a06fb9655f25cc67902c32ac1e15bff851f2b9f2edd9f082466e3b056db"
+      "bytes": 5532,
+      "sha256": "d89b426eeb87ca2f8d3b24888e056b93730da93f41d44a51d2b419e80e44c46d"
     }
   ]
 }
