@@ -114,7 +114,7 @@ jobs:
           from pathlib import Path
           import shutil
           dist = Path('dist')
-          for name in ['wish-it-better.json', 'lineage.json', 'LICENSE', 'ATTRIBUTION.md',
+          for name in ['wish-it-better.json', 'lineage.json', 'LICENSE', 'NOTICE', 'ATTRIBUTION.md',
                        'CITATION.cff', 'WISH_IT_BETTER.md', 'CONTRIBUTING.md', 'README.md']:
               shutil.copyfile(name, dist / name)
           (dist / 'docs').mkdir(exist_ok=True)

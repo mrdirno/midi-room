@@ -1,4 +1,4 @@
-MIT License — new MIDI Room host, wire protocol, Field Keys and integration code
+MIT License
 
 Copyright (c) 2026 MIDI Room contributors
 
@@ -19,8 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
-Scope: this grant covers newly authored MIDI Room code. It does not relicense
-uploaded Soul Pilot/Lucky Dreamer source, embedded musical corpora, or the
-verbatim Wish It Better specification. Their existing provenance, notices and
-terms remain in their source files. See docs/LINEAGE.md.

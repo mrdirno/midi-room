@@ -31,6 +31,6 @@ We declare **L0 / adopting**, not a higher conformance level inferred from the n
 
 ## Licenses and credits
 
-The MIT license applies to the newly authored host, integration and other code covered by its stated scope. Bundled engines, musical data, DSP code and third-party tools retain their own terms and notices. This repository is not a blanket relicensing of those components. Read [the component inventory](docs/PRODUCTION-LICENSE-INVENTORY.md) before redistribution.
+The MIT license applies to the newly authored host, integration and other code covered by [NOTICE](NOTICE). Bundled engines, musical data, DSP code and third-party tools retain their own terms and notices. This repository is not a blanket relicensing of those components. Read [the component inventory](docs/PRODUCTION-LICENSE-INVENTORY.md) before redistribution.
 
 Created and directed by **Aldrin Payopay, DRINOMAN**, with AI assistance for implementation and testing. See [ATTRIBUTION.md](ATTRIBUTION.md) for source lineage and [the license files](dist/licenses/) for bundled notices.

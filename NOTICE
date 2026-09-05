@@ -1,0 +1,20 @@
+# License scope and retained rights
+
+The MIT license in LICENSE applies only to newly authored MIDI Room host,
+wire protocol, Field Keys and integration code. It is not a grant over every
+bundled file. This notice preserves the original scope of that grant.
+
+Scope: this grant covers newly authored MIDI Room code. It does not relicense
+uploaded Soul Pilot/Lucky Dreamer source, embedded musical corpora, or the
+verbatim Wish It Better specification. Their existing provenance, notices and
+terms remain in their source files. See docs/LINEAGE.md.
+
+The bundled copy in dist/licenses/HOST-MIT.txt retains this scoped grant in
+one file. Inherited TRITON and Lucky Dreamer engine source has no separately
+verified blanket redistribution license. DSP, musical corpora, contract
+documentation and other third-party material retain their stated terms.
+See docs/PRODUCTION-LICENSE-INVENTORY.md for the component boundaries before
+redistributing or incorporating them into another product.
+
+Recorded music, release artwork, personal likenesses and private prompts
+are not licensed by this repository and are not part of its source release.
