@@ -1,0 +1,5 @@
+# Exact inherited extractions are hash-pinned; whitespace normalization would
+# change their provenance. New adapters retain the normal whitespace checks.
+src/lucky-cloud/engine.original.js whitespace=-blank-at-eol,-blank-at-eof
+src/lucky-cloud/app.original.js whitespace=-blank-at-eof
+src/lucky-cloud/cloud.css whitespace=-blank-at-eof

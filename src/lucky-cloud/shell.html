@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0c4a9e">
+
+<title>LUCKY DREAMER — roll a whole band in the clouds</title>
+<meta name="description" content="A whole beat on every roll, in the clouds. Real drum languages with their lineage named — the dembow, the Triggerman, the Amen grammar, the surdo family, go-go, hyphy slaps — played by drums synthesized from circuits and physics. No samples anywhere.">
+<link rel="canonical" href="https://persona500.com/dream-drummer">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Persona 500">
+<meta property="og:title" content="LUCKY DREAMER — roll a whole band in the clouds">
+<meta property="og:description" content="Every roll is a whole beat in a real drum language. Roll any lane, roll its sound, lock what slaps, roll the rest.">
+<meta property="og:url" content="https://persona500.com/dream-drummer">
+<meta property="og:image" content="https://persona500.com/dream-drummer/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="LUCKY DREAMER — roll a whole band in the clouds">
+<meta name="twitter:description" content="Every roll is a whole beat. Dice-roll any lane, lock what slaps, roll the rest. No samples anywhere.">
+<meta name="twitter:image" content="https://persona500.com/lucky/og.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Dream Drummer","url":"https://persona500.com/dream-drummer","applicationCategory":"MultimediaApplication","description":"A generative drum machine in the sky: every roll is a whole beat in a real credited drum language, every drum synthesized from circuits and physics, every lane re-rollable and lockable.","publisher":{"@type":"Organization","name":"Persona 500","url":"https://persona500.com"}}</script>
+<style>/*CLOUD_STYLE*/</style>
+</head>
+<body>
+
+<div id="gate">
+  <div class="gwrap">
+    <div class="title">LUCKY DREAMER</div>
+    <div class="sub">ROLL A BAND · KEEP WHAT LANDS</div>
+    <p class="blurb">Every roll is a whole band in a real musical language — hyphy slaps, crunk, the Triggerman, dembow, drill, go-go, the Amen, the marabi cycle, the surdo family — and the harmony that belongs to each. Every sound is built from circuits and physics, no samples anywhere. Roll any lane again, roll its sound, roll the harmony, lock what lands.</p>
+    <button id="dice" aria-label="Roll a beat"><canvas id="dcv" width="256" height="256"></canvas></button>
+    <div class="dlabel">ROLL ONE</div>
+    <div id="cloudKit">
+      <div><div class="ck ck-kick"></div><div class="ck-label">KICK CLOUD</div></div>
+      <div><div class="ck ck-snare"></div><div class="ck-label">SNARE CLOUD</div></div>
+      <div><div class="ck ck-hihat"></div><div class="ck-label">HI-HAT CLOUD</div></div>
+      <div><div class="ck ck-maraca"></div><div class="ck-label">MARACA CLOUD</div></div>
+    </div>
+    <button id="gCont"></button>
+    <div class="gnote">headphones or a real speaker · the 808 needs one of the two</div>
+  </div>
+</div>
+
+<div id="bar" class="hidden">
+  <span class="brand">LUCKY DREAMER</span>
+  <span class="spacer"></span>
+  <button class="chip" id="bStyle">any style</button>
+  <button class="chip" id="bAbout">?</button>
+</div>
+
+<main id="stage" class="hidden">
+  <section id="songCard">
+    <div class="shead">
+      <span id="sName"></span><span id="sEpithet"></span>
+      <button id="sAddr" title="copy a link that regrows this exact beat"></button>
+    </div>
+    <div id="sMeta"></div>
+    <div id="sOrigin"></div>
+    <div id="tempoRow">
+      <span class="tlab">tempo</span>
+      <button id="tMinus" title="slower — hold to sweep">−</button>
+      <button id="tVal"></button>
+      <button id="tPlus" title="faster — hold to sweep">+</button>
+      <span class="tbpm">bpm</span>
+    </div>
+    <div id="progWrap"><div id="prog"></div><span id="sSec"></span><span id="sTime"></span></div>
+  </section>
+  <div id="harmRow"><span class="hlab">HARMONY</span><button id="bHarm" title="roll the harmony — every part keeps its rhythm and changes its notes"><span>roll</span></button><span class="hcredit" id="harmCredit"></span></div>
+  <section id="band"></section>
+<div id="hint">tap a lane to hear it alone · <b>PATTERN</b> rolls what it plays · <b>SOUND</b> rolls how it hits · <b>LOCK</b> keeps it through the big roll · <b>MUTE</b> keeps it out of every roll</div>
+</main>
+
+<div id="deck" class="hidden">
+  <button class="dbtn gold" id="bRoll" title="roll everything that is not locked">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3.2" y="3.2" width="17.6" height="17.6" rx="4.4"/><circle cx="8.2" cy="8.2" r="1.5" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="15.8" cy="15.8" r="1.5" fill="currentColor" stroke="none"/></svg>
+    <em>ROLL</em>
+  </button>
+  <button id="bPlay" title="play / pause">
+    <svg id="icoPlay" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.4v13.2c0 .9 1 1.5 1.8 1L20 13c.8-.5.8-1.6 0-2.1L9.8 4.4C9 3.9 8 4.5 8 5.4z"/></svg>
+    <svg id="icoPause" viewBox="0 0 24 24" fill="currentColor" style="display:none"><rect x="6" y="4.6" width="4" height="14.8" rx="1.2"/><rect x="14" y="4.6" width="4" height="14.8" rx="1.2"/></svg>
+  </button>
+  <button class="dbtn" id="bSave" title="render this beat to a WAV file">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3.5v11M12 14.5l-4.4-4.4M12 14.5l4.4-4.4"/><path d="M4 16.5v2.6c0 .8.6 1.4 1.4 1.4h13.2c.8 0 1.4-.6 1.4-1.4v-2.6"/></svg>
+    <em id="saveLbl">SAVE</em>
+  </button>
+  <button class="dbtn" id="bHist" title="the last hundred beats you landed on — nothing here loads unless you pick it">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="8.2"/><path d="M12 7.2V12l3.2 2"/></svg>
+    <em>PAST</em>
+  </button>
+</div>
+
+<div id="toast"></div>
+<div id="sheet"><div class="sbox"><button class="sclose" id="sClose">✕</button><div id="sheetBody"></div></div></div>
+
+
+
+<script id="engine-src">/*CLOUD_ENGINE*/</script>
+<script id="sound-bank-src">/*CLOUD_SOUNDS*/</script>
+<script id="app-src">/*CLOUD_APP*/</script>
+</body></html>

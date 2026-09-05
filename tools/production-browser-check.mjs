@@ -62,17 +62,19 @@ try{for(const [name,type]of Object.entries({chromium,webkit})){
     await frame.locator('#keys .key').first().focus();await page.keyboard.down('Enter');
     audio=await measure(frame,'MidiRoomRack.engine().context || context');active=await frame.evaluate(()=>MidiRoomRack.report());await page.keyboard.up('Enter');
    }else if(id==='lucky-dreamer'){
-    await frame.waitForFunction(()=>!!window.LuckyDreamer);
-    await frame.locator('#play').click();await frame.waitForFunction(()=>LuckyDreamer.getState().playing);
-    await frame.waitForFunction(()=>LuckyDreamer.getState().time>0.1 && LuckyDreamer.getState().stats.peak>0,null,{timeout:20000});active=await frame.evaluate(()=>LuckyDreamer.getState());
+    await frame.waitForFunction(()=>!!window.LuckyCloud);
+    assert.equal(await frame.evaluate(()=>LuckyCloud.getState().playing),false,'cloud launch does not autoplay');
+    await frame.locator('#dice').click();await frame.waitForFunction(()=>LuckyCloud.getState().playing);
+    await frame.waitForFunction(()=>LuckyCloud.getState().time>0.1 && LuckyCloud.getState().stats.peak>0,null,{timeout:20000});active=await frame.evaluate(()=>LuckyCloud.getState());
     assert.equal(active.audioState,'running');assert.equal(active.stats.nonFinite,0);audio={state:active.audioState,mode:active.mode,playing:active.playing,time:active.time,peak:active.stats.peak,nonFinite:active.stats.nonFinite};
    }
    await page.screenshot({path:path.join(out,`production-${name}-${id}.png`)});
    await page.locator('#stopButton').click();await page.waitForTimeout(300);
+   if(id==='lucky-dreamer')await frame.waitForFunction(()=>!LuckyCloud.getState().playing&&LuckyCloud.getState().audioState==='suspended');
    stopped=await frame.evaluate(()=>({audioLabel:document.body.innerText.slice(0,70),triton:window.TritonEngine?.report(),pad:window.DrumPad?.report(),field:window.FieldKeys?.snapshot(),rack:window.MidiRoomRack?.report(),lucky:window.LuckyDreamer?.getState()}));
    if(stopped.triton){assert.equal(stopped.triton.soul.on,false);assert.equal(stopped.triton.soul.scheduler,false);assert.equal(stopped.triton.ownedVoices,0);assert.equal(stopped.triton.audio,'suspended');}
    if(stopped.pad){assert.equal(stopped.pad.held,0);assert.equal(stopped.pad.localVoices,0);}
-   if(stopped.lucky){assert.equal(stopped.lucky.playing,false);assert.equal(stopped.lucky.liveNotes,0);}
+   if(stopped.lucky){assert.equal(stopped.lucky.playing,false);assert.equal(stopped.lucky.audioState,'suspended');assert.equal(stopped.lucky.stats.nonFinite,0);}
    if(stopped.rack)assert.equal(stopped.rack.ready,false);
    if(stopped.field)assert.equal(stopped.field.voices.filter(v=>v.held).length,0);
    report.checks.push({browser:name,check:'nested-path launch + playing + room Stop',id,label,sandbox,audio,active,stopped,pageErrors:report.errors.length-beforeErrors});

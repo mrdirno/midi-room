@@ -220,7 +220,7 @@
         ]
       },
       "audio": {
-        "peak": 0.033840760588645935,
+        "peak": 0.03389006480574608,
         "sampleRate": 48000
       },
       "admission": {
@@ -256,7 +256,7 @@
         "held": 0,
         "modules": 2,
         "baseLatency": 0.0026666666666666666,
-        "outputLatency": 0.16,
+        "outputLatency": 0.015625,
         "receipts": [
           {
             "instanceId": "bloom-one",

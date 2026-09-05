@@ -34,10 +34,9 @@ jobs:
             verification/triton-regressions.json verification/production-browser.json \
             verification/production-csp.json verification/production-header.json \
             verification/production-lifecycle.json verification/production-offline.json \
-            src/lucky/tests/held-out-evaluation.json \
-            src/lucky/tests/audio-evidence/render-report.json \
-            src/lucky/tests/browser-evidence/report.json \
-            src/lucky/tests/browser-evidence/audio-stress.json
+            src/lucky-cloud/tests/evidence/pcm-report.json \
+            src/lucky-cloud/tests/evidence/locked-drum-pcm.json \
+            src/lucky-cloud/tests/evidence/browser-report.json
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
           node-version: '22'
@@ -76,12 +75,14 @@ jobs:
           git diff --exit-code -- dist
       - name: Offline reopening and waiting updates
         run: npm run test:offline
-      - name: Host, TRITON and Lucky regression tests
+      - name: Host, TRITON and current cloud contract tests
         run: npm test | tee verification/ci-node.log
-      - name: Lucky frozen composition regression set
-        run: npm run test:lucky:heldout
-      - name: Lucky rendered-sample regression set
-        run: npm run test:lucky:audio -- --skip-auditions
+      - name: Preserved previous-player rollback regressions
+        run: npm run test:lucky:legacy
+      - name: Current cloud PCM across every style and two sample rates
+        run: npm run test:lucky:audio
+      - name: Locked cloud drums preserve exact rendered sound
+        run: npm run test:lucky:locks
       - name: Six instruments under a nested Pages-style route
         run: npm run test:browser
       - name: Visible wish access, header routes and narrow-screen branding
@@ -90,10 +91,8 @@ jobs:
         run: npm run test:csp
       - name: Touch, exports and sandbox lifecycle
         run: npm run test:lifecycle
-      - name: Lucky standalone controls and audio in both browser engines
-        run: node src/lucky/tests/browser-check.cjs
-      - name: Lucky full-band audio across every style in both browser engines
-        run: node src/lucky/tests/browser-audio-stress.cjs
+      - name: Current cloud controls, exports and audio in both browser engines
+        run: npm run test:lucky:browser
       - name: Retain measured reports, never audition audio
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
@@ -110,10 +109,9 @@ jobs:
             verification/production-header.json
             verification/production-lifecycle.json
             verification/production-offline.json
-            src/lucky/tests/held-out-evaluation.json
-            src/lucky/tests/audio-evidence/render-report.json
-            src/lucky/tests/browser-evidence/report.json
-            src/lucky/tests/browser-evidence/audio-stress.json
+            src/lucky-cloud/tests/evidence/pcm-report.json
+            src/lucky-cloud/tests/evidence/locked-drum-pcm.json
+            src/lucky-cloud/tests/evidence/browser-report.json
       - name: Stage public credits and reject private or recorded media
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         run: |
@@ -128,7 +126,7 @@ jobs:
           for file in Path('docs').glob('*.md'):
               shutil.copyfile(file, dist / 'docs' / file.name)
           forbidden = {'.wav', '.m4a', '.mp3', '.aif', '.aiff', '.flac', '.ogg', '.opus', '.mid', '.midi'}
-          private = {'reference', 'node_modules', 'audio-evidence', 'browser-evidence', 'verification', '.git'}
+          private = {'reference', 'node_modules', 'audio-evidence', 'browser-evidence', 'evidence', 'tests', 'verification', '.git'}
           for file in dist.rglob('*'):
               assert not file.is_symlink(), f'Symlink in Pages artifact: {file}'
               assert not (set(file.relative_to(dist).parts) & private), f'Private/test directory: {file}'

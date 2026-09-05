@@ -1,5 +1,5 @@
 {
-  "at": "2026-09-05T19:50:58.438Z",
+  "at": "2026-09-05T21:08:57.359Z",
   "scope": "Real Playwright browser offline cache and waiting-update checks. App installation OS prompts not exercised.",
   "checks": [
     {
@@ -7,7 +7,7 @@
       "check": "six built-ins and catalog reopen offline",
       "networkMode": "Browser offline flag plus origin unavailable",
       "cache": [
-        "midi-room:/midi-room/:0cfb8c5007ca55b0"
+        "midi-room:/midi-room/:803f2e079b6a16e8"
       ],
       "files": 24
     },
@@ -22,7 +22,7 @@
       "browser": "chromium",
       "check": "explicit update reloads stopped, retires old version cache",
       "caches": [
-        "midi-room:/midi-room/:offline-test-update-0cfb8c5007ca55b0"
+        "midi-room:/midi-room/:offline-test-update-803f2e079b6a16e8"
       ]
     },
     {
@@ -30,7 +30,7 @@
       "check": "six built-ins and catalog reopen offline",
       "networkMode": "Origin unavailable; Playwright WebKit offline flag produced an internal navigation error",
       "cache": [
-        "midi-room:/midi-room/:0cfb8c5007ca55b0"
+        "midi-room:/midi-room/:803f2e079b6a16e8"
       ],
       "files": 24
     },
@@ -45,7 +45,7 @@
       "browser": "webkit",
       "check": "explicit update reloads stopped, retires old version cache",
       "caches": [
-        "midi-room:/midi-room/:offline-test-update-0cfb8c5007ca55b0"
+        "midi-room:/midi-room/:offline-test-update-803f2e079b6a16e8"
       ]
     }
   ],

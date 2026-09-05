@@ -1,7 +1,7 @@
 {
-  "at": "2026-09-05T19:32:44.726Z",
+  "at": "2026-09-05T21:08:19.797Z",
   "scope": "Real Playwright Chromium and WebKit rendering/audio with scripted trusted pointer/keyboard gestures. No physical hardware MIDI, installed Safari app, iPhone or subjective listening claim.",
-  "base": "http://127.0.0.1:53580/nested/midi-room/",
+  "base": "http://127.0.0.1:57570/nested/midi-room/",
   "checks": [
     {
       "browser": "chromium",
@@ -20,8 +20,8 @@
       "sandbox": "allow-scripts allow-downloads allow-modals",
       "audio": {
         "state": "running",
-        "time": 0.3413333333333333,
-        "peak": 0.3966030478477478,
+        "time": 0.4533333333333333,
+        "peak": 0.3993901014328003,
         "sampleRate": 48000
       },
       "active": {
@@ -72,7 +72,7 @@
                 "effective": 132,
                 "accepted": false,
                 "revision": 0,
-                "at": 1788636766045
+                "at": 1788642501180
               }
             ]
           },
@@ -102,8 +102,8 @@
       "sandbox": "allow-scripts allow-downloads allow-modals",
       "audio": {
         "state": "running",
-        "time": 0.192,
-        "peak": 0.30306321382522583,
+        "time": 0.39466666666666667,
+        "peak": 0.4272884726524353,
         "sampleRate": 48000
       },
       "active": {
@@ -148,7 +148,7 @@
               "effective": 132,
               "accepted": false,
               "revision": 0,
-              "at": 1788636767486
+              "at": 1788642504071
             }
           ]
         },
@@ -211,7 +211,7 @@
                 "effective": 132,
                 "accepted": false,
                 "revision": 0,
-                "at": 1788636767486
+                "at": 1788642504071
               }
             ]
           },
@@ -279,7 +279,7 @@
             "owner": "touch:key:0",
             "channel": 0,
             "note": 48,
-            "start": 0.005333333333333333,
+            "start": 0.010666666666666666,
             "held": true,
             "releaseAt": null
           }
@@ -300,9 +300,9 @@
               "owner": "touch:key:0",
               "channel": 0,
               "note": 48,
-              "start": 0.005333333333333333,
+              "start": 0.010666666666666666,
               "held": false,
-              "releaseAt": 0.07066666666666667
+              "releaseAt": 0.22533333333333336
             }
           ],
           "field": {
@@ -323,8 +323,8 @@
       "sandbox": "allow-scripts allow-downloads allow-modals",
       "audio": {
         "state": "running",
-        "time": 0.010666666666666666,
-        "peak": 0.0003356801171321422,
+        "time": 0.33066666666666666,
+        "peak": 0.030587930232286453,
         "sampleRate": 48000
       },
       "active": {
@@ -335,7 +335,7 @@
         "held": 1,
         "modules": 2,
         "baseLatency": 0.005333333333333333,
-        "outputLatency": 0,
+        "outputLatency": 0.024,
         "receipts": [
           {
             "instanceId": "bloom-one",
@@ -558,75 +558,81 @@
         "state": "running",
         "mode": "worklet",
         "playing": true,
-        "time": 0.25333333333333335,
-        "peak": 0.19968399703502654,
+        "time": 0.10133333333333333,
+        "peak": 0.061090946197509766,
         "nonFinite": 0
       },
       "active": {
-        "recipe": {
-          "app": "lucky-dreamer",
-          "version": "1.0.0",
-          "seed": 20260905,
-          "style": "",
-          "roll": {},
-          "bpm": null,
-          "locks": {},
-          "mute": {},
-          "volume": {},
-          "loop": true,
-          "master": 0.8
-        },
+        "historyMode": "session",
+        "historyCount": 1,
+        "seed": 987433324,
+        "style": null,
         "playing": true,
+        "solo": null,
         "bar": 0,
-        "time": 0.25333333333333335,
+        "time": 0.10133333333333333,
         "mode": "worklet",
         "audioState": "running",
         "destroyed": false,
-        "stats": {
-          "playing": true,
-          "clock": 12032,
-          "peak": 0.19968399703502654,
-          "nonFinite": 0,
-          "clamped": 0,
-          "recoveries": 0,
-          "liveNotes": 0,
-          "cpuLoad": 0.35
+        "soundBank": {
+          "version": "1.0.0",
+          "palette": "full",
+          "lanes": {}
         },
-        "liveNotes": 0
+        "stats": {
+          "next": 27136,
+          "peak": 0.061090946197509766,
+          "nonFinite": 0,
+          "clamps": 0,
+          "frames": 24064,
+          "lateRecoveries": 0
+        },
+        "lateRecoveries": 0,
+        "resources": {
+          "urls": 0,
+          "workers": 0,
+          "timers": 0,
+          "exporting": false
+        },
+        "roll": {},
+        "locks": []
       },
       "stopped": {
-        "audioLabel": "DRINOMAN\nA little room for a whole band.\nLucky\nDreamer.\n\nRoll a band. ",
+        "audioLabel": "LUCKY DREAMER\nany style\nsounds\n?\nBruldozer\nleaden, relentless\n#gbw4fg\n",
         "lucky": {
-          "recipe": {
-            "app": "lucky-dreamer",
-            "version": "1.0.0",
-            "seed": 20260905,
-            "style": "",
-            "roll": {},
-            "bpm": null,
-            "locks": {},
-            "mute": {},
-            "volume": {},
-            "loop": true,
-            "master": 0.8
-          },
+          "historyMode": "session",
+          "historyCount": 1,
+          "seed": 987433324,
+          "style": null,
           "playing": false,
+          "solo": null,
           "bar": 0,
-          "time": 0.25333333333333335,
+          "time": 0.5066666666666667,
           "mode": "worklet",
           "audioState": "suspended",
           "destroyed": false,
-          "stats": {
-            "playing": true,
-            "clock": 12032,
-            "peak": 0.19968399703502654,
-            "nonFinite": 0,
-            "clamped": 0,
-            "recoveries": 0,
-            "liveNotes": 0,
-            "cpuLoad": 0.35
+          "soundBank": {
+            "version": "1.0.0",
+            "palette": "full",
+            "lanes": {}
           },
-          "liveNotes": 0
+          "stats": {
+            "next": 51200,
+            "peak": 0.7113949656486511,
+            "nonFinite": 0,
+            "clamps": 0,
+            "frames": 48128,
+            "lateRecoveries": 0
+          },
+          "lateRecoveries": 0,
+          "resources": {
+            "urls": 0,
+            "workers": 0,
+            "timers": 0,
+            "exporting": false
+          },
+          "roll": {},
+          "locks": []
         }
       },
       "pageErrors": 0
@@ -666,8 +672,8 @@
       "sandbox": "allow-scripts allow-downloads allow-modals",
       "audio": {
         "state": "running",
-        "time": 0.296,
-        "peak": 0.39911776781082153,
+        "time": 0.41333333333333333,
+        "peak": 0.4009758234024048,
         "sampleRate": 48000
       },
       "active": {
@@ -718,7 +724,7 @@
                 "effective": 132,
                 "accepted": false,
                 "revision": 0,
-                "at": 1788636804638
+                "at": 1788642511091
               }
             ]
           },
@@ -748,8 +754,8 @@
       "sandbox": "allow-scripts allow-downloads allow-modals",
       "audio": {
         "state": "running",
-        "time": 0.21066666666666667,
-        "peak": 0.2512175142765045,
+        "time": 0.32,
+        "peak": 0.37726137042045593,
         "sampleRate": 48000
       },
       "active": {
@@ -794,7 +800,7 @@
               "effective": 132,
               "accepted": false,
               "revision": 0,
-              "at": 1788636806144
+              "at": 1788642512310
             }
           ]
         },
@@ -857,7 +863,7 @@
                 "effective": 132,
                 "accepted": false,
                 "revision": 0,
-                "at": 1788636806144
+                "at": 1788642512310
               }
             ]
           },
@@ -925,7 +931,7 @@
             "owner": "touch:key:0",
             "channel": 0,
             "note": 48,
-            "start": 0.032,
+            "start": 0.005333333333333333,
             "held": true,
             "releaseAt": null
           }
@@ -946,9 +952,9 @@
               "owner": "touch:key:0",
               "channel": 0,
               "note": 48,
-              "start": 0.032,
+              "start": 0.005333333333333333,
               "held": false,
-              "releaseAt": 0.22
+              "releaseAt": 0.17733333333333334
             }
           ],
           "field": {
@@ -969,8 +975,8 @@
       "sandbox": "allow-scripts allow-downloads allow-modals",
       "audio": {
         "state": "running",
-        "time": 0.04,
-        "peak": 0.017986156046390533,
+        "time": 0.31733333333333336,
+        "peak": 0.0303204208612442,
         "sampleRate": 48000
       },
       "active": {
@@ -981,7 +987,7 @@
         "held": 1,
         "modules": 2,
         "baseLatency": 0.0026666666666666666,
-        "outputLatency": 0.16,
+        "outputLatency": 0.015625,
         "receipts": [
           {
             "instanceId": "bloom-one",
@@ -1422,75 +1428,81 @@
         "state": "running",
         "mode": "worklet",
         "playing": true,
-        "time": 0.25333333333333335,
-        "peak": 0.19968399703502654,
+        "time": 0.10133333333333333,
+        "peak": 0.19872939586639404,
         "nonFinite": 0
       },
       "active": {
-        "recipe": {
-          "app": "lucky-dreamer",
-          "version": "1.0.0",
-          "seed": 20260905,
-          "style": "",
-          "roll": {},
-          "bpm": null,
-          "locks": {},
-          "mute": {},
-          "volume": {},
-          "loop": true,
-          "master": 0.8
-        },
+        "historyMode": "session",
+        "historyCount": 1,
+        "seed": 668095751,
+        "style": null,
         "playing": true,
+        "solo": null,
         "bar": 0,
-        "time": 0.25333333333333335,
+        "time": 0.10133333333333333,
         "mode": "worklet",
         "audioState": "running",
         "destroyed": false,
-        "stats": {
-          "playing": true,
-          "clock": 12032,
-          "peak": 0.19968399703502654,
-          "nonFinite": 0,
-          "clamped": 0,
-          "recoveries": 0,
-          "liveNotes": 0,
-          "cpuLoad": 0.35
+        "soundBank": {
+          "version": "1.0.0",
+          "palette": "full",
+          "lanes": {}
         },
-        "liveNotes": 0
+        "stats": {
+          "next": 26752,
+          "peak": 0.19872939586639404,
+          "nonFinite": 0,
+          "clamps": 0,
+          "frames": 24064,
+          "lateRecoveries": 0
+        },
+        "lateRecoveries": 0,
+        "resources": {
+          "urls": 0,
+          "workers": 0,
+          "timers": 0,
+          "exporting": false
+        },
+        "roll": {},
+        "locks": []
       },
       "stopped": {
-        "audioLabel": "DRINOMAN\nA little room for a whole band.\nLucky\nDreamer.\n\nRoll a band. ",
+        "audioLabel": "LUCKY DREAMER\nROLL A BAND · KEEP WHAT LANDS\n\nEvery roll is a whole ban",
         "lucky": {
-          "recipe": {
-            "app": "lucky-dreamer",
-            "version": "1.0.0",
-            "seed": 20260905,
-            "style": "",
-            "roll": {},
-            "bpm": null,
-            "locks": {},
-            "mute": {},
-            "volume": {},
-            "loop": true,
-            "master": 0.8
-          },
+          "historyMode": "session",
+          "historyCount": 1,
+          "seed": 668095751,
+          "style": null,
           "playing": false,
+          "solo": null,
           "bar": 0,
-          "time": 0.304,
+          "time": 0.25333333333333335,
           "mode": "worklet",
           "audioState": "suspended",
           "destroyed": false,
-          "stats": {
-            "playing": true,
-            "clock": 12032,
-            "peak": 0.19968399703502654,
-            "nonFinite": 0,
-            "clamped": 0,
-            "recoveries": 0,
-            "liveNotes": 0,
-            "cpuLoad": 0.35
+          "soundBank": {
+            "version": "1.0.0",
+            "palette": "full",
+            "lanes": {}
           },
-          "liveNotes": 0
+          "stats": {
+            "next": 26752,
+            "peak": 0.19872939586639404,
+            "nonFinite": 0,
+            "clamps": 0,
+            "frames": 24064,
+            "lateRecoveries": 0
+          },
+          "lateRecoveries": 0,
+          "resources": {
+            "urls": 0,
+            "workers": 0,
+            "timers": 0,
+            "exporting": false
+          },
+          "roll": {},
+          "locks": []
         }
       },
       "pageErrors": 0

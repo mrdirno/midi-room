@@ -9,7 +9,7 @@ npm test
 
 `src/build-slice.py` rebuilds all six instrument pages, the self-contained `dist/midi-room-local.html`, and the content-versioned service worker. Host modules and shell in `dist/` are maintained source files. Field Keys comes from `src/surface/field-keys.html`; the other generated instrument pages come from their `src/` builders. The portable edition contains the same six instruments inline.
 
-The public TRITON input is `src/triton/inherited-runtime.html`: the supplied executable engine with embedded HTML manuscript/history comments removed. Its separate provenance JSON pins the sanitized input hash and records the original private input hash. Counted transformations fail rather than silently patch an unfamiliar version. Lucky Dreamer similarly uses its sanitized engine input; its source builder records its input boundary. Original private manuscripts are unnecessary to build this edition.
+The public TRITON input is `src/triton/inherited-runtime.html`: the supplied executable engine with embedded HTML manuscript/history comments removed. Its separate provenance JSON pins the sanitized input hash and records the original private input hash. Counted transformations fail rather than silently patch an unfamiliar version. Lucky Dreamer uses the restored cloud edition under `src/lucky-cloud/`: pinned engine, original app script, cloud CSS/art and visible shell, plus lifecycle and sound-bank adapters. Its private trailing manuscript is excluded. `src/lucky/build-lucky.py` dispatches to this builder; `src/lucky/build-legacy.py` preserves the previous player's builder for rollback. Original private manuscripts are unnecessary to build this edition.
 
 DSP Rack builds from pinned local runtime, authored DSP source, generated C/header and Wasm descriptors under `src/rack/vendor/`. Repacking is deterministic and verifies the supplied artifact identities. Recompiling DSP from scratch requires the original pinned Faust toolchain; the normal app build does not invoke a compiler or network service.
 
@@ -21,6 +21,9 @@ npx playwright install chromium webkit
 npm run test:browser
 npm run test:lifecycle
 npm run test:offline
+npm run test:lucky:audio
+npm run test:lucky:locks
+npm run test:lucky:browser
 ```
 
 These scripts serve a temporary local HTTP origin, use real trusted test gestures, and close their browsers. Browser binaries install separately. WebKit means the Playwright build, not the installed Safari app or an iPhone; hardware MIDI and subjective listening are not inferred from it. The WebKit offline check disables the origin because the runner's simulated offline switch produced an internal navigation failure; Chromium also uses its offline flag.

@@ -1,4 +1,6 @@
-# Lucky Dreamer
+# Lucky Dreamer — previous player
+
+This directory preserves the previous player for rollback. The shipped cloud edition is documented in [../lucky-cloud/README.md](../lucky-cloud/README.md). The following controls and evidence describe the previous player, not the current app.
 
 Aldrin Payopay’s whole-band browser sketchbook. One die creates an arrangement; the melody returns, answers itself and leaves space. Keep a lane, roll its pattern or sound, move the key, play along, and export a recipe or MIDI score.
 
@@ -7,7 +9,7 @@ Aldrin Payopay’s whole-band browser sketchbook. One die creates an arrangement
 From the project root:
 
 ```sh
-python3 src/lucky/build-lucky.py
+python3 src/lucky/build-legacy.py
 node --test src/lucky/tests/*.test.cjs
 node src/lucky/tests/held-out-evaluation.cjs
 node src/lucky/tests/render-evaluation.cjs
@@ -24,7 +26,7 @@ Open `dist/instruments/lucky-dreamer.html` directly, or serve it with the MIDI R
 - `original-provenance.json` names the original file and both hashes. If the full original exists in the development tree, the builder verifies the extraction against it. Public source builds work without that tree.
 - `composition.js` adds planned phrases, melodic path search, bounded voice leading, chord-aware pad gates and independent variations over the original whole-band architecture.
 - `audio-runtime.js` shares the renderer between the worklet, compatibility mode and tests. It adds exact sample loop boundaries, late-clock recovery, finite-output diagnostics, lifecycle stops and Nyquist-safe metallic voices.
-- `player.html` and `player.js` supply the UI. `build-lucky.py` assembles their dependency-free standalone output. Generated HTML is not edited by hand.
+- `player.html` and `player.js` supply the UI. `build-legacy.py` assembles their dependency-free standalone output. Generated HTML is not edited by hand.
 
 The original runtime does not contain its own explicit license notice. Its credited rhythmic/harmonic vocabulary is preserved; that is provenance, not independent clearance of every musical reference. Use the project’s rights documentation for the applicable publication decision.
 

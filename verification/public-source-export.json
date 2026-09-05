@@ -4,8 +4,8 @@
   "files": [
     {
       "path": ".github/workflows/ci-pages.yml",
-      "bytes": 7460,
-      "sha256": "1048e6bc9097e79a0044603fb0dd56331c6b2cfdd6be0f3cec7fff54875aed15"
+      "bytes": 7351,
+      "sha256": "07b0bb19b7797773617e8c6fe4faa4d063da3a78fcf549d542a985391035ae11"
     },
     {
       "path": "LICENSE",
@@ -74,8 +74,8 @@
     },
     {
       "path": "dist/instruments/lucky-dreamer.html",
-      "bytes": 1131177,
-      "sha256": "8601bc4db9f437bd121337f6c4ee8c5d6e1f1bc2cb0465e424351aa5ea99f9a3"
+      "bytes": 2718464,
+      "sha256": "d5ead8e304cc07cd72f33ca0e8cc5179f08ed6803ae846fc6fb6d95e3dccf04b"
     },
     {
       "path": "dist/instruments/triton-rack.html",
@@ -104,8 +104,8 @@
     },
     {
       "path": "dist/midi-room-local.html",
-      "bytes": 3301443,
-      "sha256": "4feb0f5636cee881564952863c629da04bb5087ff5413bfedf37efa5b77970f8"
+      "bytes": 4900183,
+      "sha256": "a56ee7b3b0b8c71e79e044296f8f8963ae9f3049e0f250b7493c72438978ab8e"
     },
     {
       "path": "dist/midi.js",
@@ -130,7 +130,7 @@
     {
       "path": "dist/sw.js",
       "bytes": 1836,
-      "sha256": "adae409655b0bebe578310b279f6558bb77ce2b4b18e2581de547c140d68d046"
+      "sha256": "bc08daa17db3fa29e44ab1ae60cacb60e7d990c2dbffa8f484eaa14f5e7b2461"
     },
     {
       "path": "dist/wish-config.js",
@@ -144,13 +144,13 @@
     },
     {
       "path": "docs/BUILD.md",
-      "bytes": 2774,
-      "sha256": "3a37d78f34825750ce6f9b2dbd7f6d47226eb764bd91440c7f7fc67417885828"
+      "bytes": 3110,
+      "sha256": "20cee5a0dd94ddd80f0ed4ff1df8897d51bb53b8d839f39d01308837581846a7"
     },
     {
       "path": "docs/LINEAGE.md",
-      "bytes": 2322,
-      "sha256": "a31f8b58e81daa02c997ca964ba1a1bb20456b98db53205bbd7467a90bf8fc18"
+      "bytes": 2504,
+      "sha256": "97fe5ab7f86dff26921245c0559ff563a97bf9332b9c1a1d140df07218c98fed"
     },
     {
       "path": "docs/PLUGIN-CONTRACT.md",
@@ -164,13 +164,13 @@
     },
     {
       "path": "docs/PRODUCTION-LICENSE-INVENTORY.md",
-      "bytes": 4617,
-      "sha256": "1d8ef2b1c53e199b9ed77c134132afc0f32ad2ec317b057bff7f802aff28fc38"
+      "bytes": 4947,
+      "sha256": "9ef158fd3cc15e25740ae10a99f896f8bd9bd9c58cc01edcf11c53eea39aeb43"
     },
     {
       "path": "package.json",
-      "bytes": 935,
-      "sha256": "63490056b40e1070a507a29f3153113517e7d0d1dae70a9bf8b9d0d42b8b6609"
+      "bytes": 1180,
+      "sha256": "75c5fcbfb6b37d251a0ac3cb5d3c26074072dd7a6a0ff8434d55725ff00567ba"
     },
     {
       "path": "plugin-examples/bloom-drive.rack.json",
@@ -208,9 +208,89 @@
       "sha256": "27d5d0244f3034aa421b0cf3708b33cacbf62c39630aaaccbdd4c404fbb5b0a2"
     },
     {
+      "path": "src/lucky-cloud/README.md",
+      "bytes": 4148,
+      "sha256": "3b5d6d9850b1f8a70cb7c339f74032133f1cf5f825c139c07941fa7f8ba1c314"
+    },
+    {
+      "path": "src/lucky-cloud/app.original.js",
+      "bytes": 55646,
+      "sha256": "57cc5b3097f413b1eecdc27d542c8deadfc2885e533b5028b0189030df89f5d4"
+    },
+    {
+      "path": "src/lucky-cloud/build-cloud.py",
+      "bytes": 4424,
+      "sha256": "9f489efad782bdc0bca6730c9a271482789862d35722b35f183329c088716b31"
+    },
+    {
+      "path": "src/lucky-cloud/cloud.css",
+      "bytes": 1498664,
+      "sha256": "c1be25f0cbbdeab371b53cbbc7325afa6b4f3b7d391f1fc23fc2fa7cb4080558"
+    },
+    {
+      "path": "src/lucky-cloud/engine.original.js",
+      "bytes": 1109535,
+      "sha256": "f5f482f5eebe55ef90b5d9b25e548b4a1b5b5381a74f72c9d418d02440ecaea1"
+    },
+    {
+      "path": "src/lucky-cloud/integration.css",
+      "bytes": 871,
+      "sha256": "5034015fba18ec40f34af2fa786c4c903045ecbbec59b30864f79f3e5df49af8"
+    },
+    {
+      "path": "src/lucky-cloud/lifecycle.js",
+      "bytes": 31552,
+      "sha256": "bb92d91c98860b3472b30176c6c90f576232b53ed9c2a4d67ece27cf2b3d5aae"
+    },
+    {
+      "path": "src/lucky-cloud/provenance.json",
+      "bytes": 1102,
+      "sha256": "293826c6b3e915d06656b1f9768c0485a3d33b9160ab3bc8083388fa2d30aa38"
+    },
+    {
+      "path": "src/lucky-cloud/shell.html",
+      "bytes": 6624,
+      "sha256": "683b3ce09f07174029c38171dff76da1b311e5b5fea70893a267ac1f6efbe524"
+    },
+    {
+      "path": "src/lucky-cloud/sound-bank.js",
+      "bytes": 19161,
+      "sha256": "aa8827afb728a36de5e66339051155fe48a4ebebdfda7a0693fc185be4e981ca"
+    },
+    {
+      "path": "src/lucky-cloud/tests/README.md",
+      "bytes": 2371,
+      "sha256": "6b822b9b9e763b946aef675fad158a0561c321f91caa32ffce2fe683ff96c658"
+    },
+    {
+      "path": "src/lucky-cloud/tests/browser-check.cjs",
+      "bytes": 18240,
+      "sha256": "9c2cb23ace575bb644ae7c3708ee27f0f9ea08b1d6bd97c39d08847568151d01"
+    },
+    {
+      "path": "src/lucky-cloud/tests/contracts.test.cjs",
+      "bytes": 8697,
+      "sha256": "f6d0dffc6a07ef2fd277b5ec89cb261d7b6604f1ee7baa447c92cd5844367797"
+    },
+    {
+      "path": "src/lucky-cloud/tests/engine-loader.cjs",
+      "bytes": 1361,
+      "sha256": "cf273ff8b8e151ed622c53afc31ee32b239628465f6f73c66e69320b22cb2c9a"
+    },
+    {
+      "path": "src/lucky-cloud/tests/locked-drum-pcm.cjs",
+      "bytes": 3241,
+      "sha256": "2302dad5ca33c1b3d7ca1600d01fa825093178308ba57a63632d77cad5886ced"
+    },
+    {
+      "path": "src/lucky-cloud/tests/render-evaluation.cjs",
+      "bytes": 6740,
+      "sha256": "2bc1853ac76e013629a3db14561be6a61e859a9e4c512d5f9a1dcf73f2986de1"
+    },
+    {
       "path": "src/lucky/README.md",
-      "bytes": 6346,
-      "sha256": "4a738ab8d0b5caccd0a28224b19cdcac71c2792d1faf38c45db1424f7613a65f"
+      "bytes": 6612,
+      "sha256": "e0ad3f74673b9adae2a3b2048764c0eb623a81d0939ddb39a55168565f874705"
     },
     {
       "path": "src/lucky/audio-runtime.js",
@@ -218,9 +298,14 @@
       "sha256": "ef813721813b224aa6d0cf1de3acaef9750f36727b78d17bfabc2b6147d194f9"
     },
     {
-      "path": "src/lucky/build-lucky.py",
+      "path": "src/lucky/build-legacy.py",
       "bytes": 2580,
       "sha256": "480fc0418fd807bd255bc62a1f7d27cfda84ee22503b701dfec31423d1fca44a"
+    },
+    {
+      "path": "src/lucky/build-lucky.py",
+      "bytes": 249,
+      "sha256": "b35d7702e5f46de97ca24082b1303db371cac1c7351753ef682468721beeeaf1"
     },
     {
       "path": "src/lucky/composition.js",
@@ -279,8 +364,8 @@
     },
     {
       "path": "src/lucky/tests/public-build.test.cjs",
-      "bytes": 1108,
-      "sha256": "e6860d6b8abef9bd672adfb09f552b975915b2c65f29632750971b77fb64febf"
+      "bytes": 1168,
+      "sha256": "b6fbaf800130f1fc71cd067100052a1a5718868d0c4f9fb24636244ad9662a10"
     },
     {
       "path": "src/lucky/tests/render-evaluation.cjs",
@@ -484,8 +569,8 @@
     },
     {
       "path": "tools/production-browser-check.mjs",
-      "bytes": 8828,
-      "sha256": "25586fe98b9054ad909a4a24c6a2965ceee40ade954e100f0618c00bfa6bbd8d"
+      "bytes": 9129,
+      "sha256": "76abd956db6d3a2d938e1a43dbb197d46592d526981c86ec6abf7b05c8b85325"
     },
     {
       "path": "tools/production-csp-check.mjs",
@@ -499,13 +584,14 @@
     },
     {
       "path": "tools/production-lifecycle-check.mjs",
-      "bytes": 6881,
-      "sha256": "b24d27e757382eada233c44ae7fe2dcef7756bd3c5dad3f45b53a6c5df1b1917"
+      "bytes": 7804,
+      "sha256": "46b0594a30afe6e9873dc281610a13fe2a14bc800fe2f3667a71471b3cef8ada"
     },
     {
       "path": "tools/production-offline-check.mjs",
-      "bytes": 5532,
-      "sha256": "d89b426eeb87ca2f8d3b24888e056b93730da93f41d44a51d2b419e80e44c46d"
+      "bytes": 5829,
+      "sha256": "820e56e6d8fb57a949f2fa072b1c54bf7ce4adabcb594aea59ee274685159e0c"
     }
-  ]
+  ],
+  "current_lucky": "src/lucky-cloud; nine build inputs plus five executable test/helper files; evidence excluded"
 }

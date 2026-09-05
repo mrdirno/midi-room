@@ -10,3 +10,7 @@ work/
 src/lucky/tests/audio-evidence/
 workspace/
 *.log
+
+# Cloud test receipts and visitor exports are runtime evidence, not source.
+src/lucky-cloud/tests/evidence/
+verification/*.png

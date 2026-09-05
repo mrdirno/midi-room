@@ -1,5 +1,5 @@
 {
-  "at": "2026-09-05T19:04:39.938Z",
+  "at": "2026-09-05T21:08:57.324Z",
   "scope": "Real browser engine checks with scripted touch/keyboard; no physical phone or installed Safari claim.",
   "checks": [
     {
@@ -66,7 +66,7 @@
               "effective": 132,
               "accepted": false,
               "revision": 0,
-              "at": 1788635080797
+              "at": 1788642538186
             }
           ]
         },
@@ -118,9 +118,9 @@
             "owner": "touch:9",
             "channel": 0,
             "note": 48,
-            "start": 0.064,
+            "start": 0.08,
             "held": false,
-            "releaseAt": 0.484
+            "releaseAt": 0.5106666666666666
           }
         ],
         "field": {
@@ -355,6 +355,55 @@
     },
     {
       "browser": "chromium",
+      "check": "cloud-created MIDI reaches opaque parent save tray",
+      "saveText": "dream-toiser-cuy3lk.mid\n15 KB\nSave\n×"
+    },
+    {
+      "browser": "chromium",
+      "check": "390px real touch + hash launch",
+      "id": "lucky-dreamer",
+      "geometry": {
+        "inner": 390,
+        "scroll": 390
+      },
+      "result": {
+        "historyMode": "session",
+        "historyCount": 1,
+        "seed": 777573560,
+        "style": null,
+        "playing": true,
+        "solo": null,
+        "bar": 0,
+        "time": 0,
+        "mode": "worklet",
+        "audioState": "running",
+        "destroyed": false,
+        "soundBank": {
+          "version": "1.0.0",
+          "palette": "full",
+          "lanes": {}
+        },
+        "stats": {
+          "next": 27136,
+          "peak": 0.04164314642548561,
+          "nonFinite": 0,
+          "clamps": 0,
+          "frames": 24064,
+          "lateRecoveries": 0
+        },
+        "lateRecoveries": 0,
+        "resources": {
+          "urls": 0,
+          "workers": 0,
+          "timers": 0,
+          "exporting": false
+        },
+        "roll": {},
+        "locks": []
+      }
+    },
+    {
+      "browser": "chromium",
       "check": "created MIDI export reaches parent save tray",
       "saveText": "drum-pad-take.mid\n1 KB\nSave\n×"
     },
@@ -413,7 +462,7 @@
               "effective": 132,
               "accepted": false,
               "revision": 0,
-              "at": 1788635081821
+              "at": 1788642541376
             }
           ]
         },
@@ -497,7 +546,7 @@
               "effective": 132,
               "accepted": false,
               "revision": 0,
-              "at": 1788635084481
+              "at": 1788642544420
             }
           ]
         },
@@ -549,9 +598,9 @@
             "owner": "touch:0",
             "channel": 0,
             "note": 48,
-            "start": 0.032,
+            "start": 0.048,
             "held": false,
-            "releaseAt": 0.45199999999999996
+            "releaseAt": 0.46799999999999997
           }
         ],
         "field": {
@@ -1004,6 +1053,55 @@
     },
     {
       "browser": "webkit",
+      "check": "cloud-created MIDI reaches opaque parent save tray",
+      "saveText": "dream-rumble-ty9ob8.mid\n7 KB\nSave\n×"
+    },
+    {
+      "browser": "webkit",
+      "check": "390px real touch + hash launch",
+      "id": "lucky-dreamer",
+      "geometry": {
+        "inner": 390,
+        "scroll": 390
+      },
+      "result": {
+        "historyMode": "session",
+        "historyCount": 1,
+        "seed": 1811077460,
+        "style": null,
+        "playing": true,
+        "solo": null,
+        "bar": 0,
+        "time": 0.10133333333333333,
+        "mode": "worklet",
+        "audioState": "running",
+        "destroyed": false,
+        "soundBank": {
+          "version": "1.0.0",
+          "palette": "full",
+          "lanes": {}
+        },
+        "stats": {
+          "next": 28928,
+          "peak": 0.3991597592830658,
+          "nonFinite": 0,
+          "clamps": 0,
+          "frames": 24064,
+          "lateRecoveries": 0
+        },
+        "lateRecoveries": 0,
+        "resources": {
+          "urls": 0,
+          "workers": 0,
+          "timers": 0,
+          "exporting": false
+        },
+        "roll": {},
+        "locks": []
+      }
+    },
+    {
+      "browser": "webkit",
       "check": "created MIDI export reaches parent save tray",
       "saveText": "drum-pad-take.mid\n1 KB\nSave\n×"
     },
@@ -1062,7 +1160,7 @@
               "effective": 132,
               "accepted": false,
               "revision": 0,
-              "at": 1788635085597
+              "at": 1788642547069
             }
           ]
         },

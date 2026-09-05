@@ -8,7 +8,7 @@ Music led to these tools. Building the tools led back to music. [RUN THIS GAME](
 
 ## Play
 
-- **Lucky Dreamer** creates a whole-band phrase from a repeatable seed, with connected melody, harmony, bass and drums. Keep parts you like and explore variations.
+- **Lucky Dreamer** rolls a whole band in the original cloud interface. Keep a lane, change its pattern or sound, explore six sound palettes, and save the music you make.
 - **TRITON Rack** is an independent browser synthesizer with patches and effects. It uses local synthesis, not Korg sample ROMs; it is not a Korg product or affiliated with Korg.
 - **Improvisator** opens the conductor and harmony view of the same underlying TRITON engine. It is a focused view, not an independently invented sound engine.
 - **Drum Pad** gives you sixteen playable pads and MIDI takes.

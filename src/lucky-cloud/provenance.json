@@ -1,0 +1,25 @@
+{
+  "sourceName": "luckydreamer_aug_27_2026_3.html",
+  "originalHtmlSha256": "1f0ec733412ac379465cd6a732132cfc27fd40a7e73760ca30d4e855ebed9a65",
+  "originalBytes": 3000837,
+  "extraction": "Exact engine-src and app-src scripts, original cloud CSS/art and visible shell before engine. Embedded RINGS manuscript/development diary excluded. No source prompts or private HTML tail.",
+  "inputs": {
+    "engine.original.js": {
+      "bytes": 1109535,
+      "sha256": "f5f482f5eebe55ef90b5d9b25e548b4a1b5b5381a74f72c9d418d02440ecaea1"
+    },
+    "app.original.js": {
+      "bytes": 55646,
+      "sha256": "57cc5b3097f413b1eecdc27d542c8deadfc2885e533b5028b0189030df89f5d4"
+    },
+    "cloud.css": {
+      "bytes": 1498664,
+      "sha256": "c1be25f0cbbdeab371b53cbbc7325afa6b4f3b7d391f1fc23fc2fa7cb4080558"
+    },
+    "shell.html": {
+      "bytes": 6624,
+      "sha256": "683b3ce09f07174029c38171dff76da1b311e5b5fea70893a267ac1f6efbe524"
+    }
+  },
+  "licenseNote": "Operator-supplied source and artwork preserved. This record does not grant blanket rights to inherited vocabulary or third-party materials."
+}

@@ -1,0 +1,9 @@
+/* Small accessibility and host additions; the original cloud artwork stays intact. */
+button:focus-visible,[tabindex]:focus-visible,select:focus-visible{outline:3px solid #ffe397;outline-offset:4px}
+#cancelExport{position:fixed;bottom:100px;right:20px;z-index:60;background:#162644;color:#fff}
+#cancelExport[hidden]{display:none}
+.bank-label{display:block;margin:18px 0 8px;font-size:13px;letter-spacing:.08em;text-transform:uppercase}
+.bank-select{width:100%;min-height:44px;background:#132642;color:#fff;border:1px solid #a2b8cd;border-radius:8px;padding:10px;font:inherit}
+#sheet .sbox{max-height:85dvh;overflow:auto}
+@media(max-width:420px){#bar{flex-wrap:wrap}#bar .brand{font-size:13px}#bar .chip{min-height:44px}#cancelExport{bottom:94px;right:12px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}

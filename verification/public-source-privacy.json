@@ -1,15 +1,10 @@
 {
-  "scope": "Targeted scan of all tracked files and reviewed source/JSON additions. Test screenshots, local auditions, dependencies and git metadata excluded. No universal private-data detection claim.",
-  "text_files": 124,
-  "findings": {
-    "absolute_private_path": [],
-    "embedded_manuscript": [],
-    "private_prompt_markers": [],
-    "external_executable_dependency": [],
-    "credential_pattern": []
-  },
+  "scope": "All tracked public files, including the staged cloud additions; binary images counted separately. No universal private-data detection claim.",
+  "text_files": 143,
+  "binary_files": 2,
+  "findings": [],
   "private_reference_present": false,
   "allowed_public_configuration": [
-    "Intentionally public insert-only client config in dist/wish-config.js; no private backend credentials."
+    "Insert-only public client configuration remains in dist/wish-config.js; no private backend credentials."
   ]
 }

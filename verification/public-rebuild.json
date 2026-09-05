@@ -1,47 +1,32 @@
 {
-  "check": "Rebuild all six generated instruments, portable page and service worker from public runtime-only sources; repeat build is byte-identical.",
   "private_reference_present": false,
   "byte_identical": true,
-  "artifacts": [
-    {
-      "path": "dist/instruments/drum-pad.html",
-      "sha256": "1edc3e15c6dc0c49035b6f6ac5fb2e54a58d660ff0c360c2781196d8de938f38",
-      "matches_original_build": true
-    },
-    {
-      "path": "dist/instruments/dsp-rack.html",
-      "sha256": "9ae76236b3bf5a33e3cf4dca8247a8f84e1c15d90c9dc55500e7597586c878ab",
-      "matches_original_build": true
-    },
-    {
-      "path": "dist/instruments/field-keys.html",
-      "sha256": "9d2cdea8b940c3c2144332b9b6d6ede7022066174c1c71871e721355cedd8a12",
-      "matches_original_build": true
-    },
-    {
-      "path": "dist/instruments/improvisator.html",
-      "sha256": "3ced270c9c96a64a5531f9d4cf5d15a24194abb0edabfa3d3dbc9545aa1595be",
-      "matches_original_build": true
-    },
-    {
-      "path": "dist/instruments/lucky-dreamer.html",
-      "sha256": "8601bc4db9f437bd121337f6c4ee8c5d6e1f1bc2cb0465e424351aa5ea99f9a3",
-      "matches_original_build": true
-    },
-    {
-      "path": "dist/instruments/triton-rack.html",
-      "sha256": "c68e0dc55cf64bbd33420cadb0e099b44ed93d175a4b5c0af11ddd01b544eee0",
-      "matches_original_build": true
-    },
-    {
-      "path": "dist/midi-room-local.html",
-      "sha256": "4feb0f5636cee881564952863c629da04bb5087ff5413bfedf37efa5b77970f8",
-      "matches_original_build": true
-    },
-    {
-      "path": "dist/sw.js",
-      "sha256": "adae409655b0bebe578310b279f6558bb77ce2b4b18e2581de547c140d68d046",
-      "matches_original_build": true
-    }
-  ]
+  "files": {
+    "app.js": "158c4095e592011047db81864ee8513d3204fc86a7c1e67fd9afe72e270ec6e5",
+    "bridge.js": "841ba19bb4d09c888b484f7252411b4d607774824af23fae80acac607a15777d",
+    "catalog.js": "ccda8d736a7dea31a21646dc1b36c4b9c3791f62438e6a20869cb0bd309d7f81",
+    "icon-192.png": "111e3ea23aabd971d08df4ea47ab6e838f76dba884ad832b6982fe30166ad60f",
+    "icon-512.png": "c143ce04e29d8bb5d537dec089d29c5be0ba3200da0cd9538546d6bc40d06c90",
+    "icon.svg": "1685a07266e25fe747dffa5ede02ad7761372d58f34cdad2ad1bac6fbf8b29b6",
+    "index.html": "95c222539fb99672da4c6a45ccb47bfbadd8b87b75c386fcdefb3bd84880ca4b",
+    "instrument-bus.js": "e72db1085bad3e1598c7bccb129b22a950b86829b78b266247924708ef3e2730",
+    "instruments/drum-pad.html": "1edc3e15c6dc0c49035b6f6ac5fb2e54a58d660ff0c360c2781196d8de938f38",
+    "instruments/dsp-rack.html": "9ae76236b3bf5a33e3cf4dca8247a8f84e1c15d90c9dc55500e7597586c878ab",
+    "instruments/field-keys.html": "9d2cdea8b940c3c2144332b9b6d6ede7022066174c1c71871e721355cedd8a12",
+    "instruments/improvisator.html": "3ced270c9c96a64a5531f9d4cf5d15a24194abb0edabfa3d3dbc9545aa1595be",
+    "instruments/lucky-dreamer.html": "d5ead8e304cc07cd72f33ca0e8cc5179f08ed6803ae846fc6fb6d95e3dccf04b",
+    "instruments/triton-rack.html": "c68e0dc55cf64bbd33420cadb0e099b44ed93d175a4b5c0af11ddd01b544eee0",
+    "licenses/FAUST-COPYING.txt": "92a42adab3110694eb7731691f57f229fcaba31570d1727eb7be3f197307378c",
+    "licenses/HOST-MIT.txt": "82692049ae6c2832600819157720673d7e5baafe8ddbb8d7249c34daaa498c6d",
+    "loader.js": "3687ea89655708f4c2df5af91c6cd3eb8837698c4fd8b79af9c10edb17288d9e",
+    "manifest.webmanifest": "e2753686aca871de9047fb97b395da89311e233e91877da1d16d1d2fc638c0df",
+    "midi-room-local.html": "a56ee7b3b0b8c71e79e044296f8f8963ae9f3049e0f250b7493c72438978ab8e",
+    "midi.js": "c4ab0eb4eb62eba25221e1d341dca5b412800607dceadaa6e3a985229fde963d",
+    "plugin-contract.js": "aced69dc07bf95d285546a1ae39042eadfc2f4bce5a7b442045344781e9e6107",
+    "style.css": "7e2b7eda83d0ab11ba647fd5989386aeffb42e12741e1d942997fa1761573524",
+    "surface-router.js": "4d6fb22e60535c71065131763408c21d5274759c3cab657b45c506b248907b72",
+    "sw.js": "bc08daa17db3fa29e44ab1ae60cacb60e7d990c2dbffa8f484eaa14f5e7b2461",
+    "wish-config.js": "6c7ab2b88146ee723e36143af2c1c4707acac01cc935d1350f4f6d2ff8b1b942",
+    "wish.js": "f880cba31305a44d6755242fd800124f7893811b58de45e424223e789f9224e5"
+  }
 }

@@ -1,4 +1,32 @@
-# What was checked
+# Current cloud edition checks
+
+The current Lucky artifact restores the supplied cloud interface. The older player and its tests remain available for rollback; their historical counts below do not qualify the cloud edition.
+
+Local independent qualification on September 5, 2026 used artifact SHA256 `d5ead8e304cc07cd72f33ca0e8cc5179f08ed6803ae846fc6fb6d95e3dccf04b` and sound bank SHA256 `aa8827afb728a36de5e66339051155fe48a4ebebdfda7a0693fc185be4e981ca`.
+
+| Current check | Passed / attempted | Reproduction |
+| --- | --- | --- |
+| Pinned extraction, public-only rebuild, deterministic scores, sound/score independence, locks, invalid imports and MIDI | 7 / 7 tests | `npm run test:lucky:contracts` |
+| All inherited styles, two sample rates, crossfade and Stop | 46 / 46 renders: 23 styles × 44.1/48 kHz | `npm run test:lucky:audio` |
+| Different sounds on the same score | 8 / 8 lane comparisons | Same PCM command |
+| Locked kick, snare and hats across a new seed/palette with the UI-pinned tonal frame | 18 / 18 isolated Part/Kit comparisons | `npm run test:lucky:locks` |
+| Cloud standalone/file, opaque iframe, phone, storage, exports and teardown | 8 / 8 browser cases | `npm run test:lucky:browser` |
+| Six instruments and responsive host | 20 / 20 records, Chromium and WebKit | `npm run test:browser` |
+| Touch, current cloud MIDI reaching the parent Save tray, imports and teardown | 20 / 20 records | `npm run test:lifecycle` |
+| Cached reopening and explicit waiting update | 6 / 6 records | `npm run test:offline` |
+| CSP and worker lifecycle | 6 / 6 route policies, 2 / 2 engines | `npm run test:csp` |
+| Header and account-free Wish access | 10 / 10 records | `npm run test:header` |
+| Previous-player source and exact prior artifact rollback | 17 / 17 tests | `npm run test:lucky:legacy` |
+
+The full-band PCM sweep's maximum peak was 0.844043, with no non-finite samples and an exactly silent measured Stop tail. These measurements use four seconds from bar 3 per style/rate, including a sound-roll crossfade; they are not indefinite playback or every seed/preset. Same-score comparisons use 1.4 seconds per voice. Locked drums use fixed render RNG/trigger and the supported pinned-frame workflow. The scripts record their exact source hashes and limitations in JSON under `src/lucky-cloud/tests/evidence/`; CI retains those JSON reports, not audio, screenshots or visitor MIDI.
+
+Before these checks, the stated falsifiers were a changed score under Sound rolls, rejected real lock captures, changed locked drum audio, non-finite or over-threshold PCM, non-silent Stop, or a surviving audio/export resource after teardown. Tests exposed early humanized onsets and accented velocities rejected by validation, seed-dependent locked drum velocity drift, asynchronous stop/history issues and old host selectors. Repairs preserved the actual musical events and made the tests address the shipped cloud artifact. The validators regenerate trusted source recipes rather than accepting arbitrary imported patch graphs.
+
+No subjective listening verdict, cultural authenticity, rights clearance, physical Safari/iPhone test or hardware MIDI result is inferred. Playwright's WebKit is a separate runner. The cloud tests and the six-instrument host tests qualify local builds; a successful Actions run and an anonymous live check qualify a particular deployment. The workflow exercises the current cloud artifact; legacy checks are explicitly separate.
+
+---
+
+# Historical initial-player qualification
 
 This is the September 5, 2026 local qualification record. Passing it does not establish a deployed GitHub Pages site, physical-device compatibility, or a listening preference. Each later Actions run produces its own reports for its checked-out source revision.
 

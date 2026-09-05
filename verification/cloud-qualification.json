@@ -1,0 +1,28 @@
+{
+  "artifact": "dist/instruments/lucky-dreamer.html",
+  "sha256": "d5ead8e304cc07cd72f33ca0e8cc5179f08ed6803ae846fc6fb6d95e3dccf04b",
+  "bankSha256": "aa8827afb728a36de5e66339051155fe48a4ebebdfda7a0693fc185be4e981ca",
+  "sourceAndTestsMatchIndependentQualification": true,
+  "independentReports": {
+    "pcm-report.json": {
+      "renders": 46,
+      "soundComparisons": 8,
+      "failures": 0,
+      "peakMax": 0.8440428972244263
+    },
+    "locked-drum-pcm.json": {
+      "cases": 18,
+      "failures": 0,
+      "pass": true
+    },
+    "browser-report.json": {
+      "engines": 2,
+      "cases": 8,
+      "allPassed": true
+    }
+  },
+  "limitations": [
+    "No subjective listening judgement or physical Safari/iPhone/hardware MIDI claim.",
+    "Only JSON summaries retained here; audition audio, screenshots and visitor MIDI excluded."
+  ]
+}

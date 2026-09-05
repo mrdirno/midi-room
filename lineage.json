@@ -29,8 +29,10 @@
       "name": "Lucky Dreamer",
       "launch": "https://persona500.com/midi-room/?instrument=lucky-dreamer",
       "wish_channel": "https://persona500.com/lucky-dreamer-card/#wish",
-      "source": "https://github.com/mrdirno/midi-room/tree/main/src/lucky",
-      "relationship": "new composition and player around supplied Lucky Dreamer synthesis"
+      "source": "https://github.com/mrdirno/midi-room/tree/main/src/lucky-cloud",
+      "relationship": "restored supplied cloud interface and whole-band engine with bounded lifecycle adapters and independent sound-bank selection",
+      "source_provenance": "src/lucky-cloud/provenance.json",
+      "previous_implementation": "src/lucky (build-legacy.py; retained for rollback)"
     },
     {
       "id": "org.persona500.midi-room.improvisator",

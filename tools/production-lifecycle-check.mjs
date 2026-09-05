@@ -6,8 +6,8 @@ const report={at:new Date().toISOString(),scope:'Real browser engine checks with
 try{for(const [name,type]of Object.entries({chromium,webkit})){
  const browser=await type.launch({headless:true});const context=await browser.newContext({viewport:{width:390,height:844},hasTouch:true,isMobile:true,acceptDownloads:true});const page=await context.newPage();page.on('pageerror',e=>report.errors.push({browser:name,error:e.message}));
  try{
-  for(const id of ['triton-rack','improvisator','drum-pad','field-keys','dsp-rack']){
-   await page.goto(base+'#instrument='+id);await page.waitForFunction(label=>document.querySelector('#instrumentName')?.textContent===label,({'triton-rack':'TRITON Rack',improvisator:'Improvisator','drum-pad':'Drum Pad','field-keys':'Field Keys','dsp-rack':'DSP Rack'})[id]);const f=page.frames().find(f=>f.parentFrame());await f.waitForLoadState();
+  for(const id of ['triton-rack','improvisator','drum-pad','field-keys','dsp-rack','lucky-dreamer']){
+   await page.goto(base+'#instrument='+id);await page.waitForFunction(label=>document.querySelector('#instrumentName')?.textContent===label,({'triton-rack':'TRITON Rack',improvisator:'Improvisator','drum-pad':'Drum Pad','field-keys':'Field Keys','dsp-rack':'DSP Rack','lucky-dreamer':'Lucky Dreamer'})[id]);const f=page.frames().find(f=>f.parentFrame());await f.waitForLoadState();
    const geometry=await f.evaluate(()=>({inner:innerWidth,scroll:document.documentElement.scrollWidth}));assert.ok(geometry.scroll<=geometry.inner+1,id+' mobile overflow '+JSON.stringify(geometry));
    let result;
    if(id==='triton-rack'){await f.locator('#kb [data-note]').nth(5).tap();await page.waitForTimeout(120);result=await f.evaluate(()=>({audio:TritonEngine.audioContext()?.state,powered:state.powered,held:ptrMap.size}));assert.equal(result.audio,'running');assert.equal(result.held,0);}
@@ -15,7 +15,14 @@ try{for(const [name,type]of Object.entries({chromium,webkit})){
    if(id==='drum-pad'){await f.locator('#pads .pad').first().tap();await page.waitForTimeout(120);result=await f.evaluate(()=>({audio:DrumPad.audioContext()?.state,...DrumPad.report()}));assert.equal(result.audio,'running');assert.ok(result.hits>0,'first touch must trigger a hit');}
    if(id==='field-keys'){await f.locator('#enable').tap();await f.waitForFunction(()=>FieldKeys.snapshot().enabled);await f.locator('#keys .key').first().tap();result=await f.evaluate(()=>FieldKeys.snapshot());assert.equal(result.enabled,true);}
    if(id==='dsp-rack'){await f.locator('#audio').tap();await f.waitForFunction(()=>MidiRoomRack.report().ready);await f.locator('#keys .key').first().tap();result=await f.evaluate(()=>MidiRoomRack.report());assert.equal(result.ready,true);}
-   await page.locator('#stopButton').tap();report.checks.push({browser:name,check:'390px real touch + hash launch',id,geometry,result});console.log('PASS touch',name,id);
+   if(id==='lucky-dreamer'){await f.waitForFunction(()=>!!window.LuckyCloud);assert.equal(await f.evaluate(()=>LuckyCloud.getState().playing),false);await f.locator('#dice').tap();await f.waitForFunction(()=>LuckyCloud.getState().audioState==='running'&&LuckyCloud.getState().stats?.peak>0,null,{timeout:20000});result=await f.evaluate(()=>LuckyCloud.getState());assert.equal(result.stats.nonFinite,0);}
+   await page.locator('#stopButton').tap();
+   if(id==='lucky-dreamer'){
+    await f.waitForFunction(()=>!LuckyCloud.getState().playing&&LuckyCloud.getState().audioState==='suspended');
+    await f.locator('#bSave').tap();await f.locator('#svMidi').tap();await page.locator('#saveTray .save-row').waitFor();
+    const saveText=await page.locator('#saveTray').innerText();assert.match(saveText,/\.mid/);report.checks.push({browser:name,check:'cloud-created MIDI reaches opaque parent save tray',saveText});
+   }
+   report.checks.push({browser:name,check:'390px real touch + hash launch',id,geometry,result});console.log('PASS touch',name,id);
   }
   // A generated creation export travels from the opaque frame to the parent save tray.
   await page.goto(base+'?instrument=drum-pad');await page.waitForSelector('#rackTabs .rack-tab');const pad=page.frames()[1];await pad.locator('#save').tap();await pad.locator('#record').tap();await pad.locator('[data-close="saveDialog"]').tap();await pad.locator('#pads .pad').first().tap();await pad.locator('#save').tap();await pad.locator('#record').tap();await pad.locator('#saveMidi').tap();

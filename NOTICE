@@ -13,6 +13,11 @@ The bundled copy in dist/licenses/HOST-MIT.txt retains this scoped grant in
 one file. Inherited TRITON and Lucky Dreamer engine source has no separately
 verified blanket redistribution license. DSP, musical corpora, contract
 documentation and other third-party material retain their stated terms.
+The restored Lucky cloud UI includes its operator-supplied cloud artwork.
+That artwork and inherited app/engine prose are not relicensed by the new
+integration code’s MIT grant. The built About view replaces the original
+blanket claims about ownership of rhythms; historical source prose is not
+legal guidance or a new rights grant.
 See docs/PRODUCTION-LICENSE-INVENTORY.md for the component boundaries before
 redistributing or incorporating them into another product.
 
