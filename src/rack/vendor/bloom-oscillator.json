@@ -1,0 +1,228 @@
+{
+  "format": "gauntlet.dsp-build/1",
+  "card": {
+    "format": "gauntlet.dsp-card/1",
+    "id": "bloom-oscillator",
+    "name": "Bloom Oscillator",
+    "author": "Aldrin Payopay",
+    "language": "faust",
+    "source": "// Author: Aldrin Payopay <aldrin.gdf@gmail.com>\ndeclare name \"Bloom Oscillator\";\ndeclare author \"Aldrin Payopay\";\nimport(\"stdfaust.lib\");\nfrequency = hslider(\"frequency[unit:Hz][scale:log]\",220,30,2000,0.1) : si.smoo;\nratio = hslider(\"ratio\",2,0.25,8,0.01) : si.smoo;\nindex = hslider(\"index\",0.3,0,3,0.01) : si.smoo;\nspread = hslider(\"spread[unit:Hz]\",1.5,0,12,0.1) : si.smoo;\nlevel = hslider(\"level[unit:dB]\",-18,-48,-6,0.1) : ba.db2linear : si.smoo;\nvoice(detune) = os.osc(max(1,frequency+detune+os.osc(frequency*ratio)*frequency*index)) * level;\nprocess = voice(0-spread), voice(spread);\n"
+  },
+  "sourceHash": "1b4dc394aed7f50c36c0c7ad1a215af055973bc703bcc8c763a3441dbc39b554",
+  "metadata": {
+    "nativePrefix": "dsp_bloom_oscillator",
+    "name": "Bloom Oscillator",
+    "inputs": 0,
+    "outputs": 2,
+    "size": 262272,
+    "parameters": [
+      {
+        "id": "/Bloom_Oscillator/frequency",
+        "label": "frequency",
+        "index": 262184,
+        "min": 30,
+        "max": 2000,
+        "init": 220,
+        "step": 0.1,
+        "meta": {
+          "scale": "log",
+          "unit": "Hz"
+        }
+      },
+      {
+        "id": "/Bloom_Oscillator/index",
+        "label": "index",
+        "index": 262196,
+        "min": 0,
+        "max": 3,
+        "init": 0.3,
+        "step": 0.01,
+        "meta": {}
+      },
+      {
+        "id": "/Bloom_Oscillator/level",
+        "label": "level",
+        "index": 262156,
+        "min": -48,
+        "max": -6,
+        "init": -18,
+        "step": 0.1,
+        "meta": {
+          "unit": "dB"
+        }
+      },
+      {
+        "id": "/Bloom_Oscillator/ratio",
+        "label": "ratio",
+        "index": 262208,
+        "min": 0.25,
+        "max": 8,
+        "init": 2,
+        "step": 0.01,
+        "meta": {}
+      },
+      {
+        "id": "/Bloom_Oscillator/spread",
+        "label": "spread",
+        "index": 262228,
+        "min": 0,
+        "max": 12,
+        "init": 1.5,
+        "step": 0.1,
+        "meta": {
+          "unit": "Hz"
+        }
+      }
+    ],
+    "ui": [
+      {
+        "type": "vgroup",
+        "label": "Bloom Oscillator",
+        "items": [
+          {
+            "type": "hslider",
+            "label": "frequency",
+            "varname": "fHslider1",
+            "shortname": "frequency",
+            "address": "/Bloom_Oscillator/frequency",
+            "index": 262184,
+            "meta": [
+              {
+                "scale": "log"
+              },
+              {
+                "unit": "Hz"
+              }
+            ],
+            "init": 220,
+            "min": 30,
+            "max": 2000,
+            "step": 0.1
+          },
+          {
+            "type": "hslider",
+            "label": "index",
+            "varname": "fHslider2",
+            "shortname": "index",
+            "address": "/Bloom_Oscillator/index",
+            "index": 262196,
+            "init": 0.3,
+            "min": 0,
+            "max": 3,
+            "step": 0.01
+          },
+          {
+            "type": "hslider",
+            "label": "level",
+            "varname": "fHslider0",
+            "shortname": "level",
+            "address": "/Bloom_Oscillator/level",
+            "index": 262156,
+            "meta": [
+              {
+                "unit": "dB"
+              }
+            ],
+            "init": -18,
+            "min": -48,
+            "max": -6,
+            "step": 0.1
+          },
+          {
+            "type": "hslider",
+            "label": "ratio",
+            "varname": "fHslider3",
+            "shortname": "ratio",
+            "address": "/Bloom_Oscillator/ratio",
+            "index": 262208,
+            "init": 2,
+            "min": 0.25,
+            "max": 8,
+            "step": 0.01
+          },
+          {
+            "type": "hslider",
+            "label": "spread",
+            "varname": "fHslider4",
+            "shortname": "spread",
+            "address": "/Bloom_Oscillator/spread",
+            "index": 262228,
+            "meta": [
+              {
+                "unit": "Hz"
+              }
+            ],
+            "init": 1.5,
+            "min": 0,
+            "max": 12,
+            "step": 0.1
+          }
+        ]
+      }
+    ],
+    "libraryMetadata": [
+      {
+        "author": "Aldrin Payopay"
+      },
+      {
+        "basics.lib/name": "Faust Basic Element Library"
+      },
+      {
+        "basics.lib/version": "1.22.0"
+      },
+      {
+        "compile_options": "-lang wasm -fpga-mem-th 4 -ct 1 -cn DspBloomOscillator -es 1 -mcd 16 -mdd 1024 -mdy 33 -single -ftz 0"
+      },
+      {
+        "filename": "card.dsp"
+      },
+      {
+        "maths.lib/author": "GRAME"
+      },
+      {
+        "maths.lib/copyright": "GRAME"
+      },
+      {
+        "maths.lib/license": "LGPL with exception"
+      },
+      {
+        "maths.lib/name": "Faust Math Library"
+      },
+      {
+        "maths.lib/version": "2.9.0"
+      },
+      {
+        "name": "Bloom Oscillator"
+      },
+      {
+        "oscillators.lib/name": "Faust Oscillator Library"
+      },
+      {
+        "oscillators.lib/version": "1.7.0"
+      },
+      {
+        "platform.lib/name": "Generic Platform Library"
+      },
+      {
+        "platform.lib/version": "1.3.0"
+      },
+      {
+        "signals.lib/name": "Faust Routing Library"
+      },
+      {
+        "signals.lib/version": "1.6.0"
+      }
+    ],
+    "compiler": "FAUST Version 2.85.9"
+  },
+  "wasm": "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bVJsWTJ4aGNtVWdibUZ0WlNBaVFteHZiMjBnVDNOamFXeHNZWFJ2Y2lJN0NtUmxZMnhoY21VZ1lYVjBhRzl5SUNKQmJHUnlhVzRnVUdGNWIzQmhlU0k3Q21sdGNHOXlkQ2dpYzNSa1ptRjFjM1F1YkdsaUlpazdDbVp5WlhGMVpXNWplU0E5SUdoemJHbGtaWElvSW1aeVpYRjFaVzVqZVZ0MWJtbDBPa2g2WFZ0elkyRnNaVHBzYjJkZElpd3lNakFzTXpBc01qQXdNQ3d3TGpFcElEb2djMmt1YzIxdmJ6c0tjbUYwYVc4Z1BTQm9jMnhwWkdWeUtDSnlZWFJwYnlJc01pd3dMakkxTERnc01DNHdNU2tnT2lCemFTNXpiVzl2T3dwcGJtUmxlQ0E5SUdoemJHbGtaWElvSW1sdVpHVjRJaXd3TGpNc01Dd3pMREF1TURFcElEb2djMmt1YzIxdmJ6c0tjM0J5WldGa0lEMGdhSE5zYVdSbGNpZ2ljM0J5WldGa1czVnVhWFE2U0hwZElpd3hMalVzTUN3eE1pd3dMakVwSURvZ2Mya3VjMjF2YnpzS2JHVjJaV3dnUFNCb2MyeHBaR1Z5S0NKc1pYWmxiRnQxYm1sME9tUkNYU0lzTFRFNExDMDBPQ3d0Tml3d0xqRXBJRG9nWW1FdVpHSXliR2x1WldGeUlEb2djMmt1YzIxdmJ6c0tkbTlwWTJVb1pHVjBkVzVsS1NBOUlHOXpMbTl6WXlodFlYZ29NU3htY21WeGRXVnVZM2tyWkdWMGRXNWxLMjl6TG05ell5aG1jbVZ4ZFdWdVkza3FjbUYwYVc4cEttWnlaWEYxWlc1amVTcHBibVJsZUNrcElDb2diR1YyWld3N0NuQnliMk5sYzNNZ1BTQjJiMmxqWlNnd0xYTndjbVZoWkNrc0lIWnZhV05sS0hOd2NtVmhaQ2s3Q2c9PSIsImlucHV0cyI6MCwib3V0cHV0cyI6MiwibWV0YSI6W3siYXV0aG9yIjoiQWxkcmluIFBheW9wYXkifSx7ImJhc2ljcy5saWIvbmFtZSI6IkZhdXN0IEJhc2ljIEVsZW1lbnQgTGlicmFyeSJ9LHsiYmFzaWNzLmxpYi92ZXJzaW9uIjoiMS4yMi4wIn0seyJjb21waWxlX29wdGlvbnMiOiItbGFuZyB3YXNtIC1mcGdhLW1lbS10aCA0IC1jdCAxIC1jbiBEc3BCbG9vbU9zY2lsbGF0b3IgLWVzIDEgLW1jZCAxNiAtbWRkIDEwMjQgLW1keSAzMyAtc2luZ2xlIC1mdHogMCJ9LHsiZmlsZW5hbWUiOiJjYXJkLmRzcCJ9LHsibWF0aHMubGliL2F1dGhvciI6IkdSQU1FIn0seyJtYXRocy5saWIvY29weXJpZ2h0IjoiR1JBTUUifSx7Im1hdGhzLmxpYi9saWNlbnNlIjoiTEdQTCB3aXRoIGV4Y2VwdGlvbiJ9LHsibWF0aHMubGliL25hbWUiOiJGYXVzdCBNYXRoIExpYnJhcnkifSx7Im1hdGhzLmxpYi92ZXJzaW9uIjoiMi45LjAifSx7Im5hbWUiOiJCbG9vbSBPc2NpbGxhdG9yIn0seyJvc2NpbGxhdG9ycy5saWIvbmFtZSI6IkZhdXN0IE9zY2lsbGF0b3IgTGlicmFyeSJ9LHsib3NjaWxsYXRvcnMubGliL3ZlcnNpb24iOiIxLjcuMCJ9LHsicGxhdGZvcm0ubGliL25hbWUiOiJHZW5lcmljIFBsYXRmb3JtIExpYnJhcnkifSx7InBsYXRmb3JtLmxpYi92ZXJzaW9uIjoiMS4zLjAifSx7InNpZ25hbHMubGliL25hbWUiOiJGYXVzdCBSb3V0aW5nIExpYnJhcnkifSx7InNpZ25hbHMubGliL3ZlcnNpb24iOiIxLjYuMCJ9XSwidWkiOlt7InR5cGUiOiJ2Z3JvdXAiLCJsYWJlbCI6IkJsb29tIE9zY2lsbGF0b3IiLCJpdGVtcyI6W3sidHlwZSI6ImhzbGlkZXIiLCJsYWJlbCI6ImZyZXF1ZW5jeSIsInZhcm5hbWUiOiJmSHNsaWRlcjEiLCJzaG9ydG5hbWUiOiJmcmVxdWVuY3kiLCJhZGRyZXNzIjoiL0Jsb29tX09zY2lsbGF0b3IvZnJlcXVlbmN5IiwiaW5kZXgiOjI2MjE4NCwibWV0YSI6W3sic2NhbGUiOiJsb2cifSx7InVuaXQiOiJIeiJ9XSwiaW5pdCI6MjIwLCJtaW4iOjMwLCJtYXgiOjIwMDAsInN0ZXAiOjAuMX0seyJ0eXBlIjoiaHNsaWRlciIsImxhYmVsIjoiaW5kZXgiLCJ2YXJuYW1lIjoiZkhzbGlkZXIyIiwic2hvcnRuYW1lIjoiaW5kZXgiLCJhZGRyZXNzIjoiL0Jsb29tX09zY2lsbGF0b3IvaW5kZXgiLCJpbmRleCI6MjYyMTk2LCJpbml0IjowLjMsIm1pbiI6MCwibWF4IjozLCJzdGVwIjowLjAxfSx7InR5cGUiOiJoc2xpZGVyIiwibGFiZWwiOiJsZXZlbCIsInZhcm5hbWUiOiJmSHNsaWRlcjAiLCJzaG9ydG5hbWUiOiJsZXZlbCIsImFkZHJlc3MiOiIvQmxvb21fT3NjaWxsYXRvci9sZXZlbCIsImluZGV4IjoyNjIxNTYsIm1ldGEiOlt7InVuaXQiOiJkQiJ9XSwiaW5pdCI6LTE4LCJtaW4iOi00OCwibWF4IjotNiwic3RlcCI6MC4xfSx7InR5cGUiOiJoc2xpZGVyIiwibGFiZWwiOiJyYXRpbyIsInZhcm5hbWUiOiJmSHNsaWRlcjMiLCJzaG9ydG5hbWUiOiJyYXRpbyIsImFkZHJlc3MiOiIvQmxvb21fT3NjaWxsYXRvci9yYXRpbyIsImluZGV4IjoyNjIyMDgsImluaXQiOjIsIm1pbiI6MC4yNSwibWF4Ijo4LCJzdGVwIjowLjAxfSx7InR5cGUiOiJoc2xpZGVyIiwibGFiZWwiOiJzcHJlYWQiLCJ2YXJuYW1lIjoiZkhzbGlkZXI0Iiwic2hvcnRuYW1lIjoic3ByZWFkIiwiYWRkcmVzcyI6Ii9CbG9vbV9Pc2NpbGxhdG9yL3NwcmVhZCIsImluZGV4IjoyNjIyMjgsIm1ldGEiOlt7InVuaXQiOiJIeiJ9XSwiaW5pdCI6MS41LCJtaW4iOjAsIm1heCI6MTIsInN0ZXAiOjAuMX1dfV19",
+  "nativeC": "/************************** BEGIN CInterface.h **************************\n FAUST Architecture File\n Copyright (C) 2003-2022 GRAME, Centre National de Creation Musicale\n ---------------------------------------------------------------------\n This program is free software; you can redistribute it and/or modify\n it under the terms of the GNU Lesser General Public License as published by\n the Free Software Foundation; either version 2.1 of the License, or\n (at your option) any later version.\n \n This program is distributed in the hope that it will be useful,\n but WITHOUT ANY WARRANTY; without even the implied warranty of\n MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the\n GNU Lesser General Public License for more details.\n \n You should have received a copy of the GNU Lesser General Public License\n along with this program; if not, write to the Free Software\n Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.\n \n EXCEPTION : As a special exception, you may create a larger work\n that contains this FAUST architecture section and distribute\n that work under terms of your choice, so long as this FAUST\n architecture section is not modified.\n *************************************************************************/\n\n#ifndef CINTERFACE_H\n#define CINTERFACE_H\n\n#ifndef FAUSTFLOAT\n#define FAUSTFLOAT float\n#endif\n\n#include <stdlib.h>\n\n#ifdef __cplusplus\nextern \"C\" {\n#endif\n    \nstruct Soundfile;\n\n/*******************************************************************************\n * UI, Meta and MemoryManager structures for C code.\n ******************************************************************************/\n\n// -- widget's layouts\n\ntypedef void (* openTabBoxFun) (void* ui_interface, const char* label);\ntypedef void (* openHorizontalBoxFun) (void* ui_interface, const char* label);\ntypedef void (* openVerticalBoxFun) (void* ui_interface, const char* label);\ntypedef void (* closeBoxFun) (void* ui_interface);\n\n// -- active widgets\n\ntypedef void (* addButtonFun) (void* ui_interface, const char* label, FAUSTFLOAT* zone);\ntypedef void (* addCheckButtonFun) (void* ui_interface, const char* label, FAUSTFLOAT* zone);\ntypedef void (* addVerticalSliderFun) (void* ui_interface, const char* label, FAUSTFLOAT* zone, FAUSTFLOAT init, FAUSTFLOAT min, FAUSTFLOAT max, FAUSTFLOAT step);\ntypedef void (* addHorizontalSliderFun) (void* ui_interface, const char* label, FAUSTFLOAT* zone, FAUSTFLOAT init, FAUSTFLOAT min, FAUSTFLOAT max, FAUSTFLOAT step);\ntypedef void (* addNumEntryFun) (void* ui_interface, const char* label, FAUSTFLOAT* zone, FAUSTFLOAT init, FAUSTFLOAT min, FAUSTFLOAT max, FAUSTFLOAT step);\n\n// -- passive widgets\n\ntypedef void (* addHorizontalBargraphFun) (void* ui_interface, const char* label, FAUSTFLOAT* zone, FAUSTFLOAT min, FAUSTFLOAT max);\ntypedef void (* addVerticalBargraphFun) (void* ui_interface, const char* label, FAUSTFLOAT* zone, FAUSTFLOAT min, FAUSTFLOAT max);\n\n// -- soundfiles\n    \ntypedef void (* addSoundfileFun) (void* ui_interface, const char* label, const char* url, struct Soundfile** sf_zone);\n\ntypedef void (* declareFun) (void* ui_interface, FAUSTFLOAT* zone, const char* key, const char* value);\n\ntypedef struct {\n\n    void* uiInterface;\n\n    openTabBoxFun openTabBox;\n    openHorizontalBoxFun openHorizontalBox;\n    openVerticalBoxFun openVerticalBox;\n    closeBoxFun closeBox;\n    addButtonFun addButton;\n    addCheckButtonFun addCheckButton;\n    addVerticalSliderFun addVerticalSlider;\n    addHorizontalSliderFun addHorizontalSlider;\n    addNumEntryFun addNumEntry;\n    addHorizontalBargraphFun addHorizontalBargraph;\n    addVerticalBargraphFun addVerticalBargraph;\n    addSoundfileFun addSoundfile;\n    declareFun declare;\n\n} UIGlue;\n\ntypedef void (* metaDeclareFun) (void* ui_interface, const char* key, const char* value);\n\ntypedef struct {\n\n    void* metaInterface;\n    \n    metaDeclareFun declare;\n\n} MetaGlue;\n\n/***************************************\n *  Interface for the DSP object\n ***************************************/\n\ntypedef char dsp_imp;\n    \ntypedef dsp_imp* (* newDspFun) ();\ntypedef void (* destroyDspFun) (dsp_imp* dsp);\ntypedef int (* getNumInputsFun) (dsp_imp* dsp);\ntypedef int (* getNumOutputsFun) (dsp_imp* dsp);\ntypedef void (* buildUserInterfaceFun) (dsp_imp* dsp, UIGlue* ui);\ntypedef int (* getSampleRateFun) (dsp_imp* dsp);\ntypedef void (* initFun) (dsp_imp* dsp, int sample_rate);\ntypedef void (* classInitFun) (int sample_rate);\ntypedef void (* staticInitFun) (dsp_imp* dsp, int sample_rate);\ntypedef void (* instanceInitFun) (dsp_imp* dsp, int sample_rate);\ntypedef void (* instanceConstantsFun) (dsp_imp* dsp, int sample_rate);\ntypedef void (* instanceResetUserInterfaceFun) (dsp_imp* dsp);\ntypedef void (* instanceClearFun) (dsp_imp* dsp);\ntypedef void (* computeFun) (dsp_imp* dsp, int len, FAUSTFLOAT** inputs, FAUSTFLOAT** outputs);\ntypedef void (* metadataFun) (MetaGlue* meta);\n    \n/***************************************\n * DSP memory manager functions\n ***************************************/\n\ntypedef void* (* allocateFun) (void* manager_interface, size_t size);\ntypedef void (* destroyFun) (void* manager_interface, void* ptr);\n\ntypedef struct {\n    \n    void* managerInterface;\n    \n    allocateFun allocate;\n    destroyFun destroy;\n    \n} MemoryManagerGlue;\n\n#ifdef __cplusplus\n}\n#endif\n\n#endif\n/**************************  END  CInterface.h **************************/\n\n/* ------------------------------------------------------------\nauthor: \"Aldrin Payopay\"\nname: \"Bloom Oscillator\"\nCode generated with Faust 2.85.9 (https://faust.grame.fr)\nCompilation options: -lang c -fpga-mem-th 4 -it -fp -ct 1 -cn DspBloomOscillator -es 1 -mcd 16 -mdd 1024 -mdy 33 -single -ftz 0\n------------------------------------------------------------ */\n\n#ifndef  __DspBloomOscillator_H__\n#define  __DspBloomOscillator_H__\n\n#ifndef FAUSTFLOAT\n#define FAUSTFLOAT float\n#endif \n\n\n#ifdef __cplusplus\nextern \"C\" {\n#endif\n\n#if defined(_WIN32)\n#define RESTRICT __restrict\n#else\n#define RESTRICT __restrict__\n#endif\n\n#include <math.h>\n#include <stdint.h>\n#include <stdlib.h>\n\n\n#ifndef FAUSTCLASS \n#define FAUSTCLASS DspBloomOscillator\n#endif\n\n#ifdef __APPLE__ \n#define exp10f __exp10f\n#define exp10 __exp10\n#endif\n#ifndef FAUSTMAXI\n#define FAUSTMAXI\nstatic inline int faustmaxi(int a, int b) { return (a > b) ? a : b; }\nstatic inline int faustmini(int a, int b) { return (a < b) ? a : b; }\n#endif\n\ntypedef struct {\n\tint fSampleRate;\n\tfloat fConst0;\n\tfloat fConst1;\n\tFAUSTFLOAT fHslider0;\n\tfloat fConst2;\n\tint iVec0[2];\n\tfloat fRec0[2];\n\tfloat ftbl0DspBloomOscillatorSIG0[65536];\n\tfloat fConst3;\n\tFAUSTFLOAT fHslider1;\n\tfloat fRec3[2];\n\tFAUSTFLOAT fHslider2;\n\tfloat fRec4[2];\n\tFAUSTFLOAT fHslider3;\n\tfloat fRec6[2];\n\tfloat fRec5[2];\n\tFAUSTFLOAT fHslider4;\n\tfloat fRec7[2];\n\tfloat fRec2[2];\n\tfloat fRec8[2];\n\tint iVec1[2];\n\tint iRec1[2];\n} DspBloomOscillator;\n\nDspBloomOscillator* newDspBloomOscillator() { \n\tDspBloomOscillator* dsp = (DspBloomOscillator*)calloc(1, sizeof(DspBloomOscillator));\n\treturn dsp;\n}\n\nvoid deleteDspBloomOscillator(DspBloomOscillator* dsp) { \n\tfree(dsp);\n}\n\nvoid metadataDspBloomOscillator(MetaGlue* m) { \n\tm->declare(m->metaInterface, \"author\", \"Aldrin Payopay\");\n\tm->declare(m->metaInterface, \"basics.lib/name\", \"Faust Basic Element Library\");\n\tm->declare(m->metaInterface, \"basics.lib/version\", \"1.22.0\");\n\tm->declare(m->metaInterface, \"compile_options\", \"-lang c -fpga-mem-th 4 -it -fp -ct 1 -cn DspBloomOscillator -es 1 -mcd 16 -mdd 1024 -mdy 33 -single -ftz 0\");\n\tm->declare(m->metaInterface, \"filename\", \"card.dsp\");\n\tm->declare(m->metaInterface, \"maths.lib/author\", \"GRAME\");\n\tm->declare(m->metaInterface, \"maths.lib/copyright\", \"GRAME\");\n\tm->declare(m->metaInterface, \"maths.lib/license\", \"LGPL with exception\");\n\tm->declare(m->metaInterface, \"maths.lib/name\", \"Faust Math Library\");\n\tm->declare(m->metaInterface, \"maths.lib/version\", \"2.9.0\");\n\tm->declare(m->metaInterface, \"name\", \"Bloom Oscillator\");\n\tm->declare(m->metaInterface, \"oscillators.lib/name\", \"Faust Oscillator Library\");\n\tm->declare(m->metaInterface, \"oscillators.lib/version\", \"1.7.0\");\n\tm->declare(m->metaInterface, \"platform.lib/name\", \"Generic Platform Library\");\n\tm->declare(m->metaInterface, \"platform.lib/version\", \"1.3.0\");\n\tm->declare(m->metaInterface, \"signals.lib/name\", \"Faust Routing Library\");\n\tm->declare(m->metaInterface, \"signals.lib/version\", \"1.6.0\");\n}\n\nint getSampleRateDspBloomOscillator(DspBloomOscillator* RESTRICT dsp) {\n\treturn dsp->fSampleRate;\n}\n\nint getNumInputsDspBloomOscillator(DspBloomOscillator* RESTRICT dsp) {\n\treturn 0;\n}\nint getNumOutputsDspBloomOscillator(DspBloomOscillator* RESTRICT dsp) {\n\treturn 2;\n}\n\nvoid classInitDspBloomOscillator(int sample_rate) {}\n\nvoid staticInitDspBloomOscillator(DspBloomOscillator* dsp, int sample_rate) {\n\t/* C99 loop */\n\t{\n\t\tint l2_re0;\n\t\tfor (l2_re0 = 0; l2_re0 < 2; l2_re0 = l2_re0 + 1) {\n\t\t\tdsp->iVec1[l2_re0] = 0;\n\t\t}\n\t}\n\t/* C99 loop */\n\t{\n\t\tint l3_re0;\n\t\tfor (l3_re0 = 0; l3_re0 < 2; l3_re0 = l3_re0 + 1) {\n\t\t\tdsp->iRec1[l3_re0] = 0;\n\t\t}\n\t}\n\t/* C99 loop */\n\t{\n\t\tint i1_re0;\n\t\tfor (i1_re0 = 0; i1_re0 < 65536; i1_re0 = i1_re0 + 1) {\n\t\t\tdsp->iVec1[0] = 1;\n\t\t\tdsp->iRec1[0] = (dsp->iVec1[1] + dsp->iRec1[1]) % 65536;\n\t\t\tdsp->ftbl0DspBloomOscillatorSIG0[i1_re0] = sinf(9.58738e-05f * (float)(dsp->iRec1[0]));\n\t\t\tdsp->iVec1[1] = dsp->iVec1[0];\n\t\t\tdsp->iRec1[1] = dsp->iRec1[0];\n\t\t}\n\t}\n}\n\nvoid instanceResetUserInterfaceDspBloomOscillator(DspBloomOscillator* dsp) {\n\tdsp->fHslider0 = (FAUSTFLOAT)(-18.0f);\n\tdsp->fHslider1 = (FAUSTFLOAT)(2.2e+02f);\n\tdsp->fHslider2 = (FAUSTFLOAT)(0.3f);\n\tdsp->fHslider3 = (FAUSTFLOAT)(2.0f);\n\tdsp->fHslider4 = (FAUSTFLOAT)(1.5f);\n}\n\nvoid instanceClearDspBloomOscillator(DspBloomOscillator* dsp) {\n\t/* C99 loop */\n\t{\n\t\tint l0;\n\t\tfor (l0 = 0; l0 < 2; l0 = l0 + 1) {\n\t\t\tdsp->iVec0[l0] = 0;\n\t\t}\n\t}\n\t/* C99 loop */\n\t{\n\t\tint l1;\n\t\tfor (l1 = 0; l1 < 2; l1 = l1 + 1) {\n\t\t\tdsp->fRec0[l1] = 0.0f;\n\t\t}\n\t}\n\t/* C99 loop */\n\t{\n\t\tint l4;\n\t\tfor (l4 = 0; l4 < 2; l4 = l4 + 1) {\n\t\t\tdsp->fRec3[l4] = 0.0f;\n\t\t}\n\t}\n\t/* C99 loop */\n\t{\n\t\tint l5;\n\t\tfor (l5 = 0; l5 < 2; l5 = l5 + 1) {\n\t\t\tdsp->fRec4[l5] = 0.0f;\n\t\t}\n\t}\n\t/* C99 loop */\n\t{\n\t\tint l6;\n\t\tfor (l6 = 0; l6 < 2; l6 = l6 + 1) {\n\t\t\tdsp->fRec6[l6] = 0.0f;\n\t\t}\n\t}\n\t/* C99 loop */\n\t{\n\t\tint l7;\n\t\tfor (l7 = 0; l7 < 2; l7 = l7 + 1) {\n\t\t\tdsp->fRec5[l7] = 0.0f;\n\t\t}\n\t}\n\t/* C99 loop */\n\t{\n\t\tint l8;\n\t\tfor (l8 = 0; l8 < 2; l8 = l8 + 1) {\n\t\t\tdsp->fRec7[l8] = 0.0f;\n\t\t}\n\t}\n\t/* C99 loop */\n\t{\n\t\tint l9;\n\t\tfor (l9 = 0; l9 < 2; l9 = l9 + 1) {\n\t\t\tdsp->fRec2[l9] = 0.0f;\n\t\t}\n\t}\n\t/* C99 loop */\n\t{\n\t\tint l10;\n\t\tfor (l10 = 0; l10 < 2; l10 = l10 + 1) {\n\t\t\tdsp->fRec8[l10] = 0.0f;\n\t\t}\n\t}\n}\n\nvoid instanceConstantsDspBloomOscillator(DspBloomOscillator* dsp, int sample_rate) {\n\tdsp->fSampleRate = sample_rate;\n\tdsp->fConst0 = fminf(1.92e+05f, fmaxf(1.0f, (float)(dsp->fSampleRate)));\n\tdsp->fConst1 = 44.1f / dsp->fConst0;\n\tdsp->fConst2 = 1.0f - dsp->fConst1;\n\tdsp->fConst3 = 1.0f / dsp->fConst0;\n}\n\t\nvoid instanceInitDspBloomOscillator(DspBloomOscillator* dsp, int sample_rate) {\n\tstaticInitDspBloomOscillator(dsp, sample_rate);\n\tinstanceConstantsDspBloomOscillator(dsp, sample_rate);\n\tinstanceResetUserInterfaceDspBloomOscillator(dsp);\n\tinstanceClearDspBloomOscillator(dsp);\n}\n\nvoid initDspBloomOscillator(DspBloomOscillator* dsp, int sample_rate) {\n\tinstanceInitDspBloomOscillator(dsp, sample_rate);\n}\n\nvoid buildUserInterfaceDspBloomOscillator(DspBloomOscillator* dsp, UIGlue* ui_interface) {\n\tui_interface->openVerticalBox(ui_interface->uiInterface, \"Bloom Oscillator\");\n\tui_interface->declare(ui_interface->uiInterface, &dsp->fHslider1, \"scale\", \"log\");\n\tui_interface->declare(ui_interface->uiInterface, &dsp->fHslider1, \"unit\", \"Hz\");\n\tui_interface->addHorizontalSlider(ui_interface->uiInterface, \"frequency\", &dsp->fHslider1, (FAUSTFLOAT)2.2e+02f, (FAUSTFLOAT)3e+01f, (FAUSTFLOAT)2e+03f, (FAUSTFLOAT)0.1f);\n\tui_interface->addHorizontalSlider(ui_interface->uiInterface, \"index\", &dsp->fHslider2, (FAUSTFLOAT)0.3f, (FAUSTFLOAT)0.0f, (FAUSTFLOAT)3.0f, (FAUSTFLOAT)0.01f);\n\tui_interface->declare(ui_interface->uiInterface, &dsp->fHslider0, \"unit\", \"dB\");\n\tui_interface->addHorizontalSlider(ui_interface->uiInterface, \"level\", &dsp->fHslider0, (FAUSTFLOAT)-18.0f, (FAUSTFLOAT)-48.0f, (FAUSTFLOAT)-6.0f, (FAUSTFLOAT)0.1f);\n\tui_interface->addHorizontalSlider(ui_interface->uiInterface, \"ratio\", &dsp->fHslider3, (FAUSTFLOAT)2.0f, (FAUSTFLOAT)0.25f, (FAUSTFLOAT)8.0f, (FAUSTFLOAT)0.01f);\n\tui_interface->declare(ui_interface->uiInterface, &dsp->fHslider4, \"unit\", \"Hz\");\n\tui_interface->addHorizontalSlider(ui_interface->uiInterface, \"spread\", &dsp->fHslider4, (FAUSTFLOAT)1.5f, (FAUSTFLOAT)0.0f, (FAUSTFLOAT)12.0f, (FAUSTFLOAT)0.1f);\n\tui_interface->closeBox(ui_interface->uiInterface);\n}\n\nvoid computeDspBloomOscillator(DspBloomOscillator* dsp, int count, FAUSTFLOAT** RESTRICT inputs, FAUSTFLOAT** RESTRICT outputs) {\n\tFAUSTFLOAT* output0 = outputs[0];\n\tFAUSTFLOAT* output1 = outputs[1];\n\tfloat fSlow0 = dsp->fConst1 * powf(1e+01f, 0.05f * (float)(dsp->fHslider0));\n\tfloat fSlow1 = dsp->fConst1 * (float)(dsp->fHslider1);\n\tfloat fSlow2 = dsp->fConst1 * (float)(dsp->fHslider2);\n\tfloat fSlow3 = dsp->fConst1 * (float)(dsp->fHslider3);\n\tfloat fSlow4 = dsp->fConst1 * (float)(dsp->fHslider4);\n\t/* C99 loop */\n\t{\n\t\tint i0;\n\t\tfor (i0 = 0; i0 < count; i0 = i0 + 1) {\n\t\t\tdsp->iVec0[0] = 1;\n\t\t\tdsp->fRec0[0] = fSlow0 + (dsp->fConst2 * dsp->fRec0[1]);\n\t\t\tint iTemp0 = 1 - dsp->iVec0[1];\n\t\t\tdsp->fRec3[0] = fSlow1 + (dsp->fConst2 * dsp->fRec3[1]);\n\t\t\tdsp->fRec4[0] = fSlow2 + (dsp->fConst2 * dsp->fRec4[1]);\n\t\t\tdsp->fRec6[0] = fSlow3 + (dsp->fConst2 * dsp->fRec6[1]);\n\t\t\tfloat fTemp1 = ((iTemp0) ? 0.0f : dsp->fRec5[1] + (dsp->fConst3 * (dsp->fRec3[0] * dsp->fRec6[0])));\n\t\t\tdsp->fRec5[0] = fTemp1 - floorf(fTemp1);\n\t\t\tfloat fTemp2 = dsp->fRec3[0] * ((dsp->fRec4[0] * dsp->ftbl0DspBloomOscillatorSIG0[faustmaxi(0, faustmini((int)(65536.0f * dsp->fRec5[0]), 65535))]) + 1.0f);\n\t\t\tdsp->fRec7[0] = fSlow4 + (dsp->fConst2 * dsp->fRec7[1]);\n\t\t\tfloat fTemp3 = ((iTemp0) ? 0.0f : dsp->fRec2[1] + (dsp->fConst3 * fmaxf(1.0f, fTemp2 - dsp->fRec7[0])));\n\t\t\tdsp->fRec2[0] = fTemp3 - floorf(fTemp3);\n\t\t\toutput0[i0] = (FAUSTFLOAT)(dsp->fRec0[0] * dsp->ftbl0DspBloomOscillatorSIG0[faustmaxi(0, faustmini((int)(65536.0f * dsp->fRec2[0]), 65535))]);\n\t\t\tfloat fTemp4 = ((iTemp0) ? 0.0f : dsp->fRec8[1] + (dsp->fConst3 * fmaxf(1.0f, dsp->fRec7[0] + fTemp2)));\n\t\t\tdsp->fRec8[0] = fTemp4 - floorf(fTemp4);\n\t\t\toutput1[i0] = (FAUSTFLOAT)(dsp->fRec0[0] * dsp->ftbl0DspBloomOscillatorSIG0[faustmaxi(0, faustmini((int)(65536.0f * dsp->fRec8[0]), 65535))]);\n\t\t\tdsp->iVec0[1] = dsp->iVec0[0];\n\t\t\tdsp->fRec0[1] = dsp->fRec0[0];\n\t\t\tdsp->fRec3[1] = dsp->fRec3[0];\n\t\t\tdsp->fRec4[1] = dsp->fRec4[0];\n\t\t\tdsp->fRec6[1] = dsp->fRec6[0];\n\t\t\tdsp->fRec5[1] = dsp->fRec5[0];\n\t\t\tdsp->fRec7[1] = dsp->fRec7[0];\n\t\t\tdsp->fRec2[1] = dsp->fRec2[0];\n\t\t\tdsp->fRec8[1] = dsp->fRec8[0];\n\t\t}\n\t}\n}\n\n#ifdef __cplusplus\n}\n#endif\n\n#endif\n\n/* Author: Aldrin Payopay <aldrin.gdf@gmail.com>. Appended to generated Faust C. */\n/* A context is owned by one audio thread. Set controls at block/event boundaries.\n   Creation/destruction, compilation and file I/O belong outside the audio callback. */\n#include <stddef.h>\n#include <stdio.h>\n#include <string.h>\n#include <time.h>\n\ntypedef struct { const char *id; float initial, minimum, maximum; } DspParameter;\n#define DSP_PARAMETER_COUNT 5\n#define DSP_INPUT_COUNT 0\n#define DSP_OUTPUT_COUNT 2\nstatic const DspParameter dsp_parameters[5] = {\n{\"/Bloom_Oscillator/frequency\",220,30,2000},\n{\"/Bloom_Oscillator/index\",0.3,0,3},\n{\"/Bloom_Oscillator/level\",-18,-48,-6},\n{\"/Bloom_Oscillator/ratio\",2,0.25,8},\n{\"/Bloom_Oscillator/spread\",1.5,0,12}\n};\nvoid *dsp_bloom_oscillator_create(int rate) {\n    if (rate < 8000 || rate > 192000) return NULL;\n    DspBloomOscillator *dsp = newDspBloomOscillator();\n    if (dsp) initDspBloomOscillator(dsp, rate);\n    return dsp;\n}\nvoid dsp_bloom_oscillator_destroy(void *dsp) { if (dsp) deleteDspBloomOscillator((DspBloomOscillator *)dsp); }\nvoid dsp_bloom_oscillator_reset(void *dsp) { if (dsp) instanceClearDspBloomOscillator((DspBloomOscillator *)dsp); }\nsize_t dsp_bloom_oscillator_parameter_count(void) { return DSP_PARAMETER_COUNT; }\nconst DspParameter *dsp_bloom_oscillator_parameter(size_t index) {\n    return index < DSP_PARAMETER_COUNT ? &dsp_parameters[index] : NULL;\n}\nint dsp_bloom_oscillator_set(void *context, size_t index, float value) {\n    if (!context || index >= DSP_PARAMETER_COUNT || !isfinite(value)) return 0;\n    const DspParameter *p = &dsp_parameters[index];\n    if (value < p->minimum || value > p->maximum) return 0;\n    DspBloomOscillator *dsp = (DspBloomOscillator *)context;\n    switch (index) { case 0: dsp->fHslider1=value; break;\ncase 1: dsp->fHslider2=value; break;\ncase 2: dsp->fHslider0=value; break;\ncase 3: dsp->fHslider3=value; break;\ncase 4: dsp->fHslider4=value; break; default: return 0; }\n    return 1;\n}\nint dsp_bloom_oscillator_inputs(void) { return DSP_INPUT_COUNT; }\nint dsp_bloom_oscillator_outputs(void) { return DSP_OUTPUT_COUNT; }\nint dsp_bloom_oscillator_process(void *context, int frames, float **inputs, float **outputs) {\n    if (!context || frames < 1 || frames > 8192 || !outputs) return 0;\n    for (int c=0; c<DSP_OUTPUT_COUNT; ++c) if (!outputs[c]) return 0;\n    for (int c=0; c<DSP_INPUT_COUNT; ++c) if (!inputs || !inputs[c]) return 0;\n    computeDspBloomOscillator((DspBloomOscillator *)context, frames, inputs, outputs);\n    return 1;\n}\n\n#ifdef DSP_CARD_RENDER_MAIN\n/* Offline verification host. Input/output are little-endian interleaved float32.\n   Timings cover only dsp_bloom_oscillator_process; they do not measure device latency. */\nstatic double card_clock(void) {\n    struct timespec ts; clock_gettime(CLOCK_MONOTONIC, &ts);\n    return (double)ts.tv_sec + (double)ts.tv_nsec * 1e-9;\n}\nint main(int argc, char **argv) {\n    if (argc != 8) {\n        fprintf(stderr,\"usage: render rate frames block input.f32 output.f32 params.txt events.txt\\n\"); return 2;\n    }\n    char *end;\n    long rate=strtol(argv[1],&end,10); if (*end || rate<8000 || rate>192000) return 2;\n    long frames=strtol(argv[2],&end,10); if (*end || frames<1 || frames>rate*90) return 2;\n    long block=strtol(argv[3],&end,10); if (*end || block<1 || block>8192) return 2;\n    DspBloomOscillator *dsp=dsp_bloom_oscillator_create((int)rate); if (!dsp) return 3;\n    float *in[2]={NULL,NULL}, *out[2]={NULL,NULL};\n    for(int c=0;c<DSP_INPUT_COUNT;c++) in[c]=calloc((size_t)block,sizeof(float));\n    for(int c=0;c<DSP_OUTPUT_COUNT;c++) out[c]=calloc((size_t)block,sizeof(float));\n    float *source=calloc((size_t)frames*(DSP_INPUT_COUNT?DSP_INPUT_COUNT:1),sizeof(float));\n    float *result=calloc((size_t)frames*DSP_OUTPUT_COUNT,sizeof(float));\n    if(!source||!result) return 3;\n    for(int c=0;c<DSP_INPUT_COUNT;c++) if(!in[c]) return 3;\n    for(int c=0;c<DSP_OUTPUT_COUNT;c++) if(!out[c]) return 3;\n    FILE *input=fopen(argv[4],\"rb\"), *params=fopen(argv[6],\"r\"), *events=fopen(argv[7],\"r\");\n    if(!input||!params||!events) return 4;\n    size_t samples=(size_t)frames*DSP_INPUT_COUNT;\n    if(samples && fread(source,sizeof(float),samples,input)!=samples) return 4;\n    fclose(input);\n    for(size_t i=0;i<samples;i++) if(!isfinite(source[i])) return 4;\n    size_t parameter; float value; int fields;\n    while((fields=fscanf(params,\"%zu %f\",&parameter,&value))==2) if(!dsp_bloom_oscillator_set(dsp,parameter,value)) return 4;\n    if(fields!=EOF) return 4;\n    fclose(params);\n    long event_frame=0; size_t event_param=0; float event_value=0;\n    fields=fscanf(events,\"%ld %zu %f\",&event_frame,&event_param,&event_value);\n    if(fields!=3&&fields!=EOF) return 4;\n    int has_event=fields==3;\n    double sum=0, maximum=0; long calls=0; double peak=0;\n    for(long at=0;at<frames;) {\n        while(has_event && event_frame==at) {\n            if(!dsp_bloom_oscillator_set(dsp,event_param,event_value)) return 4;\n            fields=fscanf(events,\"%ld %zu %f\",&event_frame,&event_param,&event_value);\n            if(fields!=3&&fields!=EOF) return 4;\n            has_event=fields==3;\n        }\n        if(has_event && (event_frame<at || event_frame>=frames)) return 4;\n        int count=(int)((frames-at)<block?(frames-at):block);\n        if(has_event && event_frame>at && event_frame<at+count) count=(int)(event_frame-at);\n        for(int c=0;c<DSP_INPUT_COUNT;c++) for(int i=0;i<count;i++) in[c][i]=source[(at+i)*DSP_INPUT_COUNT+c];\n        double before=card_clock();\n        if(!dsp_bloom_oscillator_process(dsp,count,in,out)) return 5;\n        double elapsed=card_clock()-before;sum+=elapsed;if(elapsed>maximum)maximum=elapsed;calls++;\n        for(int c=0;c<DSP_OUTPUT_COUNT;c++) for(int i=0;i<count;i++) {\n            if(!isfinite(out[c][i])) return 5;\n            result[(at+i)*DSP_OUTPUT_COUNT+c]=out[c][i];\n            if(fabs(out[c][i])>peak)peak=fabs(out[c][i]);\n        }\n        at+=count;\n    }\n    fclose(events);\n    FILE *output=fopen(argv[5],\"wb\"); if(!output) return 4;\n    if(fwrite(result,sizeof(float),(size_t)frames*DSP_OUTPUT_COUNT,output)!=(size_t)frames*DSP_OUTPUT_COUNT) return 4;\n    fclose(output);\n    printf(\"{\\\"frames\\\":%ld,\\\"sampleRate\\\":%ld,\\\"block\\\":%ld,\\\"calls\\\":%ld,\\\"meanComputeUs\\\":%.6f,\\\"maxComputeUs\\\":%.6f,\\\"audioDurationSeconds\\\":%.9f,\\\"computeSeconds\\\":%.9f,\\\"peak\\\":%.9f}\\n\",frames,rate,block,calls,sum/calls*1e6,maximum*1e6,(double)frames/rate,sum,peak);\n    free(source);free(result);for(int c=0;c<DSP_INPUT_COUNT;c++)free(in[c]);for(int c=0;c<DSP_OUTPUT_COUNT;c++)free(out[c]);dsp_bloom_oscillator_destroy(dsp);\n    return 0;\n}\n#endif\n",
+  "nativeHeader": "/* Author: Aldrin Payopay <aldrin.gdf@gmail.com>. Generated DSP Cards C ABI. */\n#ifndef DSP_BLOOM_OSCILLATOR_H\n#define DSP_BLOOM_OSCILLATOR_H\n#include <stddef.h>\n#ifndef DSP_CARD_PARAMETER_DEFINED\n#define DSP_CARD_PARAMETER_DEFINED\ntypedef struct { const char *id; float initial, minimum, maximum; } DspParameter;\n#endif\n#ifdef __cplusplus\nextern \"C\" {\n#endif\nvoid *dsp_bloom_oscillator_create(int sample_rate);\nvoid dsp_bloom_oscillator_destroy(void *context);\nvoid dsp_bloom_oscillator_reset(void *context);\nsize_t dsp_bloom_oscillator_parameter_count(void);\nconst DspParameter *dsp_bloom_oscillator_parameter(size_t index);\nint dsp_bloom_oscillator_set(void *context, size_t index, float value);\nint dsp_bloom_oscillator_inputs(void);\nint dsp_bloom_oscillator_outputs(void);\nint dsp_bloom_oscillator_process(void *context, int frames, float **inputs, float **outputs);\n#ifdef __cplusplus\n}\n#endif\n#endif\n",
+  "hashes": {
+    "source": "45b86ee25f3f68528fb5806dd3bf82ed6cf9f7e067fa143ad70e951a131e6482",
+    "c": "1b66d6fae7a2fabd5a758d5ee2e323e53e1a6abc0daa5c99873c3ada5d043e8f",
+    "header": "5e8a6378013f0c073c44257da0d7db94a2a46349c943511fe8f3721b35aa7e79",
+    "wasm": "43a07ba9a6d07dcc6e522d5960b58237d86b4c1fe67edfc311db3587a89d72df"
+  },
+  "compiler": "FAUST Version 2.85.9"
+}

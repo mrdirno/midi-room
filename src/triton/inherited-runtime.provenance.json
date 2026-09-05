@@ -1,0 +1,11 @@
+{
+  "format": "midi-room.inherited-input/1",
+  "component": "TRITON16 shared runtime",
+  "original_sha256": "095e0f7b983523ff61b88b3a04e66714032d0a284e8e4e7b1918991e607421ad",
+  "public_input": "src/triton/inherited-runtime.html",
+  "public_sha256": "4eced0d8da0d9623c11014a29ba57ecb9751ff735ea1c5bd647478177a219404",
+  "transformation": "Remove embedded HTML comments/manuscripts only; executable JavaScript and musical phrase attribution preserved byte-for-byte outside those comments.",
+  "original_bytes": 945672,
+  "public_bytes": 757479,
+  "license": "Inherited terms and per-corpus notices retained; no new blanket license grant."
+}

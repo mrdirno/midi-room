@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#101215"><title>Field Keys</title>
+<style>
+:root{color-scheme:dark;font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#f2f2ed;background:#101215;--line:#303639;--amber:#ffc18b;--teal:#8cd5bc}*{box-sizing:border-box}body{margin:0;min-height:100vh;min-height:100svh;padding:max(20px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(20px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));background:radial-gradient(ellipse at 85% 0%,#24332e66,transparent 55%),#101215}button,input{font:inherit}button{cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid var(--teal);outline-offset:4px}button:disabled{opacity:.55}main{max-width:760px;margin:auto}.top{display:flex;align-items:center;justify-content:space-between;gap:12px}.eyebrow{font-size:.68rem;letter-spacing:.18em;color:var(--teal);margin:0 0 7px}h1{font-size:clamp(2rem,8vw,3rem);line-height:1;margin:0;letter-spacing:-.065em;font-weight:550}.mark{width:44px;height:44px;border:1px solid var(--line);border-radius:50%;display:grid;place-items:center;color:var(--amber);font-size:1.1rem;background:#1b201e}.subline{margin:15px 0 22px;color:#a0a9a5;font-size:.83rem;letter-spacing:.015em}.field{display:grid;grid-template-columns:.72fr 1.4fr .7fr;gap:8px;margin:0 0 18px}.field>div{min-width:0;background:#1a201e;border:1px solid #303a35;border-radius:12px;padding:12px;height:71px}.field dt{font-size:.62rem;letter-spacing:.12em;color:#91a49a;margin:0 0 7px}.field dd{font-size:1rem;line-height:1.25;font-variant-numeric:tabular-nums;margin:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.controls{display:flex;align-items:center;gap:9px}.enable{flex:1;min-width:0;height:50px;border:0;border-radius:11px;background:var(--amber);color:#2b1b10;font-weight:650;white-space:nowrap}.release{height:50px;border:1px solid var(--line);border-radius:11px;background:#1b1e20;color:#c9cfcb;padding:0 16px}.status{height:3.5em;line-height:1.4;font-size:.78rem;color:#97a69f;margin:12px 0 8px;overflow:auto;overflow-wrap:anywhere}.status[data-error=true]{color:#ffc18b}.keys{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;touch-action:none}.key{position:relative;min-width:0;height:82px;border:1px solid #374139;border-radius:12px;text-align:left;padding:13px;background:linear-gradient(160deg,#262d28,#1a201e);color:#dbe5df;touch-action:none;user-select:none;-webkit-user-select:none;transition:background .12s,border-color .12s}.key.root{border-color:#70604b;color:var(--amber)}.key[aria-pressed=true]{background:#a2ddc5;color:#14271f;border-color:#c1f7df;box-shadow:inset 0 0 0 1px #d6ffe9}.key b{display:block;font-weight:500;font-size:1.15rem;letter-spacing:-.03em}.key small{display:block;font-size:.63rem;color:#93a699;margin-top:12px;letter-spacing:.08em}.key[aria-pressed=true] small{color:#315341}.bottom{display:flex;align-items:center;gap:14px;margin:22px 0 8px}.bottom label{font-size:.75rem;color:#a5afa9}.bottom input{min-width:0;flex:1;height:44px;accent-color:var(--teal)}.bottom output{font-size:.78rem;color:#d3dcd6;width:3ch;text-align:right;font-variant-numeric:tabular-nums}.foot{display:flex;align-items:center;justify-content:space-between;color:#81928a;font-size:.7rem;border-top:1px solid var(--line);margin-top:8px;padding-top:10px}.foot span{display:block;height:20px;max-width:70%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#voices{min-width:5.5rem;text-align:right;font-variant-numeric:tabular-nums}details{margin-top:12px;border-top:1px solid #29312d;color:#95a49c;font-size:.78rem}summary{min-height:44px;display:flex;align-items:center;cursor:pointer}details p{margin:0 0 14px;line-height:1.65;max-width:60ch}@media(min-width:620px){body{padding-top:36px}.keys{grid-template-columns:repeat(8,minmax(0,1fr))}.key{height:118px;padding:12px}.key small{margin-top:42px}.field{margin-top:28px}.subline{margin-bottom:25px}}@media(max-width:360px){body{padding-left:12px;padding-right:12px}.keys{gap:6px}.key{padding:11px;height:76px}.field>div{padding:10px}.release{padding:0 12px}}@media(prefers-reduced-motion:reduce){.key{transition:none}}
+</style></head><body><main>
+<header class="top"><div><p class="eyebrow">MIDI ROOM · INSTRUMENT 02</p><h1>Field Keys</h1></div><div class="mark" aria-hidden="true">⌁</div></header>
+<p class="subline">Warm bells. A softer edge.</p>
+<dl class="field"><div><dt>KEY</dt><dd id="keyReadout">C</dd></div><div><dt>SCALE</dt><dd id="scaleReadout">Major</dd></div><div><dt>BPM</dt><dd id="bpmReadout">—</dd></div></dl>
+<div class="controls"><button type="button" class="enable" id="enable">Enable audio</button><button type="button" class="release" id="release">Release</button><button type="button" class="release" id="midi" aria-label="Connect hardware MIDI">MIDI</button></div>
+<p class="status" id="status" role="status">Enable audio to play.</p>
+<div id="keys" class="keys" role="group" aria-label="Scale keyboard"></div>
+<div class="bottom"><label for="level">Output</label><input id="level" type="range" min="0" max="100" value="46"><output id="levelValue" for="level">46</output></div>
+<div class="foot"><span id="connection">Touch instrument</span><span id="voices">0 voices</span></div>
+<details><summary>Playing &amp; connections</summary><p>Tap Enable audio once, then play the pads or your MIDI keyboard. In MIDI Room, use Wires to connect another instrument. Field Keys receives its notes, tempo, key and scale. A disconnected wire releases only its own notes.</p><p>Touch notes follow the current scale. Held notes keep their original pitch. A CV_SOURCE signal from 0–5 changes brightness. No recordings or data are uploaded.</p></details>
+</main>
+<script>
+/* Field Keys 1.0. Original portable receiver for MIDI Room protocol 1. */
+(() => {
+  'use strict';
+  const $ = id => document.getElementById(id), sdk = window.MidiRoom;
+  const scales = { major:[0,2,4,5,7,9,11], minor:[0,2,3,5,7,8,10], dorian:[0,2,3,5,7,9,10], mixolydian:[0,2,4,5,7,9,10], 'pentatonic-major':[0,2,4,7,9], 'pentatonic-minor':[0,3,5,7,10], chromatic:[0,1,2,3,4,5,6,7,8,9,10,11] };
+  const scaleNames = { major:'Major', minor:'Minor', dorian:'Dorian', mixolydian:'Mixolydian', 'pentatonic-major':'Major pent.', 'pentatonic-minor':'Minor pent.', chromatic:'Chromatic' };
+  const names = ['C','C♯','D','E♭','E','F','F♯','G','A♭','A','B♭','B'];
+  let ctx = null, master = null, compressor = null, enabled = false, disposed = false, midiAccess = null, midiPending = null, root = 0, scale = 'major', brightness = 0.34;
+  let repaint = null;
+  const voices = new Set(), held = new Map(), fingers = new Map(), channels = new Map(), ports = new Map(), buttons = [], unsubscribers = [];
+  const hostSDK = Boolean(sdk && typeof sdk.on === 'function' && typeof sdk.audioTime === 'function');
+  function status(text, error = false) { $('status').textContent = text; $('status').dataset.error = String(error); }
+  function pitchLabel(note) { return names[note % 12] + (Math.floor(note / 12) - 1); }
+  function padNote(index) { const intervals = scales[scale]; return 48 + root + intervals[index % intervals.length] + Math.floor(index / intervals.length) * 12; }
+  function redraw() {
+    repaint = null; $('voices').textContent = voices.size + ' voices';
+    buttons.forEach((button, index) => {
+      const owned = [...fingers.values()].filter(finger => finger.index === index && finger.voice && !finger.voice.finished);
+      const note = owned[0]?.voice.note ?? padNote(index);
+      button.firstChild.textContent = pitchLabel(note); button.classList.toggle('root', note % 12 === root);
+      button.setAttribute('aria-pressed', String(owned.length > 0)); button.setAttribute('aria-label', 'Play ' + pitchLabel(note));
+    });
+  }
+  function queueDraw() { if (repaint === null) repaint = requestAnimationFrame(redraw); }
+  function audioGraph() {
+    if (ctx && ctx.state !== 'closed') return true;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) { status('This browser has no Web Audio. Try a browser with audio support.', true); return false; }
+    try {
+      ctx = new AC({ latencyHint:'interactive' }); master = ctx.createGain(); master.gain.value = 0;
+      compressor = ctx.createDynamicsCompressor(); compressor.threshold.value = -16; compressor.knee.value = 18; compressor.ratio.value = 3; compressor.attack.value = .008; compressor.release.value = .18;
+      master.connect(compressor); compressor.connect(ctx.destination);
+      ctx.addEventListener?.('statechange', () => {
+        if (ctx.state !== 'running') { stopAll(); enabled = false; $('enable').textContent = 'Resume audio'; status('Audio paused. Tap Resume audio.'); }
+      });
+      return true;
+    } catch (error) { status('Audio could not start: ' + String(error.message || error), true); return false; }
+  }
+  function keyFor(owner, channel, note) { return owner + '\u0000' + channel + '\u0000' + note; }
+  function channelFor(owner, channel) { const key = owner + '\u0000' + channel; if (!channels.has(key)) channels.set(key, { sustain:false, bend:0 }); return channels.get(key); }
+  function unhold(voice) {
+    voice.held = false;
+    const queue = held.get(voice.key); if (!queue) return;
+    const index = queue.indexOf(voice); if (index >= 0) queue.splice(index, 1);
+    if (!queue.length) held.delete(voice.key);
+  }
+  function removeVoice(voice) {
+    if (voice.finished) return; voice.finished = true; unhold(voice); voices.delete(voice);
+    for (const node of voice.nodes) { try { node.disconnect(); } catch {} }
+    if (voice.owner.startsWith('touch:')) channels.delete(voice.owner + '\u0000' + voice.channel);
+    queueDraw();
+  }
+  function releaseVoice(voice, when = ctx?.currentTime || 0, hard = false) {
+    if (!voice || voice.finished) return; unhold(voice);
+    const time = Math.max(ctx.currentTime, Number.isFinite(when) ? when : ctx.currentTime);
+    const future = voice.start > time + .001;
+    const end = hard || future ? time + .012 : time + .42;
+    for (const gain of voice.gains) {
+      if (future) { gain.gain.cancelScheduledValues(time); gain.gain.setValueAtTime(0, time); }
+      else {
+        if (typeof gain.gain.cancelAndHoldAtTime === 'function') gain.gain.cancelAndHoldAtTime(time);
+        else { gain.gain.cancelScheduledValues(time); gain.gain.setValueAtTime(Math.min(.09, Math.max(.0001, gain.gain.value)), time); }
+        gain.gain.linearRampToValueAtTime(0, end);
+      }
+    }
+    for (const oscillator of voice.oscillators) { try { oscillator.stop(end + .01); } catch {} }
+    voice.releaseAt = end;
+  }
+  function stopOwner(owner, channel = null, when = ctx?.currentTime || 0) {
+    for (const voice of voices) if (voice.owner === owner && (channel === null || voice.channel === channel)) releaseVoice(voice, when, true);
+    for (const key of channels.keys()) if (key.startsWith(owner + '\u0000') && (channel === null || key === owner + '\u0000' + channel)) channels.delete(key);
+  }
+  function stopAll() { for (const voice of voices) releaseVoice(voice, ctx?.currentTime || 0, true); held.clear(); channels.clear(); fingers.clear(); queueDraw(); }
+  function noteOn(owner, channel, note, velocity, at) {
+    if (disposed || !enabled || !ctx || ctx.state !== 'running') return null;
+    const start = Math.max(ctx.currentTime, Number.isFinite(at) ? at : ctx.currentTime);
+    if (start > ctx.currentTime + 16.1) return null;
+    if (voices.size >= 64) { const oldest = [...voices].sort((a,b) => a.start - b.start)[0]; releaseVoice(oldest, ctx.currentTime, true); removeVoice(oldest); }
+    const frequency = 440 * 2 ** ((note - 69 + channelFor(owner,channel).bend) / 12);
+    const body = ctx.createOscillator(), bell = ctx.createOscillator(), bodyGain = ctx.createGain(), bellGain = ctx.createGain(), filter = ctx.createBiquadFilter();
+    body.type = 'triangle'; bell.type = 'sine'; body.frequency.setValueAtTime(frequency, start); bell.frequency.setValueAtTime(frequency * 2.003, start);
+    filter.type = 'lowpass'; filter.frequency.setValueAtTime(1500 + brightness * 8000, start); filter.Q.value = .45;
+    const strength = Math.max(.02, Math.min(1, velocity / 127));
+    bodyGain.gain.setValueAtTime(0, start); bodyGain.gain.linearRampToValueAtTime(.085 * strength, start + .025); bodyGain.gain.setTargetAtTime(.036 * strength, start + .04, .5);
+    bellGain.gain.setValueAtTime(0, start); bellGain.gain.linearRampToValueAtTime(.032 * strength, start + .008); bellGain.gain.setTargetAtTime(.0015 * strength, start + .015, .28);
+    body.connect(bodyGain); bell.connect(bellGain); bodyGain.connect(filter); bellGain.connect(filter); filter.connect(master);
+    const voice = { owner, channel, note, start, key:keyFor(owner,channel,note), held:true, finished:false, releaseAt:null, gains:[bodyGain,bellGain], oscillators:[body,bell], nodes:[body,bell,bodyGain,bellGain,filter], filter };
+    voices.add(voice); const queue = held.get(voice.key) || []; queue.push(voice); held.set(voice.key, queue);
+    body.onended = () => removeVoice(voice); body.start(start); bell.start(start); queueDraw(); return voice;
+  }
+  function noteOff(owner, channel, note, at) {
+    const voice = held.get(keyFor(owner,channel,note))?.[0]; if (!voice) return;
+    unhold(voice); if (!channelFor(owner,channel).sustain) releaseVoice(voice, at);
+  }
+  function receiveMIDI(data, owner, at) {
+    if (!data || (data.length !== 2 && data.length !== 3) || !Number.isInteger(data[0]) || data[0] < 128 || data[0] > 239 || !Array.from(data).slice(1).every(value => Number.isInteger(value) && value >= 0 && value <= 127)) return;
+    const type = data[0] & 0xf0, channel = data[0] & 15;
+    if (data.length !== ((type === 0xc0 || type === 0xd0) ? 2 : 3)) return;
+    if (type === 0x90 && data[2] > 0) noteOn(owner,channel,data[1],data[2],at);
+    else if (type === 0x80 || type === 0x90) noteOff(owner,channel,data[1],at);
+    else if (type === 0xb0 && data[1] === 64) {
+      const state = channelFor(owner,channel); state.sustain = data[2] >= 64;
+      if (!state.sustain) for (const voice of voices) if (voice.owner === owner && voice.channel === channel && !voice.held && voice.releaseAt === null) releaseVoice(voice,at);
+    } else if (type === 0xb0 && (data[1] === 120 || data[1] === 123)) stopOwner(owner,channel,at);
+    else if (type === 0xe0 && ctx) {
+      const bend = ((data[2] * 128 + data[1]) - 8192) / 8192 * 2; channelFor(owner,channel).bend = bend;
+      for (const voice of voices) if (voice.owner === owner && voice.channel === channel) {
+        const frequency = 440 * 2 ** ((voice.note - 69 + bend) / 12), when = Math.max(ctx.currentTime, Number.isFinite(at) ? at : ctx.currentTime);
+        voice.oscillators[0].frequency.setTargetAtTime(frequency,when,.012); voice.oscillators[1].frequency.setTargetAtTime(frequency * 2.003,when,.012);
+      }
+    }
+  }
+  function routeOwner(event) { return typeof event?.route === 'string' ? 'wire:' + event.route : null; }
+  function eventTime(event) { const when = hostSDK && ctx ? sdk.audioTime(ctx,event.at) : null; return Number.isFinite(when) ? when : ctx?.currentTime || 0; }
+  function field(event) {
+    if (Number.isInteger(event.key) && event.key >= 0 && event.key <= 11) root = event.key;
+    if (typeof event.scale === 'string' && Object.hasOwn(scales,event.scale)) scale = event.scale;
+    $('keyReadout').textContent = names[root]; $('scaleReadout').textContent = scaleNames[scale]; queueDraw();
+  }
+  function transport(event) {
+    if (Number.isFinite(event.bpm) && event.bpm >= 20 && event.bpm <= 300) $('bpmReadout').textContent = String(Math.round(event.bpm * 10) / 10);
+    const owner = routeOwner(event);
+    if (owner && ['stop','seek'].includes(event.action)) stopOwner(owner, null, eventTime(event));
+  }
+  function signal(event) {
+    if (event.signal !== 'CV_SOURCE' || typeof event.value !== 'number' || !Number.isFinite(event.value)) return;
+    brightness = Math.max(0,Math.min(5,event.value)) / 5;
+    if (ctx) for (const voice of voices) voice.filter.frequency.setTargetAtTime(1500 + brightness * 8000,eventTime(event),.06);
+  }
+  if (hostSDK) {
+    sdk.declare({ name:'Field Keys', send:['signal'], receive:['midi','field','transport','signal'] });
+    unsubscribers.push(sdk.on('midi', event => { const owner = routeOwner(event); if (owner) receiveMIDI(event.data,owner,eventTime(event)); }));
+    unsubscribers.push(sdk.on('cancel', event => { const owner = routeOwner(event); if (owner) stopOwner(owner); }));
+    unsubscribers.push(sdk.on('field',field),sdk.on('transport',transport),sdk.on('signal',signal));
+    $('connection').textContent = 'Room receiver · ready';
+  }
+  function disconnectPort(id, binding) {
+    stopOwner('hardware:' + id); binding.port.removeEventListener?.('midimessage',binding.listener);
+    if (binding.port.onmidimessage === binding.listener) binding.port.onmidimessage = null;
+    try { Promise.resolve(binding.port.close?.()).catch(() => {}); } catch {} ports.delete(id);
+  }
+  let refreshing = false, refreshAgain = false;
+  function refreshMIDI(retryFailed = false) {
+    if (!midiAccess || disposed) return;
+    if (refreshing) { refreshAgain = true; return; } refreshing = true;
+    try {
+      const desired = new Map([...midiAccess.inputs.values()].filter(port => port && port.state !== 'disconnected' && !(hostSDK && String(port.id).startsWith('wire:'))).map(port => [String(port.id),port]));
+      for (const [id,binding] of ports) if (desired.get(id) !== binding.port) disconnectPort(id,binding);
+      for (const [id,port] of desired) {
+        const previous = ports.get(id);
+        if (previous && !(retryFailed === true && previous.failed)) continue;
+        if (previous) { previous.port.removeEventListener?.('midimessage',previous.listener); if (previous.port.onmidimessage === previous.listener) previous.port.onmidimessage = null; }
+        const binding = {port,listener:null,ready:false,failed:false};
+        binding.listener = event => { if (ports.get(id) === binding && binding.ready) receiveMIDI(event.data,'hardware:' + id,ctx?.currentTime || 0); };
+        ports.set(id,binding); if (port.addEventListener) port.addEventListener('midimessage',binding.listener); else port.onmidimessage = binding.listener;
+        const failed = () => { if (ports.get(id) === binding) { binding.failed = true; binding.ready = false; status('A MIDI input could not open. Tap Audio ready to retry.',true); } };
+        try { Promise.resolve(port.open?.()).then(() => { if (ports.get(id) === binding && !disposed) binding.ready = true; },failed); } catch { failed(); }
+      }
+      $('connection').textContent = ports.size ? ports.size + (ports.size === 1 ? ' MIDI input' : ' MIDI inputs') + (hostSDK ? ' · Room linked' : '') : hostSDK ? 'Room receiver · ready' : 'Touch instrument';
+    } finally { refreshing = false; if (refreshAgain) { refreshAgain = false; queueMicrotask(refreshMIDI); } }
+  }
+  function connectMIDI() {
+    if (disposed || typeof navigator.requestMIDIAccess !== 'function') return Promise.resolve(false);
+    if (midiAccess) { refreshMIDI(true); return Promise.resolve(true); } if (midiPending) return midiPending;
+    let request; try { request = navigator.requestMIDIAccess({sysex:false}); } catch (error) { request = Promise.reject(error); }
+    midiPending = Promise.resolve(request).then(access => {
+      if (disposed) return false; midiAccess = access; midiAccess.addEventListener?.('statechange',refreshMIDI); if (!midiAccess.addEventListener) midiAccess.onstatechange = refreshMIDI; refreshMIDI(); return true;
+    }).catch(() => { status('Touch and room wires work. MIDI permission is unavailable here.',true); return false; }).finally(() => { midiPending = null; });
+    return midiPending;
+  }
+  function enable() {
+    if (!audioGraph()) return Promise.resolve(false);
+    let resume; try { resume = ctx.resume(); } catch (error) { resume = Promise.reject(error); }
+    if(midiAccess)refreshMIDI(true); // Audio does not request hardware access.
+    return Promise.resolve(resume).then(() => {
+      enabled = ctx.state === 'running'; $('enable').textContent = enabled ? 'Audio ready' : 'Resume audio';
+      if (enabled) { master.gain.setTargetAtTime(Number($('level').value)/100,ctx.currentTime,.025); status(hostSDK ? 'Play the pads, your controller, or a connected instrument.' : 'Play the pads or your connected controller.'); }
+      else status('Audio is paused. Tap Resume audio.',true); return enabled;
+    }).catch(error => { enabled = false; status('Audio blocked. Tap Enable audio again. ' + String(error.message || ''),true); return false; });
+  }
+  for (let index = 0; index < 16; index++) {
+    const button = document.createElement('button'); button.type = 'button'; button.className = 'key'; button.setAttribute('aria-pressed','false');
+    const title = document.createElement('b'), degree = document.createElement('small'); degree.textContent = String(index + 1).padStart(2,'0'); button.append(title,degree); $('keys').append(button); buttons.push(button);
+    button.addEventListener('pointerdown', event => {
+      if (!enabled || ctx?.state !== 'running') { status('Tap Enable audio first.'); return; } if (fingers.has(event.pointerId)) return;
+      event.preventDefault(); const voice = noteOn('touch:' + event.pointerId,0,padNote(index),100,ctx.currentTime); fingers.set(event.pointerId,{index,voice});
+      try { button.setPointerCapture(event.pointerId); } catch {} queueDraw();
+    });
+    const lift = event => { const finger = fingers.get(event.pointerId); if (!finger) return; releaseVoice(finger.voice); fingers.delete(event.pointerId); queueDraw(); };
+    for (const type of ['pointerup','pointercancel','lostpointercapture']) button.addEventListener(type,lift);
+    let keyboardVoice=null;
+    button.addEventListener('keydown',event=>{if((event.key===' '||event.key==='Enter')&&!event.repeat){event.preventDefault();if(!enabled||ctx?.state!=='running'){status('Tap Enable audio first.');return;}keyboardVoice=noteOn('touch:key:'+index,0,padNote(index),100,ctx.currentTime);queueDraw();}});
+    const releaseKeyboard=()=>{if(keyboardVoice){releaseVoice(keyboardVoice);keyboardVoice=null;queueDraw();}};
+    button.addEventListener('keyup',event=>{if(event.key===' '||event.key==='Enter'){event.preventDefault();releaseKeyboard();}});button.addEventListener('blur',releaseKeyboard);
+  }
+  $('midi').addEventListener('click',()=>{if(typeof navigator.requestMIDIAccess!=='function')status('Hardware MIDI is unavailable here. Touch and computer keys work.');else return connectMIDI();});
+  $('enable').addEventListener('click',enable); $('release').addEventListener('click',stopAll);
+  $('level').addEventListener('input',() => { const value = Math.max(0,Math.min(100,Number($('level').value))); $('levelValue').textContent = String(value); if (enabled && ctx) master.gain.setTargetAtTime(value/100,ctx.currentTime,.025); });
+  window.addEventListener('blur',() => {
+    // Room controls can take document focus while this receiver keeps sounding.
+    for (const voice of voices) if (voice.owner.startsWith('touch:')) releaseVoice(voice,ctx?.currentTime || 0,true);
+    fingers.clear(); queueDraw();
+  });
+  document.addEventListener('visibilitychange',() => { if (document.hidden) stopAll(); });
+  window.addEventListener('midiroom:connected',() => { connectMIDI(); });
+  window.addEventListener('midiroom:panic',stopAll);
+  window.addEventListener('pagehide',() => {
+    stopAll(); disposed = true; for (const unsubscribe of unsubscribers) unsubscribe?.();
+    for (const [id,binding] of ports) disconnectPort(id,binding);
+    midiAccess?.removeEventListener?.('statechange',refreshMIDI);
+    if (midiAccess?.onstatechange === refreshMIDI) midiAccess.onstatechange = null;
+    if (repaint !== null) cancelAnimationFrame(repaint);
+    try { Promise.resolve(ctx?.close()).catch(() => {}); } catch {}
+  },{once:true});
+  // Creating a silent context lets the host discover it; only an explicit gesture enables voices.
+  audioGraph(); redraw();
+  window.FieldKeys = Object.freeze({ version:1, snapshot:() => ({ enabled, voices:[...voices].map(({owner,channel,note,start,held,releaseAt}) => ({owner,channel,note,start,held,releaseAt})), field:{key:root,scale,brightness}, midiInputs:[...ports.keys()] }) });
+})();
+</script></body></html>

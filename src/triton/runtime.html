@@ -1,0 +1,15 @@
+<!-- Aldrin Payopay — stable transport and local connection controls. -->
+<section id="tritonControls" aria-label="TRITON local instrument controls">
+  <strong>TRITON Rack</strong>
+  <label>Tempo <input id="tritonBpm" type="number" min="40" max="240" step="1" value="132" aria-label="Transport beats per minute"></label>
+  <button id="tritonAdopt" type="button">Adopt patch tempo</button>
+  <button id="tritonConnect" type="button">Connect MIDI / audio</button>
+  <button id="tritonReport" type="button">Local report</button>
+  <span id="tritonStatus" role="status">132 BPM · local clock · touch keys ready</span>
+</section>
+<dialog id="tritonReportDialog" aria-label="Local instrument report">
+  <button id="tritonReportClose" type="button">Close</button>
+  <p>Local software state. Listening, physical MIDI and phone compatibility require device checks.</p>
+  <textarea id="tritonReportText" readonly aria-label="Copyable local instrument report"></textarea>
+  <button id="tritonReportCopy" type="button">Copy report</button>
+</dialog>

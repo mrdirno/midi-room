@@ -1,0 +1,1087 @@
+{
+  "at": "2026-09-05T19:04:39.938Z",
+  "scope": "Real browser engine checks with scripted touch/keyboard; no physical phone or installed Safari claim.",
+  "checks": [
+    {
+      "browser": "chromium",
+      "check": "390px real touch + hash launch",
+      "id": "triton-rack",
+      "geometry": {
+        "inner": 390,
+        "scroll": 390
+      },
+      "result": {
+        "audio": "running",
+        "powered": true,
+        "held": 0
+      }
+    },
+    {
+      "browser": "chromium",
+      "check": "390px real touch + hash launch",
+      "id": "improvisator",
+      "geometry": {
+        "inner": 390,
+        "scroll": 390
+      },
+      "result": {
+        "version": 1,
+        "definitionId": "local.triton-rack",
+        "profile": {
+          "version": 1,
+          "definitionId": "local.triton-rack",
+          "definitionVersion": "1",
+          "profileId": "triton:A012:1",
+          "kind": "pitched",
+          "name": "Ice Crystal Keys",
+          "noteRange": [
+            0,
+            127
+          ],
+          "recommendedRoot": 48,
+          "preferredTempo": 100,
+          "voices": [],
+          "velocity": {
+            "min": 1,
+            "max": 127,
+            "response": "continuous amplitude"
+          },
+          "timing": {
+            "unit": "audio-context-seconds",
+            "maximumLookahead": 10
+          },
+          "provenance": "TRITON16 supplied oscillator models; twelve pitch-class zones, not General MIDI"
+        },
+        "transport": {
+          "bpm": 132,
+          "effectiveBpm": 132,
+          "owner": "local",
+          "follow": false,
+          "revision": 0,
+          "reason": "original Soul reference tempo",
+          "history": [
+            {
+              "writer": "factory patch preference",
+              "requested": 100,
+              "effective": 132,
+              "accepted": false,
+              "revision": 0,
+              "at": 1788635080797
+            }
+          ]
+        },
+        "audio": "running",
+        "midi": {
+          "available": true,
+          "connectedInputs": 0,
+          "error": null
+        },
+        "ownedVoices": 0,
+        "ownedSourceGroups": 0,
+        "soul": {
+          "on": true,
+          "scheduler": true,
+          "generation": 1
+        },
+        "evidence": "Software state only; no claim of audible output, hardware MIDI or phone testing"
+      }
+    },
+    {
+      "browser": "chromium",
+      "check": "390px real touch + hash launch",
+      "id": "drum-pad",
+      "geometry": {
+        "inner": 390,
+        "scroll": 390
+      },
+      "result": {
+        "audio": "running",
+        "held": 0,
+        "hits": 1,
+        "localVoices": 1,
+        "mode": "local",
+        "profile": "local-kit-1"
+      }
+    },
+    {
+      "browser": "chromium",
+      "check": "390px real touch + hash launch",
+      "id": "field-keys",
+      "geometry": {
+        "inner": 390,
+        "scroll": 390
+      },
+      "result": {
+        "enabled": true,
+        "voices": [
+          {
+            "owner": "touch:9",
+            "channel": 0,
+            "note": 48,
+            "start": 0.064,
+            "held": false,
+            "releaseAt": 0.484
+          }
+        ],
+        "field": {
+          "key": 0,
+          "scale": "major",
+          "brightness": 0.34
+        },
+        "midiInputs": []
+      }
+    },
+    {
+      "browser": "chromium",
+      "check": "390px real touch + hash launch",
+      "id": "dsp-rack",
+      "geometry": {
+        "inner": 390,
+        "scroll": 390
+      },
+      "result": {
+        "ready": true,
+        "disposed": false,
+        "rate": 48000,
+        "contextState": "running",
+        "held": 0,
+        "modules": 2,
+        "baseLatency": 0.005333333333333333,
+        "outputLatency": 0.024,
+        "receipts": [
+          {
+            "instanceId": "bloom-one",
+            "integrity": {
+              "format": "midi-room.compatibility/1",
+              "pluginId": "bloom-oscillator",
+              "pluginVersion": "1.0.0",
+              "engine": "faust-wasm/1",
+              "status": "artifact-verified",
+              "rackCompatible": true,
+              "hashes": {
+                "source": "45b86ee25f3f68528fb5806dd3bf82ed6cf9f7e067fa143ad70e951a131e6482",
+                "c": "1b66d6fae7a2fabd5a758d5ee2e323e53e1a6abc0daa5c99873c3ada5d043e8f",
+                "header": "5e8a6378013f0c073c44257da0d7db94a2a46349c943511fe8f3721b35aa7e79",
+                "wasm": "43a07ba9a6d07dcc6e522d5960b58237d86b4c1fe67edfc311db3587a89d72df"
+              },
+              "checks": [
+                "Source, C, header, Wasm and card identity hashes match",
+                "Bounded metadata and supported Wasm ABI",
+                "Wasm compiled without instantiation"
+              ],
+              "wasm": {
+                "bytes": 5172,
+                "imports": [
+                  {
+                    "module": "env",
+                    "name": "_powf",
+                    "kind": "function"
+                  },
+                  {
+                    "module": "env",
+                    "name": "_sinf",
+                    "kind": "function"
+                  }
+                ],
+                "exports": [
+                  {
+                    "name": "compute",
+                    "kind": "function"
+                  },
+                  {
+                    "name": "getNumInputs",
+                    "kind": "function"
+                  },
+                  {
+                    "name": "getNumOutputs",
+                    "kind": "function"
+                  },
+                  {
+                    "name": "getParamValue",
+                    "kind": "function"
+                  },
+                  {
+                    "name": "getSampleRate",
+                    "kind": "function"
+                  },
+                  {
+                    "name": "init",
+                    "kind": "function"
+                  },
+                  {
+                    "name": "instanceClear",
+                    "kind": "function"
+                  },
+                  {
+                    "name": "instanceConstants",
+                    "kind": "function"
+                  },
+                  {
+                    "name": "instanceInit",
+                    "kind": "function"
+                  },
+                  {
+                    "name": "instanceResetUserInterface",
+                    "kind": "function"
+                  },
+                  {
+                    "name": "setParamValue",
+                    "kind": "function"
+                  },
+                  {
+                    "name": "memory",
+                    "kind": "memory"
+                  }
+                ]
+              },
+              "limitations": [
+                "Hashes establish artifact identity, not trust, DSP correctness or real-time safety.",
+                "No audio render, MIDI behavior, timing or native/FPGA parity was measured by intake.",
+                "Run only reviewed DSP: a worklet isolates audio execution but cannot guarantee deadlines for hostile or pathological code."
+              ]
+            },
+            "probe": {
+              "ok": true,
+              "frames": 4096,
+              "rate": 48000,
+              "peak": 0.1229366585612297
+            }
+          },
+          {
+            "instanceId": "drive-one",
+            "integrity": {
+              "format": "midi-room.compatibility/1",
+              "pluginId": "soft-drive",
+              "pluginVersion": "1.0.0",
+              "engine": "faust-wasm/1",
+              "status": "artifact-verified",
+              "rackCompatible": true,
+              "hashes": {
+                "source": "faaac902102825a524624b527f8c7234782de53c91a3896462d8b80474f18359",
+                "c": "56ed9391210450412ebdfef44b9189b04761f233ab6dbc83bcc298de29402b4e",
+                "header": "d2391b7815db0c85b6eea994e8085b5117120dd286a8181d4ee618795e7c06b7",
+                "wasm": "4c261d44d45b671995285b480826c59da06fbabe28dea2529a9522a31d579846"
+              },
+              "checks": [
+                "Source, C, header, Wasm and card identity hashes match",
+                "Bounded metadata and supported Wasm ABI",
+                "Wasm compiled without instantiation"
+              ],
+              "wasm": {
+                "bytes": 5513,
+                "imports": [
+                  {
+                    "module": "env",
+                    "name": "_powf",
+                    "kind": "function"
+                  },
+                  {
+                    "module": "env",
+                    "name": "_tanf",
+                    "kind": "function"
+                  },
+                  {
+                    "module": "env",
+                    "name": "_tanhf",
+                    "kind": "function"
+                  }
+                ],
+                "exports": [
+                  {
+                    "name": "compute",
+                    "kind": "function"
+                  },
+                  {
+                    "name": "getNumInputs",
+                    "kind": "function"
+                  },
+                  {
+                    "name": "getNumOutputs",
+                    "kind": "function"
+                  },
+                  {
+                    "name": "getParamValue",
+                    "kind": "function"
+                  },
+                  {
+                    "name": "getSampleRate",
+                    "kind": "function"
+                  },
+                  {
+                    "name": "init",
+                    "kind": "function"
+                  },
+                  {
+                    "name": "instanceClear",
+                    "kind": "function"
+                  },
+                  {
+                    "name": "instanceConstants",
+                    "kind": "function"
+                  },
+                  {
+                    "name": "instanceInit",
+                    "kind": "function"
+                  },
+                  {
+                    "name": "instanceResetUserInterface",
+                    "kind": "function"
+                  },
+                  {
+                    "name": "setParamValue",
+                    "kind": "function"
+                  },
+                  {
+                    "name": "memory",
+                    "kind": "memory"
+                  }
+                ]
+              },
+              "limitations": [
+                "Hashes establish artifact identity, not trust, DSP correctness or real-time safety.",
+                "No audio render, MIDI behavior, timing or native/FPGA parity was measured by intake.",
+                "Run only reviewed DSP: a worklet isolates audio execution but cannot guarantee deadlines for hostile or pathological code."
+              ]
+            },
+            "probe": {
+              "ok": true,
+              "frames": 4096,
+              "rate": 48000,
+              "peak": 0.000046019074943615124
+            }
+          }
+        ]
+      }
+    },
+    {
+      "browser": "chromium",
+      "check": "created MIDI export reaches parent save tray",
+      "saveText": "drum-pad-take.mid\n1 KB\nSave\n×"
+    },
+    {
+      "browser": "chromium",
+      "check": "real imported sandbox + CSP + AudioContext stop",
+      "isolation": {
+        "parent": "blocked",
+        "storage": "blocked",
+        "fetch": "blocked"
+      },
+      "outbound": 0
+    },
+    {
+      "browser": "chromium",
+      "check": "stopped conductor stays stopped after context resume",
+      "state": {
+        "version": 1,
+        "definitionId": "local.triton-rack",
+        "profile": {
+          "version": 1,
+          "definitionId": "local.triton-rack",
+          "definitionVersion": "1",
+          "profileId": "triton:A012:1",
+          "kind": "pitched",
+          "name": "Ice Crystal Keys",
+          "noteRange": [
+            0,
+            127
+          ],
+          "recommendedRoot": 48,
+          "preferredTempo": 100,
+          "voices": [],
+          "velocity": {
+            "min": 1,
+            "max": 127,
+            "response": "continuous amplitude"
+          },
+          "timing": {
+            "unit": "audio-context-seconds",
+            "maximumLookahead": 10
+          },
+          "provenance": "TRITON16 supplied oscillator models; twelve pitch-class zones, not General MIDI"
+        },
+        "transport": {
+          "bpm": 132,
+          "effectiveBpm": 132,
+          "owner": "local",
+          "follow": false,
+          "revision": 0,
+          "reason": "original Soul reference tempo",
+          "history": [
+            {
+              "writer": "factory patch preference",
+              "requested": 100,
+              "effective": 132,
+              "accepted": false,
+              "revision": 0,
+              "at": 1788635081821
+            }
+          ]
+        },
+        "audio": "running",
+        "midi": {
+          "available": true,
+          "connectedInputs": 0,
+          "error": null
+        },
+        "ownedVoices": 0,
+        "ownedSourceGroups": 0,
+        "soul": {
+          "on": false,
+          "scheduler": false,
+          "generation": 2
+        },
+        "evidence": "Software state only; no claim of audible output, hardware MIDI or phone testing"
+      }
+    },
+    {
+      "browser": "webkit",
+      "check": "390px real touch + hash launch",
+      "id": "triton-rack",
+      "geometry": {
+        "inner": 390,
+        "scroll": 390
+      },
+      "result": {
+        "audio": "running",
+        "powered": true,
+        "held": 0
+      }
+    },
+    {
+      "browser": "webkit",
+      "check": "390px real touch + hash launch",
+      "id": "improvisator",
+      "geometry": {
+        "inner": 390,
+        "scroll": 390
+      },
+      "result": {
+        "version": 1,
+        "definitionId": "local.triton-rack",
+        "profile": {
+          "version": 1,
+          "definitionId": "local.triton-rack",
+          "definitionVersion": "1",
+          "profileId": "triton:A012:1",
+          "kind": "pitched",
+          "name": "Ice Crystal Keys",
+          "noteRange": [
+            0,
+            127
+          ],
+          "recommendedRoot": 48,
+          "preferredTempo": 100,
+          "voices": [],
+          "velocity": {
+            "min": 1,
+            "max": 127,
+            "response": "continuous amplitude"
+          },
+          "timing": {
+            "unit": "audio-context-seconds",
+            "maximumLookahead": 10
+          },
+          "provenance": "TRITON16 supplied oscillator models; twelve pitch-class zones, not General MIDI"
+        },
+        "transport": {
+          "bpm": 132,
+          "effectiveBpm": 132,
+          "owner": "local",
+          "follow": false,
+          "revision": 0,
+          "reason": "original Soul reference tempo",
+          "history": [
+            {
+              "writer": "factory patch preference",
+              "requested": 100,
+              "effective": 132,
+              "accepted": false,
+              "revision": 0,
+              "at": 1788635084481
+            }
+          ]
+        },
+        "audio": "running",
+        "midi": {
+          "available": true,
+          "connectedInputs": 0,
+          "error": null
+        },
+        "ownedVoices": 0,
+        "ownedSourceGroups": 0,
+        "soul": {
+          "on": true,
+          "scheduler": true,
+          "generation": 1
+        },
+        "evidence": "Software state only; no claim of audible output, hardware MIDI or phone testing"
+      }
+    },
+    {
+      "browser": "webkit",
+      "check": "390px real touch + hash launch",
+      "id": "drum-pad",
+      "geometry": {
+        "inner": 390,
+        "scroll": 390
+      },
+      "result": {
+        "audio": "running",
+        "held": 0,
+        "hits": 1,
+        "localVoices": 1,
+        "mode": "local",
+        "profile": "local-kit-1"
+      }
+    },
+    {
+      "browser": "webkit",
+      "check": "390px real touch + hash launch",
+      "id": "field-keys",
+      "geometry": {
+        "inner": 390,
+        "scroll": 390
+      },
+      "result": {
+        "enabled": true,
+        "voices": [
+          {
+            "owner": "touch:0",
+            "channel": 0,
+            "note": 48,
+            "start": 0.032,
+            "held": false,
+            "releaseAt": 0.45199999999999996
+          }
+        ],
+        "field": {
+          "key": 0,
+          "scale": "major",
+          "brightness": 0.34
+        },
+        "midiInputs": []
+      }
+    },
+    {
+      "browser": "webkit",
+      "check": "390px real touch + hash launch",
+      "id": "dsp-rack",
+      "geometry": {
+        "inner": 390,
+        "scroll": 390
+      },
+      "result": {
+        "ready": true,
+        "disposed": false,
+        "rate": 48000,
+        "contextState": "running",
+        "held": 0,
+        "modules": 2,
+        "baseLatency": 0.0026666666666666666,
+        "outputLatency": 0.015625,
+        "receipts": [
+          {
+            "instanceId": "bloom-one",
+            "integrity": {
+              "format": "midi-room.compatibility/1",
+              "pluginId": "bloom-oscillator",
+              "pluginVersion": "1.0.0",
+              "engine": "faust-wasm/1",
+              "status": "artifact-verified",
+              "rackCompatible": true,
+              "hashes": {
+                "source": "45b86ee25f3f68528fb5806dd3bf82ed6cf9f7e067fa143ad70e951a131e6482",
+                "c": "1b66d6fae7a2fabd5a758d5ee2e323e53e1a6abc0daa5c99873c3ada5d043e8f",
+                "header": "5e8a6378013f0c073c44257da0d7db94a2a46349c943511fe8f3721b35aa7e79",
+                "wasm": "43a07ba9a6d07dcc6e522d5960b58237d86b4c1fe67edfc311db3587a89d72df"
+              },
+              "checks": [
+                "Source, C, header, Wasm and card identity hashes match",
+                "Bounded metadata and supported Wasm ABI",
+                "Wasm compiled without instantiation"
+              ],
+              "wasm": {
+                "bytes": 5172,
+                "imports": [
+                  {
+                    "module": "env",
+                    "name": "_powf",
+                    "kind": "function",
+                    "type": {
+                      "parameters": [
+                        "f32",
+                        "f32"
+                      ],
+                      "results": [
+                        "f32"
+                      ]
+                    }
+                  },
+                  {
+                    "module": "env",
+                    "name": "_sinf",
+                    "kind": "function",
+                    "type": {
+                      "parameters": [
+                        "f32"
+                      ],
+                      "results": [
+                        "f32"
+                      ]
+                    }
+                  }
+                ],
+                "exports": [
+                  {
+                    "name": "compute",
+                    "kind": "function",
+                    "type": {
+                      "parameters": [
+                        "i32",
+                        "i32",
+                        "i32",
+                        "i32"
+                      ],
+                      "results": []
+                    }
+                  },
+                  {
+                    "name": "getNumInputs",
+                    "kind": "function",
+                    "type": {
+                      "parameters": [
+                        "i32"
+                      ],
+                      "results": [
+                        "i32"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "getNumOutputs",
+                    "kind": "function",
+                    "type": {
+                      "parameters": [
+                        "i32"
+                      ],
+                      "results": [
+                        "i32"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "getParamValue",
+                    "kind": "function",
+                    "type": {
+                      "parameters": [
+                        "i32",
+                        "i32"
+                      ],
+                      "results": [
+                        "f32"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "getSampleRate",
+                    "kind": "function",
+                    "type": {
+                      "parameters": [
+                        "i32"
+                      ],
+                      "results": [
+                        "i32"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "init",
+                    "kind": "function",
+                    "type": {
+                      "parameters": [
+                        "i32",
+                        "i32"
+                      ],
+                      "results": []
+                    }
+                  },
+                  {
+                    "name": "instanceClear",
+                    "kind": "function",
+                    "type": {
+                      "parameters": [
+                        "i32"
+                      ],
+                      "results": []
+                    }
+                  },
+                  {
+                    "name": "instanceConstants",
+                    "kind": "function",
+                    "type": {
+                      "parameters": [
+                        "i32",
+                        "i32"
+                      ],
+                      "results": []
+                    }
+                  },
+                  {
+                    "name": "instanceInit",
+                    "kind": "function",
+                    "type": {
+                      "parameters": [
+                        "i32",
+                        "i32"
+                      ],
+                      "results": []
+                    }
+                  },
+                  {
+                    "name": "instanceResetUserInterface",
+                    "kind": "function",
+                    "type": {
+                      "parameters": [
+                        "i32"
+                      ],
+                      "results": []
+                    }
+                  },
+                  {
+                    "name": "setParamValue",
+                    "kind": "function",
+                    "type": {
+                      "parameters": [
+                        "i32",
+                        "i32",
+                        "f32"
+                      ],
+                      "results": []
+                    }
+                  },
+                  {
+                    "name": "memory",
+                    "kind": "memory",
+                    "type": {
+                      "maximum": 1008,
+                      "minimum": 8,
+                      "shared": false
+                    }
+                  }
+                ]
+              },
+              "limitations": [
+                "Hashes establish artifact identity, not trust, DSP correctness or real-time safety.",
+                "No audio render, MIDI behavior, timing or native/FPGA parity was measured by intake.",
+                "Run only reviewed DSP: a worklet isolates audio execution but cannot guarantee deadlines for hostile or pathological code."
+              ]
+            },
+            "probe": {
+              "ok": true,
+              "frames": 4096,
+              "rate": 48000,
+              "peak": 0.1229366585612297
+            }
+          },
+          {
+            "instanceId": "drive-one",
+            "integrity": {
+              "format": "midi-room.compatibility/1",
+              "pluginId": "soft-drive",
+              "pluginVersion": "1.0.0",
+              "engine": "faust-wasm/1",
+              "status": "artifact-verified",
+              "rackCompatible": true,
+              "hashes": {
+                "source": "faaac902102825a524624b527f8c7234782de53c91a3896462d8b80474f18359",
+                "c": "56ed9391210450412ebdfef44b9189b04761f233ab6dbc83bcc298de29402b4e",
+                "header": "d2391b7815db0c85b6eea994e8085b5117120dd286a8181d4ee618795e7c06b7",
+                "wasm": "4c261d44d45b671995285b480826c59da06fbabe28dea2529a9522a31d579846"
+              },
+              "checks": [
+                "Source, C, header, Wasm and card identity hashes match",
+                "Bounded metadata and supported Wasm ABI",
+                "Wasm compiled without instantiation"
+              ],
+              "wasm": {
+                "bytes": 5513,
+                "imports": [
+                  {
+                    "module": "env",
+                    "name": "_powf",
+                    "kind": "function",
+                    "type": {
+                      "parameters": [
+                        "f32",
+                        "f32"
+                      ],
+                      "results": [
+                        "f32"
+                      ]
+                    }
+                  },
+                  {
+                    "module": "env",
+                    "name": "_tanf",
+                    "kind": "function",
+                    "type": {
+                      "parameters": [
+                        "f32"
+                      ],
+                      "results": [
+                        "f32"
+                      ]
+                    }
+                  },
+                  {
+                    "module": "env",
+                    "name": "_tanhf",
+                    "kind": "function",
+                    "type": {
+                      "parameters": [
+                        "f32"
+                      ],
+                      "results": [
+                        "f32"
+                      ]
+                    }
+                  }
+                ],
+                "exports": [
+                  {
+                    "name": "compute",
+                    "kind": "function",
+                    "type": {
+                      "parameters": [
+                        "i32",
+                        "i32",
+                        "i32",
+                        "i32"
+                      ],
+                      "results": []
+                    }
+                  },
+                  {
+                    "name": "getNumInputs",
+                    "kind": "function",
+                    "type": {
+                      "parameters": [
+                        "i32"
+                      ],
+                      "results": [
+                        "i32"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "getNumOutputs",
+                    "kind": "function",
+                    "type": {
+                      "parameters": [
+                        "i32"
+                      ],
+                      "results": [
+                        "i32"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "getParamValue",
+                    "kind": "function",
+                    "type": {
+                      "parameters": [
+                        "i32",
+                        "i32"
+                      ],
+                      "results": [
+                        "f32"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "getSampleRate",
+                    "kind": "function",
+                    "type": {
+                      "parameters": [
+                        "i32"
+                      ],
+                      "results": [
+                        "i32"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "init",
+                    "kind": "function",
+                    "type": {
+                      "parameters": [
+                        "i32",
+                        "i32"
+                      ],
+                      "results": []
+                    }
+                  },
+                  {
+                    "name": "instanceClear",
+                    "kind": "function",
+                    "type": {
+                      "parameters": [
+                        "i32"
+                      ],
+                      "results": []
+                    }
+                  },
+                  {
+                    "name": "instanceConstants",
+                    "kind": "function",
+                    "type": {
+                      "parameters": [
+                        "i32",
+                        "i32"
+                      ],
+                      "results": []
+                    }
+                  },
+                  {
+                    "name": "instanceInit",
+                    "kind": "function",
+                    "type": {
+                      "parameters": [
+                        "i32",
+                        "i32"
+                      ],
+                      "results": []
+                    }
+                  },
+                  {
+                    "name": "instanceResetUserInterface",
+                    "kind": "function",
+                    "type": {
+                      "parameters": [
+                        "i32"
+                      ],
+                      "results": []
+                    }
+                  },
+                  {
+                    "name": "setParamValue",
+                    "kind": "function",
+                    "type": {
+                      "parameters": [
+                        "i32",
+                        "i32",
+                        "f32"
+                      ],
+                      "results": []
+                    }
+                  },
+                  {
+                    "name": "memory",
+                    "kind": "memory",
+                    "type": {
+                      "maximum": 1004,
+                      "minimum": 4,
+                      "shared": false
+                    }
+                  }
+                ]
+              },
+              "limitations": [
+                "Hashes establish artifact identity, not trust, DSP correctness or real-time safety.",
+                "No audio render, MIDI behavior, timing or native/FPGA parity was measured by intake.",
+                "Run only reviewed DSP: a worklet isolates audio execution but cannot guarantee deadlines for hostile or pathological code."
+              ]
+            },
+            "probe": {
+              "ok": true,
+              "frames": 4096,
+              "rate": 48000,
+              "peak": 0.000046019074943615124
+            }
+          }
+        ]
+      }
+    },
+    {
+      "browser": "webkit",
+      "check": "created MIDI export reaches parent save tray",
+      "saveText": "drum-pad-take.mid\n1 KB\nSave\n×"
+    },
+    {
+      "browser": "webkit",
+      "check": "real imported sandbox + CSP + AudioContext stop",
+      "isolation": {
+        "parent": "blocked",
+        "storage": "blocked",
+        "fetch": "blocked"
+      },
+      "outbound": 0
+    },
+    {
+      "browser": "webkit",
+      "check": "stopped conductor stays stopped after context resume",
+      "state": {
+        "version": 1,
+        "definitionId": "local.triton-rack",
+        "profile": {
+          "version": 1,
+          "definitionId": "local.triton-rack",
+          "definitionVersion": "1",
+          "profileId": "triton:A012:1",
+          "kind": "pitched",
+          "name": "Ice Crystal Keys",
+          "noteRange": [
+            0,
+            127
+          ],
+          "recommendedRoot": 48,
+          "preferredTempo": 100,
+          "voices": [],
+          "velocity": {
+            "min": 1,
+            "max": 127,
+            "response": "continuous amplitude"
+          },
+          "timing": {
+            "unit": "audio-context-seconds",
+            "maximumLookahead": 10
+          },
+          "provenance": "TRITON16 supplied oscillator models; twelve pitch-class zones, not General MIDI"
+        },
+        "transport": {
+          "bpm": 132,
+          "effectiveBpm": 132,
+          "owner": "local",
+          "follow": false,
+          "revision": 0,
+          "reason": "original Soul reference tempo",
+          "history": [
+            {
+              "writer": "factory patch preference",
+              "requested": 100,
+              "effective": 132,
+              "accepted": false,
+              "revision": 0,
+              "at": 1788635085597
+            }
+          ]
+        },
+        "audio": "running",
+        "midi": {
+          "available": true,
+          "connectedInputs": 0,
+          "error": null
+        },
+        "ownedVoices": 0,
+        "ownedSourceGroups": 0,
+        "soul": {
+          "on": false,
+          "scheduler": false,
+          "generation": 2
+        },
+        "evidence": "Software state only; no claim of audible output, hardware MIDI or phone testing"
+      }
+    }
+  ],
+  "errors": []
+}

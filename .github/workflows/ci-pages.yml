@@ -1,0 +1,157 @@
+name: Verify and publish MIDI Room
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: midi-room-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  verify:
+    name: Public build, instruments and browsers
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      # Official action release refs verified on 2026-09-05; pin commits, not moving tags.
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
+      - name: Clear prior receipts so failed runs cannot upload stale results
+        run: |
+          rm -f verification/ci-rebuild.json verification/ci-node.log \
+            verification/triton-regressions.json verification/production-browser.json \
+            verification/production-lifecycle.json verification/production-offline.json \
+            src/lucky/tests/held-out-evaluation.json \
+            src/lucky/tests/audio-evidence/render-report.json \
+            src/lucky/tests/browser-evidence/report.json \
+            src/lucky/tests/browser-evidence/audio-stress.json
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version: '22'
+          cache: npm
+          package-manager-cache: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+        with:
+          python-version: '3.12'
+      - name: Install locked test dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Install Chromium and WebKit with Linux dependencies
+        run: npx --no-install playwright install --with-deps chromium webkit
+      - name: Rebuild twice from public source and compare every dist byte
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib, json, subprocess
+          root = Path.cwd()
+          assert not (root / 'reference').exists(), 'Private reference tree must not be present'
+          generated = [root / 'dist/instruments' / (name + '.html') for name in
+                       ['triton-rack', 'improvisator', 'lucky-dreamer', 'drum-pad', 'field-keys', 'dsp-rack']]
+          generated += [root / 'dist/midi-room-local.html', root / 'dist/sw.js']
+          def rebuild():
+              for file in generated:
+                  file.unlink(missing_ok=True)
+              subprocess.run(['npm', 'run', 'build'], check=True)
+              return {str(p.relative_to(root / 'dist')): hashlib.sha256(p.read_bytes()).hexdigest()
+                      for p in sorted((root / 'dist').rglob('*')) if p.is_file()}
+          first, second = rebuild(), rebuild()
+          assert first == second, 'Repeated public builds differ'
+          Path('verification/ci-rebuild.json').write_text(json.dumps({
+              'private_reference_present': False, 'byte_identical': True, 'files': second
+          }, indent=2) + '\n')
+          print(f'Two public builds match across {len(second)} files')
+          PY
+          git diff --exit-code -- dist
+      - name: Host, TRITON and Lucky regression tests
+        run: npm test | tee verification/ci-node.log
+      - name: Lucky frozen composition regression set
+        run: npm run test:lucky:heldout
+      - name: Lucky rendered-sample regression set
+        run: npm run test:lucky:audio
+      - name: Six instruments under a nested Pages-style route
+        run: npm run test:browser
+      - name: Touch, exports and sandbox lifecycle
+        run: npm run test:lifecycle
+      - name: Offline reopening and waiting updates
+        run: npm run test:offline
+      - name: Lucky standalone controls and audio in both browser engines
+        run: node src/lucky/tests/browser-check.cjs
+      - name: Lucky full-band audio across every style in both browser engines
+        run: node src/lucky/tests/browser-audio-stress.cjs
+      - name: Retain measured reports, never audition audio
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: evaluation-reports
+          retention-days: 14
+          if-no-files-found: warn
+          path: |
+            verification/ci-rebuild.json
+            verification/ci-node.log
+            verification/triton-regressions.json
+            verification/production-browser.json
+            verification/production-lifecycle.json
+            verification/production-offline.json
+            src/lucky/tests/held-out-evaluation.json
+            src/lucky/tests/audio-evidence/render-report.json
+            src/lucky/tests/browser-evidence/report.json
+            src/lucky/tests/browser-evidence/audio-stress.json
+      - name: Stage public credits and reject private or recorded media
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import shutil
+          dist = Path('dist')
+          for name in ['wish-it-better.json', 'lineage.json', 'LICENSE', 'ATTRIBUTION.md',
+                       'CITATION.cff', 'WISH_IT_BETTER.md', 'CONTRIBUTING.md', 'README.md']:
+              shutil.copyfile(name, dist / name)
+          (dist / 'docs').mkdir(exist_ok=True)
+          for file in Path('docs').glob('*.md'):
+              shutil.copyfile(file, dist / 'docs' / file.name)
+          forbidden = {'.wav', '.m4a', '.mp3', '.aif', '.aiff', '.flac', '.ogg', '.opus', '.mid', '.midi'}
+          private = {'reference', 'node_modules', 'audio-evidence', 'browser-evidence', 'verification', '.git'}
+          for file in dist.rglob('*'):
+              assert not file.is_symlink(), f'Symlink in Pages artifact: {file}'
+              assert not (set(file.relative_to(dist).parts) & private), f'Private/test directory: {file}'
+              assert file.suffix.lower() not in forbidden, f'Recorded media or generated take: {file}'
+          PY
+      - name: Upload only the verified static site
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4.0.0
+        with:
+          path: dist
+
+  deploy:
+    name: Publish GitHub Pages
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    needs: verify
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    concurrency:
+      group: github-pages
+      cancel-in-progress: false
+    steps:
+      - name: Read Pages configuration
+        uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5.0.0
+      - name: Deploy the verified artifact
+        id: deployment
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4.0.5

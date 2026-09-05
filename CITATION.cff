@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: "If you refer to or build on MIDI Room, cite this project and preserve its component credits."
+title: "MIDI Room"
+type: software
+authors:
+  - family-names: Payopay
+    given-names: Aldrin
+repository-code: "https://github.com/mrdirno/midi-room"
+url: "https://persona500.com/midi-room/"
+abstract: "A browser workspace for DRINOMAN's musical instruments, with touch and keyboard audio and optional hardware MIDI."

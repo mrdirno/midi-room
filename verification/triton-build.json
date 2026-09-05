@@ -1,0 +1,160 @@
+{
+  "originalSourceSha256": "095e0f7b983523ff61b88b3a04e66714032d0a284e8e4e7b1918991e607421ad",
+  "source": "inherited-runtime.html",
+  "sourceSha256": "4eced0d8da0d9623c11014a29ba57ecb9751ff735ea1c5bd647478177a219404",
+  "artifact": "dist/instruments/triton-rack.html",
+  "artifactSha256": "fe970bd96d0a1eee22b0a02364a5eae9cd3062c7bc6e7275c3b305386892ad5a",
+  "bytes": 776070,
+  "countedPatches": [
+    {
+      "anchor": "let activeVoices=0, voiceList=[]",
+      "count": 1
+    },
+    {
+      "anchor": "state.tempo=Math.min(240,Math.max(40,state.tempo+d));",
+      "count": 1
+    },
+    {
+      "anchor": "if(!dreaming) state.tempo=cur.tempo||100;",
+      "count": 2
+    },
+    {
+      "anchor": "state.tempo=cur.tempo||100;",
+      "count": 1
+    },
+    {
+      "anchor": "state.tempo=(typeof p.tempo===\"number\"&&isFinite(p.tempo))? p.tempo : (state.tempo||100);",
+      "count": 1
+    },
+    {
+      "anchor": "if(cur.arpDefault && !dreaming){ Object.assign(state.arp,cur.arpDefault); }\n  else if(!dreaming){ state.arp.on",
+      "count": 1
+    },
+    {
+      "anchor": "state.arp.on=false; latchSet.clear();\n  syncLeds(); if(dreaming",
+      "count": 1
+    },
+    {
+      "anchor": "if(cur.arpDefault){ Object.assign(state.arp,cur.arpDefault); } else { state.arp.on=false; }",
+      "count": 1
+    },
+    {
+      "anchor": "bar.bpm = clamp(this.settings.bpm * (1 + shape * this.settings.humanize), 34, 132);",
+      "count": 1
+    },
+    {
+      "anchor": "bar.bpm=clamp(this.settings.bpm*(1+shape*this.settings.humanize),34,132);",
+      "count": 1
+    },
+    {
+      "anchor": "var settings=Object.assign({},K.PRESETS.reference,K.LOCKED_PERFORMANCE||{});",
+      "count": 1
+    },
+    {
+      "anchor": "id=\"spTempo\" type=\"range\" min=\"34\" max=\"132\" value=\"132\"",
+      "count": 1
+    },
+    {
+      "anchor": "state.tempo=+bar.bpm.toFixed(2);",
+      "count": 1
+    },
+    {
+      "anchor": "settings.mode=p.mode;Object.assign(settings,K.LOCKED_PERFORMANCE||K.PRESETS.reference);",
+      "count": 1
+    },
+    {
+      "anchor": "settings[key]=isBpm?v:v/100;",
+      "count": 1
+    },
+    {
+      "anchor": "function soulStart(fresh){\n",
+      "count": 1
+    },
+    {
+      "anchor": "function soulStop(silent){\n",
+      "count": 1
+    },
+    {
+      "anchor": "if(SP.on){soulStop(false);return;}\n  if(ctx&&ctx.state==='suspended'&&ctx.resume){ctx.resume().then(function()",
+      "count": 1
+    },
+    {
+      "anchor": "spawnVoice(p,e.pitch,vel,when,dur,SP.pans[role]);SP.diagnostics.notes++;",
+      "count": 1
+    },
+    {
+      "anchor": "allNotesOff();if(typeof takeStop==='function')takeStop();\n  if(typeof TAKE",
+      "count": 1
+    },
+    {
+      "anchor": "SP.selfTest=function(){",
+      "count": 1
+    },
+    {
+      "anchor": "const t=Math.max(when,ctx.currentTime), out=ctx.createGain(); out.gain.value=0;",
+      "count": 1
+    },
+    {
+      "anchor": "const stops=[], nodes=[];",
+      "count": 1
+    },
+    {
+      "anchor": "g.connect(f1); s.start(t); s.stop(t+.3);",
+      "count": 1
+    },
+    {
+      "anchor": "g.connect(f1); s.start(t); s.stop(t+.1);",
+      "count": 1
+    },
+    {
+      "anchor": "const n0=Math.max(ctx.currentTime,t); holdEnv(n0);\n    out.gain.setTargetAtTime(0.0001,n0,.02);\n    stops.forE",
+      "count": 1
+    },
+    {
+      "anchor": "const r=Math.max(.03,prog.aEG.r), tr=Math.max(rt||ctx.currentTime,ctx.currentTime);",
+      "count": 1
+    },
+    {
+      "anchor": "Math.max(0,(st-ctx.currentTime)*1000)+80);",
+      "count": 1
+    },
+    {
+      "anchor": "const v={units,note,t,killed:false,oscs:oscRefs,baseHz,lgP,lfoP:prog.lfo.pitch,_take:_tk||null};",
+      "count": 1
+    },
+    {
+      "anchor": "if(prog.cat===\"DRUMS\"){ drumHit(note,vel,when,prog.kit||\"std\"); return null; }",
+      "count": 1
+    },
+    {
+      "anchor": "const v={units:1,t,killed:false};\n  v.kill=()=>{ if(!v.killed){ v.killed=true; unreg(v); } };",
+      "count": 3
+    },
+    {
+      "anchor": "</head>",
+      "count": 1
+    },
+    {
+      "anchor": "<body class=\"soulMode\">",
+      "count": 1
+    },
+    {
+      "anchor": "</body>",
+      "count": 1
+    },
+    {
+      "anchor": "if(e.repeat||e.metaKey||e.ctrlKey||e.altKey) return;",
+      "count": 1
+    }
+  ],
+  "donorChanges": [
+    "idempotent Soul start",
+    "cancel future pitched/drum source audio, including transients"
+  ],
+  "notAdopted": [
+    "Ensemble conductor",
+    "Ensemble sound defaults",
+    "LiveKeys UI",
+    "unverified history claims"
+  ]
+}

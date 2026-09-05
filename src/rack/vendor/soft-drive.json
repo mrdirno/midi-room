@@ -1,0 +1,257 @@
+{
+  "format": "gauntlet.dsp-build/1",
+  "card": {
+    "format": "gauntlet.dsp-card/1",
+    "id": "soft-drive",
+    "name": "Soft Drive",
+    "author": "Aldrin Payopay",
+    "language": "faust",
+    "source": "// Author: Aldrin Payopay <aldrin.gdf@gmail.com>\ndeclare name \"Soft Drive\";\ndeclare author \"Aldrin Payopay\";\nimport(\"stdfaust.lib\");\ncutoff = hslider(\"cutoff[unit:Hz][scale:log]\",5000,80,18000,1) : si.smoo;\ndrive = hslider(\"drive[unit:dB]\",6,0,24,0.1) : ba.db2linear : si.smoo;\nmix = hslider(\"mix\",0.65,0,1,0.01) : si.smoo;\nlevel = hslider(\"level[unit:dB]\",-6,-36,0,0.1) : ba.db2linear : si.smoo;\n// Keep filter coefficients inside the stable frequency range at every supported rate.\ncolor(x) = x*(1-mix)+ma.tanh(fi.lowpass(2,min(cutoff,ma.SR*0.45),x)*drive)*mix;\nprocess = par(i,2,color : *(level));\n"
+  },
+  "sourceHash": "33e0b0ad337301a69a64711d1f645e7dd8f1b5aeb4808dbad21e9af20df99588",
+  "metadata": {
+    "nativePrefix": "dsp_soft_drive",
+    "name": "Soft Drive",
+    "inputs": 2,
+    "outputs": 2,
+    "size": 96,
+    "parameters": [
+      {
+        "id": "/Soft_Drive/cutoff",
+        "label": "cutoff",
+        "index": 56,
+        "min": 80,
+        "max": 18000,
+        "init": 5000,
+        "step": 1,
+        "meta": {
+          "scale": "log",
+          "unit": "Hz"
+        }
+      },
+      {
+        "id": "/Soft_Drive/drive",
+        "label": "drive",
+        "index": 40,
+        "min": 0,
+        "max": 24,
+        "init": 6,
+        "step": 0.1,
+        "meta": {
+          "unit": "dB"
+        }
+      },
+      {
+        "id": "/Soft_Drive/level",
+        "label": "level",
+        "index": 12,
+        "min": -36,
+        "max": 0,
+        "init": -6,
+        "step": 0.1,
+        "meta": {
+          "unit": "dB"
+        }
+      },
+      {
+        "id": "/Soft_Drive/mix",
+        "label": "mix",
+        "index": 28,
+        "min": 0,
+        "max": 1,
+        "init": 0.65,
+        "step": 0.01,
+        "meta": {}
+      }
+    ],
+    "ui": [
+      {
+        "type": "vgroup",
+        "label": "Soft Drive",
+        "items": [
+          {
+            "type": "hslider",
+            "label": "cutoff",
+            "varname": "fHslider3",
+            "shortname": "cutoff",
+            "address": "/Soft_Drive/cutoff",
+            "index": 56,
+            "meta": [
+              {
+                "scale": "log"
+              },
+              {
+                "unit": "Hz"
+              }
+            ],
+            "init": 5000,
+            "min": 80,
+            "max": 18000,
+            "step": 1
+          },
+          {
+            "type": "hslider",
+            "label": "drive",
+            "varname": "fHslider2",
+            "shortname": "drive",
+            "address": "/Soft_Drive/drive",
+            "index": 40,
+            "meta": [
+              {
+                "unit": "dB"
+              }
+            ],
+            "init": 6,
+            "min": 0,
+            "max": 24,
+            "step": 0.1
+          },
+          {
+            "type": "hslider",
+            "label": "level",
+            "varname": "fHslider0",
+            "shortname": "level",
+            "address": "/Soft_Drive/level",
+            "index": 12,
+            "meta": [
+              {
+                "unit": "dB"
+              }
+            ],
+            "init": -6,
+            "min": -36,
+            "max": 0,
+            "step": 0.1
+          },
+          {
+            "type": "hslider",
+            "label": "mix",
+            "varname": "fHslider1",
+            "shortname": "mix",
+            "address": "/Soft_Drive/mix",
+            "index": 28,
+            "init": 0.65,
+            "min": 0,
+            "max": 1,
+            "step": 0.01
+          }
+        ]
+      }
+    ],
+    "libraryMetadata": [
+      {
+        "author": "Aldrin Payopay"
+      },
+      {
+        "basics.lib/name": "Faust Basic Element Library"
+      },
+      {
+        "basics.lib/version": "1.22.0"
+      },
+      {
+        "compile_options": "-lang wasm -fpga-mem-th 4 -ct 1 -cn DspSoftDrive -es 1 -mcd 16 -mdd 1024 -mdy 33 -single -ftz 0"
+      },
+      {
+        "filename": "card.dsp"
+      },
+      {
+        "filters.lib/fir:author": "Julius O. Smith III"
+      },
+      {
+        "filters.lib/fir:copyright": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
+      },
+      {
+        "filters.lib/fir:license": "MIT-style STK-4.3 license"
+      },
+      {
+        "filters.lib/iir:author": "Julius O. Smith III"
+      },
+      {
+        "filters.lib/iir:copyright": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
+      },
+      {
+        "filters.lib/iir:license": "MIT-style STK-4.3 license"
+      },
+      {
+        "filters.lib/lowpass0_highpass1": "MIT-style STK-4.3 license"
+      },
+      {
+        "filters.lib/lowpass0_highpass1:author": "Julius O. Smith III"
+      },
+      {
+        "filters.lib/lowpass:author": "Julius O. Smith III"
+      },
+      {
+        "filters.lib/lowpass:copyright": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
+      },
+      {
+        "filters.lib/lowpass:license": "MIT-style STK-4.3 license"
+      },
+      {
+        "filters.lib/name": "Faust Filters Library"
+      },
+      {
+        "filters.lib/tf2:author": "Julius O. Smith III"
+      },
+      {
+        "filters.lib/tf2:copyright": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
+      },
+      {
+        "filters.lib/tf2:license": "MIT-style STK-4.3 license"
+      },
+      {
+        "filters.lib/tf2s:author": "Julius O. Smith III"
+      },
+      {
+        "filters.lib/tf2s:copyright": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
+      },
+      {
+        "filters.lib/tf2s:license": "MIT-style STK-4.3 license"
+      },
+      {
+        "filters.lib/version": "1.7.1"
+      },
+      {
+        "maths.lib/author": "GRAME"
+      },
+      {
+        "maths.lib/copyright": "GRAME"
+      },
+      {
+        "maths.lib/license": "LGPL with exception"
+      },
+      {
+        "maths.lib/name": "Faust Math Library"
+      },
+      {
+        "maths.lib/version": "2.9.0"
+      },
+      {
+        "name": "Soft Drive"
+      },
+      {
+        "platform.lib/name": "Generic Platform Library"
+      },
+      {
+        "platform.lib/version": "1.3.0"
+      },
+      {
+        "signals.lib/name": "Faust Routing Library"
+      },
+      {
+        "signals.lib/version": "1.6.0"
+      }
+    ],
+    "compiler": "FAUST Version 2.85.9"
+  },
+  "wasm": "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LCJjb21waWxlX29wdGlvbnMiOiItbGFuZyB3YXNtIC1mcGdhLW1lbS10aCA0IC1jdCAxIC1jbiBEc3BTb2Z0RHJpdmUgLWVzIDEgLW1jZCAxNiAtbWRkIDEwMjQgLW1keSAzMyAtc2luZ2xlIC1mdHogMCIsImxpYnJhcnlfbGlzdCI6WyJzdGRmYXVzdC5saWIiLCJiYXNpY3MubGliIiwic2lnbmFscy5saWIiLCJtYXRocy5saWIiLCJwbGF0Zm9ybS5saWIiLCJmaWx0ZXJzLmxpYiJdLCJzaXplIjo5NiwiY29kZSI6Ikx5OGdRWFYwYUc5eU9pQkJiR1J5YVc0Z1VHRjViM0JoZVNBOFlXeGtjbWx1TG1ka1prQm5iV0ZwYkM1amIyMCtDbVJsWTJ4aGNtVWdibUZ0WlNBaVUyOW1kQ0JFY21sMlpTSTdDbVJsWTJ4aGNtVWdZWFYwYUc5eUlDSkJiR1J5YVc0Z1VHRjViM0JoZVNJN0NtbHRjRzl5ZENnaWMzUmtabUYxYzNRdWJHbGlJaWs3Q21OMWRHOW1aaUE5SUdoemJHbGtaWElvSW1OMWRHOW1abHQxYm1sME9raDZYVnR6WTJGc1pUcHNiMmRkSWl3MU1EQXdMRGd3TERFNE1EQXdMREVwSURvZ2Mya3VjMjF2YnpzS1pISnBkbVVnUFNCb2MyeHBaR1Z5S0NKa2NtbDJaVnQxYm1sME9tUkNYU0lzTml3d0xESTBMREF1TVNrZ09pQmlZUzVrWWpKc2FXNWxZWElnT2lCemFTNXpiVzl2T3dwdGFYZ2dQU0JvYzJ4cFpHVnlLQ0p0YVhnaUxEQXVOalVzTUN3eExEQXVNREVwSURvZ2Mya3VjMjF2YnpzS2JHVjJaV3dnUFNCb2MyeHBaR1Z5S0NKc1pYWmxiRnQxYm1sME9tUkNYU0lzTFRZc0xUTTJMREFzTUM0eEtTQTZJR0poTG1SaU1teHBibVZoY2lBNklITnBMbk50YjI4N0NpOHZJRXRsWlhBZ1ptbHNkR1Z5SUdOdlpXWm1hV05wWlc1MGN5QnBibk5wWkdVZ2RHaGxJSE4wWVdKc1pTQm1jbVZ4ZFdWdVkza2djbUZ1WjJVZ1lYUWdaWFpsY25rZ2MzVndjRzl5ZEdWa0lISmhkR1V1Q21OdmJHOXlLSGdwSUQwZ2VDb29NUzF0YVhncEsyMWhMblJoYm1nb1pta3ViRzkzY0dGemN5Z3lMRzFwYmloamRYUnZabVlzYldFdVUxSXFNQzQwTlNrc2VDa3FaSEpwZG1VcEttMXBlRHNLY0hKdlkyVnpjeUE5SUhCaGNpaHBMRElzWTI5c2IzSWdPaUFxS0d4bGRtVnNLU2s3Q2c9PSIsImlucHV0cyI6Miwib3V0cHV0cyI6MiwibWV0YSI6W3siYXV0aG9yIjoiQWxkcmluIFBheW9wYXkifSx7ImJhc2ljcy5saWIvbmFtZSI6IkZhdXN0IEJhc2ljIEVsZW1lbnQgTGlicmFyeSJ9LHsiYmFzaWNzLmxpYi92ZXJzaW9uIjoiMS4yMi4wIn0seyJjb21waWxlX29wdGlvbnMiOiItbGFuZyB3YXNtIC1mcGdhLW1lbS10aCA0IC1jdCAxIC1jbiBEc3BTb2Z0RHJpdmUgLWVzIDEgLW1jZCAxNiAtbWRkIDEwMjQgLW1keSAzMyAtc2luZ2xlIC1mdHogMCJ9LHsiZmlsZW5hbWUiOiJjYXJkLmRzcCJ9LHsiZmlsdGVycy5saWIvZmlyOmF1dGhvciI6Ikp1bGl1cyBPLiBTbWl0aCBJSUkifSx7ImZpbHRlcnMubGliL2Zpcjpjb3B5cmlnaHQiOiJDb3B5cmlnaHQgKEMpIDIwMDMtMjAxOSBieSBKdWxpdXMgTy4gU21pdGggSUlJIDxqb3NAY2NybWEuc3RhbmZvcmQuZWR1PiJ9LHsiZmlsdGVycy5saWIvZmlyOmxpY2Vuc2UiOiJNSVQtc3R5bGUgU1RLLTQuMyBsaWNlbnNlIn0seyJmaWx0ZXJzLmxpYi9paXI6YXV0aG9yIjoiSnVsaXVzIE8uIFNtaXRoIElJSSJ9LHsiZmlsdGVycy5saWIvaWlyOmNvcHlyaWdodCI6IkNvcHlyaWdodCAoQykgMjAwMy0yMDE5IGJ5IEp1bGl1cyBPLiBTbWl0aCBJSUkgPGpvc0BjY3JtYS5zdGFuZm9yZC5lZHU+In0seyJmaWx0ZXJzLmxpYi9paXI6bGljZW5zZSI6Ik1JVC1zdHlsZSBTVEstNC4zIGxpY2Vuc2UifSx7ImZpbHRlcnMubGliL2xvd3Bhc3MwX2hpZ2hwYXNzMSI6Ik1JVC1zdHlsZSBTVEstNC4zIGxpY2Vuc2UifSx7ImZpbHRlcnMubGliL2xvd3Bhc3MwX2hpZ2hwYXNzMTphdXRob3IiOiJKdWxpdXMgTy4gU21pdGggSUlJIn0seyJmaWx0ZXJzLmxpYi9sb3dwYXNzOmF1dGhvciI6Ikp1bGl1cyBPLiBTbWl0aCBJSUkifSx7ImZpbHRlcnMubGliL2xvd3Bhc3M6Y29weXJpZ2h0IjoiQ29weXJpZ2h0IChDKSAyMDAzLTIwMTkgYnkgSnVsaXVzIE8uIFNtaXRoIElJSSA8am9zQGNjcm1hLnN0YW5mb3JkLmVkdT4ifSx7ImZpbHRlcnMubGliL2xvd3Bhc3M6bGljZW5zZSI6Ik1JVC1zdHlsZSBTVEstNC4zIGxpY2Vuc2UifSx7ImZpbHRlcnMubGliL25hbWUiOiJGYXVzdCBGaWx0ZXJzIExpYnJhcnkifSx7ImZpbHRlcnMubGliL3RmMjphdXRob3IiOiJKdWxpdXMgTy4gU21pdGggSUlJIn0seyJmaWx0ZXJzLmxpYi90ZjI6Y29weXJpZ2h0IjoiQ29weXJpZ2h0IChDKSAyMDAzLTIwMTkgYnkgSnVsaXVzIE8uIFNtaXRoIElJSSA8am9zQGNjcm1hLnN0YW5mb3JkLmVkdT4ifSx7ImZpbHRlcnMubGliL3RmMjpsaWNlbnNlIjoiTUlULXN0eWxlIFNUSy00LjMgbGljZW5zZSJ9LHsiZmlsdGVycy5saWIvdGYyczphdXRob3IiOiJKdWxpdXMgTy4gU21pdGggSUlJIn0seyJmaWx0ZXJzLmxpYi90ZjJzOmNvcHlyaWdodCI6IkNvcHlyaWdodCAoQykgMjAwMy0yMDE5IGJ5IEp1bGl1cyBPLiBTbWl0aCBJSUkgPGpvc0BjY3JtYS5zdGFuZm9yZC5lZHU+In0seyJmaWx0ZXJzLmxpYi90ZjJzOmxpY2Vuc2UiOiJNSVQtc3R5bGUgU1RLLTQuMyBsaWNlbnNlIn0seyJmaWx0ZXJzLmxpYi92ZXJzaW9uIjoiMS43LjEifSx7Im1hdGhzLmxpYi9hdXRob3IiOiJHUkFNRSJ9LHsibWF0aHMubGliL2NvcHlyaWdodCI6IkdSQU1FIn0seyJtYXRocy5saWIvbGljZW5zZSI6IkxHUEwgd2l0aCBleGNlcHRpb24ifSx7Im1hdGhzLmxpYi9uYW1lIjoiRmF1c3QgTWF0aCBMaWJyYXJ5In0seyJtYXRocy5saWIvdmVyc2lvbiI6IjIuOS4wIn0seyJuYW1lIjoiU29mdCBEcml2ZSJ9LHsicGxhdGZvcm0ubGliL25hbWUiOiJHZW5lcmljIFBsYXRmb3JtIExpYnJhcnkifSx7InBsYXRmb3JtLmxpYi92ZXJzaW9uIjoiMS4zLjAifSx7InNpZ25hbHMubGliL25hbWUiOiJGYXVzdCBSb3V0aW5nIExpYnJhcnkifSx7InNpZ25hbHMubGliL3ZlcnNpb24iOiIxLjYuMCJ9XSwidWkiOlt7InR5cGUiOiJ2Z3JvdXAiLCJsYWJlbCI6IlNvZnQgRHJpdmUiLCJpdGVtcyI6W3sidHlwZSI6ImhzbGlkZXIiLCJsYWJlbCI6ImN1dG9mZiIsInZhcm5hbWUiOiJmSHNsaWRlcjMiLCJzaG9ydG5hbWUiOiJjdXRvZmYiLCJhZGRyZXNzIjoiL1NvZnRfRHJpdmUvY3V0b2ZmIiwiaW5kZXgiOjU2LCJtZXRhIjpbeyJzY2FsZSI6ImxvZyJ9LHsidW5pdCI6Ikh6In1dLCJpbml0Ijo1MDAwLCJtaW4iOjgwLCJtYXgiOjE4MDAwLCJzdGVwIjoxfSx7InR5cGUiOiJoc2xpZGVyIiwibGFiZWwiOiJkcml2ZSIsInZhcm5hbWUiOiJmSHNsaWRlcjIiLCJzaG9ydG5hbWUiOiJkcml2ZSIsImFkZHJlc3MiOiIvU29mdF9Ecml2ZS9kcml2ZSIsImluZGV4Ijo0MCwibWV0YSI6W3sidW5pdCI6ImRCIn1dLCJpbml0Ijo2LCJtaW4iOjAsIm1heCI6MjQsInN0ZXAiOjAuMX0seyJ0eXBlIjoiaHNsaWRlciIsImxhYmVsIjoibGV2ZWwiLCJ2YXJuYW1lIjoiZkhzbGlkZXIwIiwic2hvcnRuYW1lIjoibGV2ZWwiLCJhZGRyZXNzIjoiL1NvZnRfRHJpdmUvbGV2ZWwiLCJpbmRleCI6MTIsIm1ldGEiOlt7InVuaXQiOiJkQiJ9XSwiaW5pdCI6LTYsIm1pbiI6LTM2LCJtYXgiOjAsInN0ZXAiOjAuMX0seyJ0eXBlIjoiaHNsaWRlciIsImxhYmVsIjoibWl4IiwidmFybmFtZSI6ImZIc2xpZGVyMSIsInNob3J0bmFtZSI6Im1peCIsImFkZHJlc3MiOiIvU29mdF9Ecml2ZS9taXgiLCJpbmRleCI6MjgsImluaXQiOjAuNjUsIm1pbiI6MCwibWF4IjoxLCJzdGVwIjowLjAxfV19XX0=",
+  "nativeC": "/************************** BEGIN CInterface.h **************************\n FAUST Architecture File\n Copyright (C) 2003-2022 GRAME, Centre National de Creation Musicale\n ---------------------------------------------------------------------\n This program is free software; you can redistribute it and/or modify\n it under the terms of the GNU Lesser General Public License as published by\n the Free Software Foundation; either version 2.1 of the License, or\n (at your option) any later version.\n \n This program is distributed in the hope that it will be useful,\n but WITHOUT ANY WARRANTY; without even the implied warranty of\n MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the\n GNU Lesser General Public License for more details.\n \n You should have received a copy of the GNU Lesser General Public License\n along with this program; if not, write to the Free Software\n Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.\n \n EXCEPTION : As a special exception, you may create a larger work\n that contains this FAUST architecture section and distribute\n that work under terms of your choice, so long as this FAUST\n architecture section is not modified.\n *************************************************************************/\n\n#ifndef CINTERFACE_H\n#define CINTERFACE_H\n\n#ifndef FAUSTFLOAT\n#define FAUSTFLOAT float\n#endif\n\n#include <stdlib.h>\n\n#ifdef __cplusplus\nextern \"C\" {\n#endif\n    \nstruct Soundfile;\n\n/*******************************************************************************\n * UI, Meta and MemoryManager structures for C code.\n ******************************************************************************/\n\n// -- widget's layouts\n\ntypedef void (* openTabBoxFun) (void* ui_interface, const char* label);\ntypedef void (* openHorizontalBoxFun) (void* ui_interface, const char* label);\ntypedef void (* openVerticalBoxFun) (void* ui_interface, const char* label);\ntypedef void (* closeBoxFun) (void* ui_interface);\n\n// -- active widgets\n\ntypedef void (* addButtonFun) (void* ui_interface, const char* label, FAUSTFLOAT* zone);\ntypedef void (* addCheckButtonFun) (void* ui_interface, const char* label, FAUSTFLOAT* zone);\ntypedef void (* addVerticalSliderFun) (void* ui_interface, const char* label, FAUSTFLOAT* zone, FAUSTFLOAT init, FAUSTFLOAT min, FAUSTFLOAT max, FAUSTFLOAT step);\ntypedef void (* addHorizontalSliderFun) (void* ui_interface, const char* label, FAUSTFLOAT* zone, FAUSTFLOAT init, FAUSTFLOAT min, FAUSTFLOAT max, FAUSTFLOAT step);\ntypedef void (* addNumEntryFun) (void* ui_interface, const char* label, FAUSTFLOAT* zone, FAUSTFLOAT init, FAUSTFLOAT min, FAUSTFLOAT max, FAUSTFLOAT step);\n\n// -- passive widgets\n\ntypedef void (* addHorizontalBargraphFun) (void* ui_interface, const char* label, FAUSTFLOAT* zone, FAUSTFLOAT min, FAUSTFLOAT max);\ntypedef void (* addVerticalBargraphFun) (void* ui_interface, const char* label, FAUSTFLOAT* zone, FAUSTFLOAT min, FAUSTFLOAT max);\n\n// -- soundfiles\n    \ntypedef void (* addSoundfileFun) (void* ui_interface, const char* label, const char* url, struct Soundfile** sf_zone);\n\ntypedef void (* declareFun) (void* ui_interface, FAUSTFLOAT* zone, const char* key, const char* value);\n\ntypedef struct {\n\n    void* uiInterface;\n\n    openTabBoxFun openTabBox;\n    openHorizontalBoxFun openHorizontalBox;\n    openVerticalBoxFun openVerticalBox;\n    closeBoxFun closeBox;\n    addButtonFun addButton;\n    addCheckButtonFun addCheckButton;\n    addVerticalSliderFun addVerticalSlider;\n    addHorizontalSliderFun addHorizontalSlider;\n    addNumEntryFun addNumEntry;\n    addHorizontalBargraphFun addHorizontalBargraph;\n    addVerticalBargraphFun addVerticalBargraph;\n    addSoundfileFun addSoundfile;\n    declareFun declare;\n\n} UIGlue;\n\ntypedef void (* metaDeclareFun) (void* ui_interface, const char* key, const char* value);\n\ntypedef struct {\n\n    void* metaInterface;\n    \n    metaDeclareFun declare;\n\n} MetaGlue;\n\n/***************************************\n *  Interface for the DSP object\n ***************************************/\n\ntypedef char dsp_imp;\n    \ntypedef dsp_imp* (* newDspFun) ();\ntypedef void (* destroyDspFun) (dsp_imp* dsp);\ntypedef int (* getNumInputsFun) (dsp_imp* dsp);\ntypedef int (* getNumOutputsFun) (dsp_imp* dsp);\ntypedef void (* buildUserInterfaceFun) (dsp_imp* dsp, UIGlue* ui);\ntypedef int (* getSampleRateFun) (dsp_imp* dsp);\ntypedef void (* initFun) (dsp_imp* dsp, int sample_rate);\ntypedef void (* classInitFun) (int sample_rate);\ntypedef void (* staticInitFun) (dsp_imp* dsp, int sample_rate);\ntypedef void (* instanceInitFun) (dsp_imp* dsp, int sample_rate);\ntypedef void (* instanceConstantsFun) (dsp_imp* dsp, int sample_rate);\ntypedef void (* instanceResetUserInterfaceFun) (dsp_imp* dsp);\ntypedef void (* instanceClearFun) (dsp_imp* dsp);\ntypedef void (* computeFun) (dsp_imp* dsp, int len, FAUSTFLOAT** inputs, FAUSTFLOAT** outputs);\ntypedef void (* metadataFun) (MetaGlue* meta);\n    \n/***************************************\n * DSP memory manager functions\n ***************************************/\n\ntypedef void* (* allocateFun) (void* manager_interface, size_t size);\ntypedef void (* destroyFun) (void* manager_interface, void* ptr);\n\ntypedef struct {\n    \n    void* managerInterface;\n    \n    allocateFun allocate;\n    destroyFun destroy;\n    \n} MemoryManagerGlue;\n\n#ifdef __cplusplus\n}\n#endif\n\n#endif\n/**************************  END  CInterface.h **************************/\n\n/* ------------------------------------------------------------\nauthor: \"Aldrin Payopay\"\nname: \"Soft Drive\"\nCode generated with Faust 2.85.9 (https://faust.grame.fr)\nCompilation options: -lang c -fpga-mem-th 4 -it -fp -ct 1 -cn DspSoftDrive -es 1 -mcd 16 -mdd 1024 -mdy 33 -single -ftz 0\n------------------------------------------------------------ */\n\n#ifndef  __DspSoftDrive_H__\n#define  __DspSoftDrive_H__\n\n#ifndef FAUSTFLOAT\n#define FAUSTFLOAT float\n#endif \n\n\n#ifdef __cplusplus\nextern \"C\" {\n#endif\n\n#if defined(_WIN32)\n#define RESTRICT __restrict\n#else\n#define RESTRICT __restrict__\n#endif\n\n/* link with : \"\" */\n#include <math.h>\n#include <stdint.h>\n#include <stdlib.h>\n\nstatic float DspSoftDrive_faustpower2_f(float value) {\n\treturn value * value;\n}\n\n#ifndef FAUSTCLASS \n#define FAUSTCLASS DspSoftDrive\n#endif\n\n#ifdef __APPLE__ \n#define exp10f __exp10f\n#define exp10 __exp10\n#endif\n#ifndef FAUSTMAXI\n#define FAUSTMAXI\nstatic inline int faustmaxi(int a, int b) { return (a > b) ? a : b; }\nstatic inline int faustmini(int a, int b) { return (a < b) ? a : b; }\n#endif\n\ntypedef struct {\n\tint fSampleRate;\n\tfloat fConst0;\n\tfloat fConst1;\n\tFAUSTFLOAT fHslider0;\n\tfloat fConst2;\n\tfloat fRec0[2];\n\tFAUSTFLOAT fHslider1;\n\tfloat fRec1[2];\n\tFAUSTFLOAT fHslider2;\n\tfloat fRec2[2];\n\tfloat fConst3;\n\tFAUSTFLOAT fHslider3;\n\tfloat fRec4[2];\n\tfloat fConst4;\n\tfloat fRec3[3];\n\tfloat fRec5[3];\n} DspSoftDrive;\n\nDspSoftDrive* newDspSoftDrive() { \n\tDspSoftDrive* dsp = (DspSoftDrive*)calloc(1, sizeof(DspSoftDrive));\n\treturn dsp;\n}\n\nvoid deleteDspSoftDrive(DspSoftDrive* dsp) { \n\tfree(dsp);\n}\n\nvoid metadataDspSoftDrive(MetaGlue* m) { \n\tm->declare(m->metaInterface, \"author\", \"Aldrin Payopay\");\n\tm->declare(m->metaInterface, \"basics.lib/name\", \"Faust Basic Element Library\");\n\tm->declare(m->metaInterface, \"basics.lib/version\", \"1.22.0\");\n\tm->declare(m->metaInterface, \"compile_options\", \"-lang c -fpga-mem-th 4 -it -fp -ct 1 -cn DspSoftDrive -es 1 -mcd 16 -mdd 1024 -mdy 33 -single -ftz 0\");\n\tm->declare(m->metaInterface, \"filename\", \"card.dsp\");\n\tm->declare(m->metaInterface, \"filters.lib/fir:author\", \"Julius O. Smith III\");\n\tm->declare(m->metaInterface, \"filters.lib/fir:copyright\", \"Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>\");\n\tm->declare(m->metaInterface, \"filters.lib/fir:license\", \"MIT-style STK-4.3 license\");\n\tm->declare(m->metaInterface, \"filters.lib/iir:author\", \"Julius O. Smith III\");\n\tm->declare(m->metaInterface, \"filters.lib/iir:copyright\", \"Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>\");\n\tm->declare(m->metaInterface, \"filters.lib/iir:license\", \"MIT-style STK-4.3 license\");\n\tm->declare(m->metaInterface, \"filters.lib/lowpass0_highpass1\", \"MIT-style STK-4.3 license\");\n\tm->declare(m->metaInterface, \"filters.lib/lowpass0_highpass1:author\", \"Julius O. Smith III\");\n\tm->declare(m->metaInterface, \"filters.lib/lowpass:author\", \"Julius O. Smith III\");\n\tm->declare(m->metaInterface, \"filters.lib/lowpass:copyright\", \"Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>\");\n\tm->declare(m->metaInterface, \"filters.lib/lowpass:license\", \"MIT-style STK-4.3 license\");\n\tm->declare(m->metaInterface, \"filters.lib/name\", \"Faust Filters Library\");\n\tm->declare(m->metaInterface, \"filters.lib/tf2:author\", \"Julius O. Smith III\");\n\tm->declare(m->metaInterface, \"filters.lib/tf2:copyright\", \"Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>\");\n\tm->declare(m->metaInterface, \"filters.lib/tf2:license\", \"MIT-style STK-4.3 license\");\n\tm->declare(m->metaInterface, \"filters.lib/tf2s:author\", \"Julius O. Smith III\");\n\tm->declare(m->metaInterface, \"filters.lib/tf2s:copyright\", \"Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>\");\n\tm->declare(m->metaInterface, \"filters.lib/tf2s:license\", \"MIT-style STK-4.3 license\");\n\tm->declare(m->metaInterface, \"filters.lib/version\", \"1.7.1\");\n\tm->declare(m->metaInterface, \"maths.lib/author\", \"GRAME\");\n\tm->declare(m->metaInterface, \"maths.lib/copyright\", \"GRAME\");\n\tm->declare(m->metaInterface, \"maths.lib/license\", \"LGPL with exception\");\n\tm->declare(m->metaInterface, \"maths.lib/name\", \"Faust Math Library\");\n\tm->declare(m->metaInterface, \"maths.lib/version\", \"2.9.0\");\n\tm->declare(m->metaInterface, \"name\", \"Soft Drive\");\n\tm->declare(m->metaInterface, \"platform.lib/name\", \"Generic Platform Library\");\n\tm->declare(m->metaInterface, \"platform.lib/version\", \"1.3.0\");\n\tm->declare(m->metaInterface, \"signals.lib/name\", \"Faust Routing Library\");\n\tm->declare(m->metaInterface, \"signals.lib/version\", \"1.6.0\");\n}\n\nint getSampleRateDspSoftDrive(DspSoftDrive* RESTRICT dsp) {\n\treturn dsp->fSampleRate;\n}\n\nint getNumInputsDspSoftDrive(DspSoftDrive* RESTRICT dsp) {\n\treturn 2;\n}\nint getNumOutputsDspSoftDrive(DspSoftDrive* RESTRICT dsp) {\n\treturn 2;\n}\n\nvoid classInitDspSoftDrive(int sample_rate) {}\n\nvoid staticInitDspSoftDrive(DspSoftDrive* dsp, int sample_rate) {\n}\n\nvoid instanceResetUserInterfaceDspSoftDrive(DspSoftDrive* dsp) {\n\tdsp->fHslider0 = (FAUSTFLOAT)(-6.0f);\n\tdsp->fHslider1 = (FAUSTFLOAT)(0.65f);\n\tdsp->fHslider2 = (FAUSTFLOAT)(6.0f);\n\tdsp->fHslider3 = (FAUSTFLOAT)(5e+03f);\n}\n\nvoid instanceClearDspSoftDrive(DspSoftDrive* dsp) {\n\t/* C99 loop */\n\t{\n\t\tint l0;\n\t\tfor (l0 = 0; l0 < 2; l0 = l0 + 1) {\n\t\t\tdsp->fRec0[l0] = 0.0f;\n\t\t}\n\t}\n\t/* C99 loop */\n\t{\n\t\tint l1;\n\t\tfor (l1 = 0; l1 < 2; l1 = l1 + 1) {\n\t\t\tdsp->fRec1[l1] = 0.0f;\n\t\t}\n\t}\n\t/* C99 loop */\n\t{\n\t\tint l2;\n\t\tfor (l2 = 0; l2 < 2; l2 = l2 + 1) {\n\t\t\tdsp->fRec2[l2] = 0.0f;\n\t\t}\n\t}\n\t/* C99 loop */\n\t{\n\t\tint l3;\n\t\tfor (l3 = 0; l3 < 2; l3 = l3 + 1) {\n\t\t\tdsp->fRec4[l3] = 0.0f;\n\t\t}\n\t}\n\t/* C99 loop */\n\t{\n\t\tint l4;\n\t\tfor (l4 = 0; l4 < 3; l4 = l4 + 1) {\n\t\t\tdsp->fRec3[l4] = 0.0f;\n\t\t}\n\t}\n\t/* C99 loop */\n\t{\n\t\tint l5;\n\t\tfor (l5 = 0; l5 < 3; l5 = l5 + 1) {\n\t\t\tdsp->fRec5[l5] = 0.0f;\n\t\t}\n\t}\n}\n\nvoid instanceConstantsDspSoftDrive(DspSoftDrive* dsp, int sample_rate) {\n\tdsp->fSampleRate = sample_rate;\n\tdsp->fConst0 = fminf(1.92e+05f, fmaxf(1.0f, (float)(dsp->fSampleRate)));\n\tdsp->fConst1 = 44.1f / dsp->fConst0;\n\tdsp->fConst2 = 1.0f - dsp->fConst1;\n\tdsp->fConst3 = 3.1415927f / dsp->fConst0;\n\tdsp->fConst4 = 0.45f * dsp->fConst0;\n}\n\t\nvoid instanceInitDspSoftDrive(DspSoftDrive* dsp, int sample_rate) {\n\tstaticInitDspSoftDrive(dsp, sample_rate);\n\tinstanceConstantsDspSoftDrive(dsp, sample_rate);\n\tinstanceResetUserInterfaceDspSoftDrive(dsp);\n\tinstanceClearDspSoftDrive(dsp);\n}\n\nvoid initDspSoftDrive(DspSoftDrive* dsp, int sample_rate) {\n\tinstanceInitDspSoftDrive(dsp, sample_rate);\n}\n\nvoid buildUserInterfaceDspSoftDrive(DspSoftDrive* dsp, UIGlue* ui_interface) {\n\tui_interface->openVerticalBox(ui_interface->uiInterface, \"Soft Drive\");\n\tui_interface->declare(ui_interface->uiInterface, &dsp->fHslider3, \"scale\", \"log\");\n\tui_interface->declare(ui_interface->uiInterface, &dsp->fHslider3, \"unit\", \"Hz\");\n\tui_interface->addHorizontalSlider(ui_interface->uiInterface, \"cutoff\", &dsp->fHslider3, (FAUSTFLOAT)5e+03f, (FAUSTFLOAT)8e+01f, (FAUSTFLOAT)1.8e+04f, (FAUSTFLOAT)1.0f);\n\tui_interface->declare(ui_interface->uiInterface, &dsp->fHslider2, \"unit\", \"dB\");\n\tui_interface->addHorizontalSlider(ui_interface->uiInterface, \"drive\", &dsp->fHslider2, (FAUSTFLOAT)6.0f, (FAUSTFLOAT)0.0f, (FAUSTFLOAT)24.0f, (FAUSTFLOAT)0.1f);\n\tui_interface->declare(ui_interface->uiInterface, &dsp->fHslider0, \"unit\", \"dB\");\n\tui_interface->addHorizontalSlider(ui_interface->uiInterface, \"level\", &dsp->fHslider0, (FAUSTFLOAT)-6.0f, (FAUSTFLOAT)-36.0f, (FAUSTFLOAT)0.0f, (FAUSTFLOAT)0.1f);\n\tui_interface->addHorizontalSlider(ui_interface->uiInterface, \"mix\", &dsp->fHslider1, (FAUSTFLOAT)0.65f, (FAUSTFLOAT)0.0f, (FAUSTFLOAT)1.0f, (FAUSTFLOAT)0.01f);\n\tui_interface->closeBox(ui_interface->uiInterface);\n}\n\nvoid computeDspSoftDrive(DspSoftDrive* dsp, int count, FAUSTFLOAT** RESTRICT inputs, FAUSTFLOAT** RESTRICT outputs) {\n\tFAUSTFLOAT* input0 = inputs[0];\n\tFAUSTFLOAT* input1 = inputs[1];\n\tFAUSTFLOAT* output0 = outputs[0];\n\tFAUSTFLOAT* output1 = outputs[1];\n\tfloat fSlow0 = dsp->fConst1 * powf(1e+01f, 0.05f * (float)(dsp->fHslider0));\n\tfloat fSlow1 = dsp->fConst1 * (float)(dsp->fHslider1);\n\tfloat fSlow2 = dsp->fConst1 * powf(1e+01f, 0.05f * (float)(dsp->fHslider2));\n\tfloat fSlow3 = dsp->fConst1 * (float)(dsp->fHslider3);\n\t/* C99 loop */\n\t{\n\t\tint i0;\n\t\tfor (i0 = 0; i0 < count; i0 = i0 + 1) {\n\t\t\tdsp->fRec0[0] = fSlow0 + (dsp->fConst2 * dsp->fRec0[1]);\n\t\t\tfloat fTemp0 = (float)(input0[i0]);\n\t\t\tdsp->fRec1[0] = fSlow1 + (dsp->fConst2 * dsp->fRec1[1]);\n\t\t\tfloat fTemp1 = 1.0f - dsp->fRec1[0];\n\t\t\tdsp->fRec2[0] = fSlow2 + (dsp->fConst2 * dsp->fRec2[1]);\n\t\t\tdsp->fRec4[0] = fSlow3 + (dsp->fConst2 * dsp->fRec4[1]);\n\t\t\tfloat fTemp2 = tanf(dsp->fConst3 * fminf(dsp->fRec4[0], dsp->fConst4));\n\t\t\tfloat fTemp3 = 1.0f / fTemp2;\n\t\t\tfloat fTemp4 = ((fTemp3 + -1.4142135f) / fTemp2) + 1.0f;\n\t\t\tfloat fTemp5 = 1.0f - (1.0f / DspSoftDrive_faustpower2_f(fTemp2));\n\t\t\tfloat fTemp6 = ((fTemp3 + 1.4142135f) / fTemp2) + 1.0f;\n\t\t\tdsp->fRec3[0] = fTemp0 - (((dsp->fRec3[2] * fTemp4) + (2.0f * (dsp->fRec3[1] * fTemp5))) / fTemp6);\n\t\t\toutput0[i0] = (FAUSTFLOAT)(dsp->fRec0[0] * ((fTemp0 * fTemp1) + (dsp->fRec1[0] * tanhf((dsp->fRec2[0] * (dsp->fRec3[2] + (dsp->fRec3[0] + (2.0f * dsp->fRec3[1])))) / fTemp6))));\n\t\t\tfloat fTemp7 = (float)(input1[i0]);\n\t\t\tdsp->fRec5[0] = fTemp7 - (((fTemp4 * dsp->fRec5[2]) + (2.0f * (fTemp5 * dsp->fRec5[1]))) / fTemp6);\n\t\t\toutput1[i0] = (FAUSTFLOAT)(dsp->fRec0[0] * ((fTemp7 * fTemp1) + (dsp->fRec1[0] * tanhf((dsp->fRec2[0] * (dsp->fRec5[2] + (dsp->fRec5[0] + (2.0f * dsp->fRec5[1])))) / fTemp6))));\n\t\t\tdsp->fRec0[1] = dsp->fRec0[0];\n\t\t\tdsp->fRec1[1] = dsp->fRec1[0];\n\t\t\tdsp->fRec2[1] = dsp->fRec2[0];\n\t\t\tdsp->fRec4[1] = dsp->fRec4[0];\n\t\t\tdsp->fRec3[2] = dsp->fRec3[1];\n\t\t\tdsp->fRec3[1] = dsp->fRec3[0];\n\t\t\tdsp->fRec5[2] = dsp->fRec5[1];\n\t\t\tdsp->fRec5[1] = dsp->fRec5[0];\n\t\t}\n\t}\n}\n\n#ifdef __cplusplus\n}\n#endif\n\n#endif\n\n/* Author: Aldrin Payopay <aldrin.gdf@gmail.com>. Appended to generated Faust C. */\n/* A context is owned by one audio thread. Set controls at block/event boundaries.\n   Creation/destruction, compilation and file I/O belong outside the audio callback. */\n#include <stddef.h>\n#include <stdio.h>\n#include <string.h>\n#include <time.h>\n\ntypedef struct { const char *id; float initial, minimum, maximum; } DspParameter;\n#define DSP_PARAMETER_COUNT 4\n#define DSP_INPUT_COUNT 2\n#define DSP_OUTPUT_COUNT 2\nstatic const DspParameter dsp_parameters[4] = {\n{\"/Soft_Drive/cutoff\",5000,80,18000},\n{\"/Soft_Drive/drive\",6,0,24},\n{\"/Soft_Drive/level\",-6,-36,0},\n{\"/Soft_Drive/mix\",0.65,0,1}\n};\nvoid *dsp_soft_drive_create(int rate) {\n    if (rate < 8000 || rate > 192000) return NULL;\n    DspSoftDrive *dsp = newDspSoftDrive();\n    if (dsp) initDspSoftDrive(dsp, rate);\n    return dsp;\n}\nvoid dsp_soft_drive_destroy(void *dsp) { if (dsp) deleteDspSoftDrive((DspSoftDrive *)dsp); }\nvoid dsp_soft_drive_reset(void *dsp) { if (dsp) instanceClearDspSoftDrive((DspSoftDrive *)dsp); }\nsize_t dsp_soft_drive_parameter_count(void) { return DSP_PARAMETER_COUNT; }\nconst DspParameter *dsp_soft_drive_parameter(size_t index) {\n    return index < DSP_PARAMETER_COUNT ? &dsp_parameters[index] : NULL;\n}\nint dsp_soft_drive_set(void *context, size_t index, float value) {\n    if (!context || index >= DSP_PARAMETER_COUNT || !isfinite(value)) return 0;\n    const DspParameter *p = &dsp_parameters[index];\n    if (value < p->minimum || value > p->maximum) return 0;\n    DspSoftDrive *dsp = (DspSoftDrive *)context;\n    switch (index) { case 0: dsp->fHslider3=value; break;\ncase 1: dsp->fHslider2=value; break;\ncase 2: dsp->fHslider0=value; break;\ncase 3: dsp->fHslider1=value; break; default: return 0; }\n    return 1;\n}\nint dsp_soft_drive_inputs(void) { return DSP_INPUT_COUNT; }\nint dsp_soft_drive_outputs(void) { return DSP_OUTPUT_COUNT; }\nint dsp_soft_drive_process(void *context, int frames, float **inputs, float **outputs) {\n    if (!context || frames < 1 || frames > 8192 || !outputs) return 0;\n    for (int c=0; c<DSP_OUTPUT_COUNT; ++c) if (!outputs[c]) return 0;\n    for (int c=0; c<DSP_INPUT_COUNT; ++c) if (!inputs || !inputs[c]) return 0;\n    computeDspSoftDrive((DspSoftDrive *)context, frames, inputs, outputs);\n    return 1;\n}\n\n#ifdef DSP_CARD_RENDER_MAIN\n/* Offline verification host. Input/output are little-endian interleaved float32.\n   Timings cover only dsp_soft_drive_process; they do not measure device latency. */\nstatic double card_clock(void) {\n    struct timespec ts; clock_gettime(CLOCK_MONOTONIC, &ts);\n    return (double)ts.tv_sec + (double)ts.tv_nsec * 1e-9;\n}\nint main(int argc, char **argv) {\n    if (argc != 8) {\n        fprintf(stderr,\"usage: render rate frames block input.f32 output.f32 params.txt events.txt\\n\"); return 2;\n    }\n    char *end;\n    long rate=strtol(argv[1],&end,10); if (*end || rate<8000 || rate>192000) return 2;\n    long frames=strtol(argv[2],&end,10); if (*end || frames<1 || frames>rate*90) return 2;\n    long block=strtol(argv[3],&end,10); if (*end || block<1 || block>8192) return 2;\n    DspSoftDrive *dsp=dsp_soft_drive_create((int)rate); if (!dsp) return 3;\n    float *in[2]={NULL,NULL}, *out[2]={NULL,NULL};\n    for(int c=0;c<DSP_INPUT_COUNT;c++) in[c]=calloc((size_t)block,sizeof(float));\n    for(int c=0;c<DSP_OUTPUT_COUNT;c++) out[c]=calloc((size_t)block,sizeof(float));\n    float *source=calloc((size_t)frames*(DSP_INPUT_COUNT?DSP_INPUT_COUNT:1),sizeof(float));\n    float *result=calloc((size_t)frames*DSP_OUTPUT_COUNT,sizeof(float));\n    if(!source||!result) return 3;\n    for(int c=0;c<DSP_INPUT_COUNT;c++) if(!in[c]) return 3;\n    for(int c=0;c<DSP_OUTPUT_COUNT;c++) if(!out[c]) return 3;\n    FILE *input=fopen(argv[4],\"rb\"), *params=fopen(argv[6],\"r\"), *events=fopen(argv[7],\"r\");\n    if(!input||!params||!events) return 4;\n    size_t samples=(size_t)frames*DSP_INPUT_COUNT;\n    if(samples && fread(source,sizeof(float),samples,input)!=samples) return 4;\n    fclose(input);\n    for(size_t i=0;i<samples;i++) if(!isfinite(source[i])) return 4;\n    size_t parameter; float value; int fields;\n    while((fields=fscanf(params,\"%zu %f\",&parameter,&value))==2) if(!dsp_soft_drive_set(dsp,parameter,value)) return 4;\n    if(fields!=EOF) return 4;\n    fclose(params);\n    long event_frame=0; size_t event_param=0; float event_value=0;\n    fields=fscanf(events,\"%ld %zu %f\",&event_frame,&event_param,&event_value);\n    if(fields!=3&&fields!=EOF) return 4;\n    int has_event=fields==3;\n    double sum=0, maximum=0; long calls=0; double peak=0;\n    for(long at=0;at<frames;) {\n        while(has_event && event_frame==at) {\n            if(!dsp_soft_drive_set(dsp,event_param,event_value)) return 4;\n            fields=fscanf(events,\"%ld %zu %f\",&event_frame,&event_param,&event_value);\n            if(fields!=3&&fields!=EOF) return 4;\n            has_event=fields==3;\n        }\n        if(has_event && (event_frame<at || event_frame>=frames)) return 4;\n        int count=(int)((frames-at)<block?(frames-at):block);\n        if(has_event && event_frame>at && event_frame<at+count) count=(int)(event_frame-at);\n        for(int c=0;c<DSP_INPUT_COUNT;c++) for(int i=0;i<count;i++) in[c][i]=source[(at+i)*DSP_INPUT_COUNT+c];\n        double before=card_clock();\n        if(!dsp_soft_drive_process(dsp,count,in,out)) return 5;\n        double elapsed=card_clock()-before;sum+=elapsed;if(elapsed>maximum)maximum=elapsed;calls++;\n        for(int c=0;c<DSP_OUTPUT_COUNT;c++) for(int i=0;i<count;i++) {\n            if(!isfinite(out[c][i])) return 5;\n            result[(at+i)*DSP_OUTPUT_COUNT+c]=out[c][i];\n            if(fabs(out[c][i])>peak)peak=fabs(out[c][i]);\n        }\n        at+=count;\n    }\n    fclose(events);\n    FILE *output=fopen(argv[5],\"wb\"); if(!output) return 4;\n    if(fwrite(result,sizeof(float),(size_t)frames*DSP_OUTPUT_COUNT,output)!=(size_t)frames*DSP_OUTPUT_COUNT) return 4;\n    fclose(output);\n    printf(\"{\\\"frames\\\":%ld,\\\"sampleRate\\\":%ld,\\\"block\\\":%ld,\\\"calls\\\":%ld,\\\"meanComputeUs\\\":%.6f,\\\"maxComputeUs\\\":%.6f,\\\"audioDurationSeconds\\\":%.9f,\\\"computeSeconds\\\":%.9f,\\\"peak\\\":%.9f}\\n\",frames,rate,block,calls,sum/calls*1e6,maximum*1e6,(double)frames/rate,sum,peak);\n    free(source);free(result);for(int c=0;c<DSP_INPUT_COUNT;c++)free(in[c]);for(int c=0;c<DSP_OUTPUT_COUNT;c++)free(out[c]);dsp_soft_drive_destroy(dsp);\n    return 0;\n}\n#endif\n",
+  "nativeHeader": "/* Author: Aldrin Payopay <aldrin.gdf@gmail.com>. Generated DSP Cards C ABI. */\n#ifndef DSP_SOFT_DRIVE_H\n#define DSP_SOFT_DRIVE_H\n#include <stddef.h>\n#ifndef DSP_CARD_PARAMETER_DEFINED\n#define DSP_CARD_PARAMETER_DEFINED\ntypedef struct { const char *id; float initial, minimum, maximum; } DspParameter;\n#endif\n#ifdef __cplusplus\nextern \"C\" {\n#endif\nvoid *dsp_soft_drive_create(int sample_rate);\nvoid dsp_soft_drive_destroy(void *context);\nvoid dsp_soft_drive_reset(void *context);\nsize_t dsp_soft_drive_parameter_count(void);\nconst DspParameter *dsp_soft_drive_parameter(size_t index);\nint dsp_soft_drive_set(void *context, size_t index, float value);\nint dsp_soft_drive_inputs(void);\nint dsp_soft_drive_outputs(void);\nint dsp_soft_drive_process(void *context, int frames, float **inputs, float **outputs);\n#ifdef __cplusplus\n}\n#endif\n#endif\n",
+  "hashes": {
+    "source": "faaac902102825a524624b527f8c7234782de53c91a3896462d8b80474f18359",
+    "c": "56ed9391210450412ebdfef44b9189b04761f233ab6dbc83bcc298de29402b4e",
+    "header": "d2391b7815db0c85b6eea994e8085b5117120dd286a8181d4ee618795e7c06b7",
+    "wasm": "4c261d44d45b671995285b480826c59da06fbabe28dea2529a9522a31d579846"
+  },
+  "compiler": "FAUST Version 2.85.9"
+}

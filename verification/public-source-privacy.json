@@ -1,0 +1,14 @@
+{
+  "scope": "Targeted public-source scan excluding generated evidence, dependencies and git metadata. No universal private-data detection claim.",
+  "text_files": 96,
+  "findings": {
+    "absolute_private_path": [],
+    "embedded_manuscript": [],
+    "private_prompt_markers": [],
+    "external_executable_dependency": []
+  },
+  "private_reference_present": false,
+  "allowed_public_configuration": [
+    "Intentionally public insert-only client config in dist/wish-config.js; no private backend credentials."
+  ]
+}

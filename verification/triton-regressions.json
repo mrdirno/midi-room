@@ -1,0 +1,172 @@
+{
+  "testedAt": "2026-09-05T19:06:01.176Z",
+  "artifactSha256": "fe970bd96d0a1eee22b0a02364a5eae9cd3062c7bc6e7275c3b305386892ad5a",
+  "method": "Node VM execution of original and candidate implementation with explicit DOM, AudioContext and timer doubles",
+  "tests": [
+    {
+      "name": "Reproduce original patch and user-bank tempo writers; candidate rejects both",
+      "pass": true
+    },
+    {
+      "name": "Reproduce original character resetting selected tempo and performance overrides",
+      "pass": true
+    },
+    {
+      "name": "Active SoulComposer locks 32 expressive bars at 117 and preserves event microtiming",
+      "pass": true
+    },
+    {
+      "name": "Repeated Play owns one timer; Stop defeats a delayed resume",
+      "pass": true
+    },
+    {
+      "name": "Actual original duplicates its scheduler on repeated start",
+      "pass": true
+    },
+    {
+      "name": "Pitched future source cancellation stops oscillator and transient before onset",
+      "pass": true
+    },
+    {
+      "name": "Future drums stop actual source audio, not only voice ledger",
+      "pass": true
+    },
+    {
+      "name": "Legacy physical percussion stops its generated buffer source before future onset",
+      "pass": true
+    },
+    {
+      "name": "Voice ownership survives patch changes and same-pitch route cancellation",
+      "pass": true
+    },
+    {
+      "name": "Future release retains ownership so route close cancels the still-future onset",
+      "pass": true
+    },
+    {
+      "name": "Initial visible Soul posture retains 132 BPM and all original performance values",
+      "pass": true
+    },
+    {
+      "name": "Live source release and cancellation retain their original AudioContext after a render swap",
+      "pass": true
+    },
+    {
+      "name": "Tempo controls cannot mutate an active offline render",
+      "pass": true
+    },
+    {
+      "name": "Actual renderNote restores live graph, pitch settings and voice ledger on success and failure",
+      "pass": true
+    },
+    {
+      "name": "Metadata distinguishes pitched voices and nine verified standard kit roles",
+      "pass": true
+    },
+    {
+      "name": "Hat choke cancels its future group, preserves independent route, and oneshot release leaves decay",
+      "pass": true
+    },
+    {
+      "name": "Foreign tempo rejected; patch and MIDI selection cannot change authority",
+      "pass": true
+    },
+    {
+      "name": "Soul retime cancels its queued generation while a manual route survives",
+      "pass": true
+    },
+    {
+      "name": "All connected MIDI sources receive; stale disconnected port callbacks do not",
+      "pass": true
+    },
+    {
+      "name": "MIDI sustain and same note are isolated by input and channel",
+      "pass": true
+    }
+  ],
+  "observations": [
+    {
+      "action": "tempo 117, browse A000 then user B000 with preferred tempo 84",
+      "original": {
+        "afterFactory": 96,
+        "afterUser": 84
+      },
+      "candidate": {
+        "afterFactory": 117,
+        "afterUser": 117
+      }
+    },
+    {
+      "action": "settings BPM 117, melody .31, sustain .44; change character",
+      "original": {
+        "bpm": 132,
+        "melody": 0.02,
+        "sustain": 0.78
+      },
+      "candidate": {
+        "bpm": 117,
+        "melody": 0.31,
+        "sustain": 0.44
+      }
+    },
+    {
+      "action": "same seed, active composer, humanize 1, requested BPM 117, 32 bars",
+      "original": {
+        "minBpm": 111.73311595835654,
+        "maxBpm": 121.84759018849829,
+        "microEvents": 211
+      },
+      "candidate": {
+        "minBpm": 117,
+        "maxBpm": 117,
+        "microEvents": 211
+      }
+    },
+    {
+      "action": "two Soul start calls",
+      "originalTimers": 2,
+      "candidateTimers": 1
+    },
+    {
+      "action": "schedule original A016 at context time +1, then kill at time 0",
+      "original": {
+        "sources": 4,
+        "latestStop": 1.3
+      },
+      "candidate": {
+        "sources": 4,
+        "latestStop": 0
+      }
+    },
+    {
+      "action": "schedule standard kick +1 second, kill all voices immediately",
+      "original": {
+        "sources": 2,
+        "latestStop": 1.6
+      },
+      "candidate": {
+        "sources": 2,
+        "latestStop": 0
+      }
+    },
+    {
+      "action": "physical agogoL at context time +1, immediate panic",
+      "original": {
+        "sources": 1,
+        "latestStop": 1.7424263038548753
+      },
+      "candidate": {
+        "sources": 1,
+        "latestStop": 0
+      }
+    }
+  ],
+  "pass": true,
+  "notRun": [
+    "Physical MIDI controller",
+    "Listening/audio output",
+    "Actual browser layout",
+    "Phone/Spck",
+    "Real offline export waveform"
+  ]
+}

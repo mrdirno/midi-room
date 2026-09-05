@@ -1,0 +1,9 @@
+{
+  "sourceName": "luckydreamer_aug_27_2.html",
+  "originalHtmlSha256": "ebde63754bc6d8db762b11a5d89abb604ac242af6ca06149ccd109f9f1b054ac",
+  "runtimeFile": "engine.original.js",
+  "runtimeSha256": "7a2e62e9a15777bd5b096ea85a1c9731795288990dfe06095da8e447c8936ef4",
+  "extraction": "Exact engine-src script only. Original app-src, manuscript, development diary and embedded documents are excluded.",
+  "attribution": "Original supplied instrument by Aldrin Payopay. Musical lineage fields retained.",
+  "licenseNote": "No explicit license notice was embedded in the engine script. This manifest does not independently clear musical vocabulary or source rights."
+}

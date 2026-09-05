@@ -1,0 +1,69 @@
+{
+  "spec": "persona500.lineage/1",
+  "project_id": "org.persona500.midi-room",
+  "creator": {
+    "name": "Aldrin Payopay",
+    "artist": "DRINOMAN"
+  },
+  "repository": "https://github.com/mrdirno/midi-room",
+  "canonical_url": "https://persona500.com/midi-room/",
+  "publication_history_starts": "2026-09-05",
+  "wish_standard": {
+    "repository": "https://github.com/mrdirno/vibe-cards",
+    "revision": "640ae23",
+    "file": "WISH_IT_BETTER.md",
+    "sha256": "e5601838b830354f4ed894985e82aca0b484887ea2ca098c4a4cf5d360aaf3d2",
+    "relationship": "specification and queue design adopted; not a git fork"
+  },
+  "components": [
+    {
+      "id": "org.persona500.midi-room.triton-rack",
+      "name": "TRITON Rack",
+      "launch": "https://persona500.com/midi-room/?instrument=triton-rack",
+      "wish_channel": "https://persona500.com/triton-rack-card/#wish",
+      "source": "https://github.com/mrdirno/midi-room/tree/main/src/triton",
+      "relationship": "derived from supplied TRITON16 engine"
+    },
+    {
+      "id": "org.persona500.midi-room.lucky-dreamer",
+      "name": "Lucky Dreamer",
+      "launch": "https://persona500.com/midi-room/?instrument=lucky-dreamer",
+      "wish_channel": "https://persona500.com/lucky-dreamer-card/#wish",
+      "source": "https://github.com/mrdirno/midi-room/tree/main/src/lucky",
+      "relationship": "new composition and player around supplied Lucky Dreamer synthesis"
+    },
+    {
+      "id": "org.persona500.midi-room.improvisator",
+      "name": "Improvisator",
+      "launch": "https://persona500.com/midi-room/?instrument=improvisator",
+      "wish_channel": "https://persona500.com/improvisator-card/#wish",
+      "source": "https://github.com/mrdirno/midi-room/tree/main/src/triton",
+      "relationship": "focused conductor view of the shared TRITON16 engine"
+    },
+    {
+      "id": "org.persona500.midi-room.drum-pad",
+      "name": "Drum Pad",
+      "launch": "https://persona500.com/midi-room/?instrument=drum-pad",
+      "wish_channel": "https://persona500.com/drum-pad-card/#wish",
+      "source": "https://github.com/mrdirno/midi-room/tree/main/src/surface",
+      "relationship": "playable surface and local synthesis"
+    },
+    {
+      "id": "org.persona500.midi-room.field-keys",
+      "name": "Field Keys",
+      "launch": "https://persona500.com/midi-room/?instrument=field-keys",
+      "wish_channel": "https://persona500.com/field-keys-card/#wish",
+      "source": "https://github.com/mrdirno/midi-room/tree/main/src/surface",
+      "relationship": "playable keyboard and local synthesis"
+    },
+    {
+      "id": "org.persona500.midi-room.dsp-rack",
+      "name": "DSP Rack",
+      "launch": "https://persona500.com/midi-room/?instrument=dsp-rack",
+      "wish_channel": "https://persona500.com/dsp-rack-card/#wish",
+      "source": "https://github.com/mrdirno/midi-room/tree/main/src/rack",
+      "relationship": "hosted DSP plugins with retained component notices"
+    }
+  ],
+  "privacy": "No private lyrics, prompt library, user-imported files or raw wishes are part of this publication."
+}

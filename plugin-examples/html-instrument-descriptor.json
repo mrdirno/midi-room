@@ -1,0 +1,19 @@
+{
+  "format": "midi-room.plugin/1",
+  "id": "your-instrument",
+  "version": "1.0.0",
+  "name": "Your instrument",
+  "role": "instrument",
+  "engine": {
+    "type": "html-sandbox/1"
+  },
+  "requirements": [],
+  "audio": {
+    "routing": "isolated"
+  },
+  "controls": [],
+  "midi": {
+    "mode": "web-midi",
+    "channel": null
+  }
+}

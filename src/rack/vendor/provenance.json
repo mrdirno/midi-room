@@ -1,0 +1,31 @@
+{
+  "author": "Aldrin Payopay",
+  "origin": "Existing HTML Gauntlet workspace; snapshot reused without modifying that project",
+  "files": [
+    {
+      "source": "src/dsp/runtime/wasm.js",
+      "file": "wasm.js",
+      "sha256": "830ba87c116554527b0d276ab0f4e198b1b20b3bf8f82c39f2f36ed2e84e28f2"
+    },
+    {
+      "source": "src/dsp/runtime/worklet.js",
+      "file": "worklet.js",
+      "sha256": "3fffa7f22114e9bc08e97ae6ddc3299e6807618828ec0bc777ac8a94b091ec4d"
+    },
+    {
+      "source": "src/dsp/compiled/bloom-oscillator.json",
+      "file": "bloom-oscillator.json",
+      "sha256": "1f904ab12d9bf8295e112be3b7ebc986c1ce41d7bdc16af9de8f6c10b8ec57ba"
+    },
+    {
+      "source": "src/dsp/compiled/soft-drive.json",
+      "file": "soft-drive.json",
+      "sha256": "c11b5f6afb32734fa9ba5f4a980e352e652be0988e16233a06a0856128b208c4"
+    },
+    {
+      "source": "docs/licenses/FAUST-COPYING.txt",
+      "file": "FAUST-COPYING.txt",
+      "sha256": "92a42adab3110694eb7731691f57f229fcaba31570d1727eb7be3f197307378c"
+    }
+  ]
+}

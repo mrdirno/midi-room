@@ -1,0 +1,11 @@
+{
+  "spec": "wish-it-better/1.0",
+  "level": "L0",
+  "project": "midi-room",
+  "repo": "https://github.com/mrdirno/midi-room",
+  "wish_channel": "https://persona500.com/midi-room/#wish",
+  "origin": "Wish It Better specification and queue pattern adopted from https://github.com/mrdirno/vibe-cards; MIDI Room is not a git fork. Instrument source lineage is recorded in lineage.json.",
+  "spinoffs": [],
+  "evals": "docs/EVALS.md",
+  "amended": []
+}

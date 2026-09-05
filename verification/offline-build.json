@@ -1,0 +1,31 @@
+{
+  "cache_version": "9fc791f85bb8d621",
+  "files": [
+    "index.html",
+    "style.css",
+    "app.js",
+    "catalog.js",
+    "bridge.js",
+    "loader.js",
+    "midi.js",
+    "instrument-bus.js",
+    "surface-router.js",
+    "plugin-contract.js",
+    "wish-config.js",
+    "wish.js",
+    "icon.svg",
+    "icon-192.png",
+    "icon-512.png",
+    "manifest.webmanifest",
+    "instruments/drum-pad.html",
+    "instruments/dsp-rack.html",
+    "instruments/field-keys.html",
+    "instruments/improvisator.html",
+    "instruments/lucky-dreamer.html",
+    "instruments/triton-rack.html",
+    "licenses/FAUST-COPYING.txt",
+    "licenses/HOST-MIT.txt"
+  ],
+  "bytes": 3138314,
+  "scope": "Relative to sw.js directory; built-ins and shell only. Imported private instruments, maps and exports excluded."
+}

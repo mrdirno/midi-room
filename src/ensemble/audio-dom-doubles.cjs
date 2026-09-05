@@ -1,0 +1,18 @@
+// Explicit simulation doubles; no browser or audio rendering.
+const assert=require('node:assert/strict');
+class Param{constructor(v=0){this.value=v;this.events=[];}
+ setValueAtTime(v,t){assert(Number.isFinite(v));this.value=v;this.events.push(['set',v,t]);}
+ setTargetAtTime(v,t,c){assert(Number.isFinite(v));this.value=v;this.events.push(['target',v,t,c]);}
+ linearRampToValueAtTime(v,t){assert(Number.isFinite(v));this.value=v;this.events.push(['linear',v,t]);}
+ exponentialRampToValueAtTime(v,t){assert(Number.isFinite(v));this.value=v;this.events.push(['exp',v,t]);}
+ cancelScheduledValues(t){this.events.push(['cancel',t]);}}
+class AudioNode{constructor(type){this.kind=type;this.connections=[];this.gain=new Param(1);this.frequency=new Param(440);this.detune=new Param(0);this.Q=new Param(1);this.delayTime=new Param(0);this.pan=new Param(0);this.threshold=new Param(0);this.knee=new Param(0);this.ratio=new Param(1);this.attack=new Param(.003);this.release=new Param(.25);this.playbackRate=new Param(1);}
+ connect(n){this.connections.push(n);return n;}disconnect(){this.connections=[];}start(t){this.started=t;}stop(t){this.stopped=t;}setPeriodicWave(w){} }
+class AudioContext{constructor(){this.currentTime=0;this.state='running';this.sampleRate=22050;this.destination=new AudioNode('destination');this.nodes=[];this.listeners={};}
+ mk(t){const n=new AudioNode(t);this.nodes.push(n);return n;}createGain(){return this.mk('gain');}createBiquadFilter(){return this.mk('filter');}createOscillator(){return this.mk('oscillator');}createBufferSource(){return this.mk('buffer');}createDelay(){return this.mk('delay');}createDynamicsCompressor(){return this.mk('compressor');}createWaveShaper(){return this.mk('waveshaper');}createStereoPanner(){return this.mk('pan');}createConvolver(){return this.mk('convolver');}createAnalyser(){const a=this.mk('analyser');a.getByteTimeDomainData=a=>a.fill(128);return a;}createPeriodicWave(){return {};}
+ createBuffer(ch,n,sr){const data=Array.from({length:ch},()=>new Float32Array(n));return {length:n,sampleRate:sr,getChannelData:i=>data[i]};}
+ addEventListener(n,f){(this.listeners[n]??=[]).push(f);}emit(n){(this.listeners[n]||[]).forEach(f=>f());}resume(){this.state='running';return Promise.resolve();}suspend(){this.state='suspended';this.emit('statechange');return Promise.resolve();}}
+class E{constructor(tag='div',id=''){this.tagName=tag.toUpperCase();this.id=id;this.children=[];this.style={};this.dataset={};this.value='';this.listeners={};this.attrs={};this.textContent='';this.disabled=false;this.open=false;this.cls=new Set();this.classList={add:(...s)=>s.forEach(v=>this.cls.add(v)),remove:(...s)=>s.forEach(v=>this.cls.delete(v)),contains:s=>this.cls.has(s),toggle:(s,v)=>{if(v===undefined)v=!this.cls.has(s);v?this.cls.add(s):this.cls.delete(s);return v;}};}
+ appendChild(e){this.children.push(e);e.parent=this;return e;}set innerHTML(v){this.children=[];this._html=v;}get innerHTML(){return this._html||'';}set className(s){this.cls=new Set(s.split(' '));}get className(){return [...this.cls].join(' ');}setAttribute(k,v){this.attrs[k]=v;}getAttribute(k){return this.attrs[k];}addEventListener(n,f,opts){(this.listeners[n]??=[]).push(f);}removeEventListener(n,f){this.listeners[n]=(this.listeners[n]||[]).filter(x=>x!==f);}fire(n,e={}){e.target??=this;e.preventDefault??=()=>{};for(const f of this.listeners[n]||[])f.call(this,e);if(this['on'+n])this['on'+n].call(this,e);}click(){this.fire('click',{detail:1});}scrollIntoView(){}setPointerCapture(){}getBoundingClientRect(){return {top:0,left:0,height:139,width:45};}closest(s){return s==='[data-live-note]'&&this.dataset.liveNote!=null?this:null;}}
+
+module.exports={Param,AudioNode,AudioContext,E};

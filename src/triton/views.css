@@ -1,0 +1,16 @@
+/* Separate public faces over one maintained TRITON synthesis build. */
+body[data-instrument="triton-rack"] #conductorSwitch,
+body[data-instrument="triton-rack"] #soulDeck,
+body[data-instrument="triton-rack"] #engineToggleWrap,
+body[data-instrument="triton-rack"] #ldrScale,
+body[data-instrument="triton-rack"] #rackScale{display:none!important}
+body[data-instrument="improvisator"] #conductorSwitch,
+body[data-instrument="improvisator"] #engineToggleWrap,
+body[data-instrument="improvisator"] #unitScale,
+body[data-instrument="improvisator"] .keys-shell,
+body[data-instrument="improvisator"] .tabs,
+body[data-instrument="improvisator"] .pane,
+body[data-instrument="improvisator"] #ldrScale,
+body[data-instrument="improvisator"] #rackScale{display:none!important}
+body[data-instrument="improvisator"] h1{font-size:clamp(2rem,7vw,3.4rem)}
+@media(max-width:500px){#tritonControls{gap:6px!important;padding:10px!important}#tritonControls strong{width:100%}#tritonControls button{font-size:11px}#tritonControls label{font-size:11px}}

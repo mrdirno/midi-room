@@ -1,0 +1,27 @@
+name: Wish it better
+description: A change that would help you make something.
+title: "Wish: "
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: "You can also send a wish without a GitHub account at https://persona500.com/midi-room/#wish. Do not include private recordings or prompts here."
+  - type: textarea
+    id: wish
+    attributes:
+      label: What would make your creative process better?
+      description: Tell us what you tried and where the tool got in the way.
+    validations:
+      required: true
+  - type: dropdown
+    id: tool
+    attributes:
+      label: Which part of the room?
+      options:
+        - MIDI Room
+        - Lucky Dreamer
+        - TRITON Rack
+        - Improvisator
+        - Drum Pad
+        - Field Keys
+        - DSP Rack

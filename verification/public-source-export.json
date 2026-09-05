@@ -1,0 +1,491 @@
+{
+  "format": "midi-room.public-source-export/1",
+  "boundary": "Allowlisted source and generated app; no original reference tree, manuscripts, user songs, source prompts, private repo or environment files. README, network manifests and Git metadata are release-owner files and not overwritten.",
+  "files": [
+    {
+      "path": "LICENSE",
+      "bytes": 1439,
+      "sha256": "82692049ae6c2832600819157720673d7e5baafe8ddbb8d7249c34daaa498c6d"
+    },
+    {
+      "path": "dist/app.js",
+      "bytes": 45486,
+      "sha256": "ff4d9f163880752e7f7709331668c695cc204dd97c2cf7e1bc26132d81ce3c24"
+    },
+    {
+      "path": "dist/bridge.js",
+      "bytes": 30452,
+      "sha256": "841ba19bb4d09c888b484f7252411b4d607774824af23fae80acac607a15777d"
+    },
+    {
+      "path": "dist/catalog.js",
+      "bytes": 1697,
+      "sha256": "ccda8d736a7dea31a21646dc1b36c4b9c3791f62438e6a20869cb0bd309d7f81"
+    },
+    {
+      "path": "dist/icon-192.png",
+      "bytes": 2448,
+      "sha256": "111e3ea23aabd971d08df4ea47ab6e838f76dba884ad832b6982fe30166ad60f"
+    },
+    {
+      "path": "dist/icon-512.png",
+      "bytes": 7105,
+      "sha256": "c143ce04e29d8bb5d537dec089d29c5be0ba3200da0cd9538546d6bc40d06c90"
+    },
+    {
+      "path": "dist/icon.svg",
+      "bytes": 313,
+      "sha256": "1685a07266e25fe747dffa5ede02ad7761372d58f34cdad2ad1bac6fbf8b29b6"
+    },
+    {
+      "path": "dist/index.html",
+      "bytes": 12368,
+      "sha256": "1e1daa28f18ef5bd32b505f79fd94dc315265b90b403e56526d78766d55eef19"
+    },
+    {
+      "path": "dist/instrument-bus.js",
+      "bytes": 14132,
+      "sha256": "e72db1085bad3e1598c7bccb129b22a950b86829b78b266247924708ef3e2730"
+    },
+    {
+      "path": "dist/instruments/drum-pad.html",
+      "bytes": 27676,
+      "sha256": "f40cbd92cc19a46ff68498dd03fcb2ef0be483962bb4b9c26753cbca60528656"
+    },
+    {
+      "path": "dist/instruments/dsp-rack.html",
+      "bytes": 195085,
+      "sha256": "4769db6aa5f324358e6d8c6076dc3e7f81e2e14a88b618ea79af668754397673"
+    },
+    {
+      "path": "dist/instruments/field-keys.html",
+      "bytes": 24577,
+      "sha256": "ffafeffaac634f4dbcf52304c80063a4e1c49655852fdb82c24360f67998ee89"
+    },
+    {
+      "path": "dist/instruments/improvisator.html",
+      "bytes": 776062,
+      "sha256": "1ccc863bde7d5b55871c6f15afa185cbbb7088bd58f8f2a496ce6c7724c3caf1"
+    },
+    {
+      "path": "dist/instruments/lucky-dreamer.html",
+      "bytes": 1131083,
+      "sha256": "2b3503797b1ee52e8fb911fe588eb4c8dff6a2c4401544e11312fb8007fb3f04"
+    },
+    {
+      "path": "dist/instruments/triton-rack.html",
+      "bytes": 776070,
+      "sha256": "fe970bd96d0a1eee22b0a02364a5eae9cd3062c7bc6e7275c3b305386892ad5a"
+    },
+    {
+      "path": "dist/licenses/FAUST-COPYING.txt",
+      "bytes": 27544,
+      "sha256": "92a42adab3110694eb7731691f57f229fcaba31570d1727eb7be3f197307378c"
+    },
+    {
+      "path": "dist/licenses/HOST-MIT.txt",
+      "bytes": 1439,
+      "sha256": "82692049ae6c2832600819157720673d7e5baafe8ddbb8d7249c34daaa498c6d"
+    },
+    {
+      "path": "dist/loader.js",
+      "bytes": 2871,
+      "sha256": "3687ea89655708f4c2df5af91c6cd3eb8837698c4fd8b79af9c10edb17288d9e"
+    },
+    {
+      "path": "dist/manifest.webmanifest",
+      "bytes": 564,
+      "sha256": "e2753686aca871de9047fb97b395da89311e233e91877da1d16d1d2fc638c0df"
+    },
+    {
+      "path": "dist/midi-room-local.html",
+      "bytes": 3298760,
+      "sha256": "cf06e17fe5325f6b0b98ffc9b4fdeba0ad6341b63cd48138a97f5bea1fea3131"
+    },
+    {
+      "path": "dist/midi.js",
+      "bytes": 12524,
+      "sha256": "c4ab0eb4eb62eba25221e1d341dca5b412800607dceadaa6e3a985229fde963d"
+    },
+    {
+      "path": "dist/plugin-contract.js",
+      "bytes": 18268,
+      "sha256": "aced69dc07bf95d285546a1ae39042eadfc2f4bce5a7b442045344781e9e6107"
+    },
+    {
+      "path": "dist/style.css",
+      "bytes": 14965,
+      "sha256": "599ea0f719a0f3d1bdec18f6cf3fecea8ab8d1d1128f230d6262241b0b47ff8c"
+    },
+    {
+      "path": "dist/surface-router.js",
+      "bytes": 7964,
+      "sha256": "4d6fb22e60535c71065131763408c21d5274759c3cab657b45c506b248907b72"
+    },
+    {
+      "path": "dist/sw.js",
+      "bytes": 1836,
+      "sha256": "8ffbbec1496f8d7a26fc2e048c2c355e6c82f05cc5b00eb6ffa7ff94cc951de1"
+    },
+    {
+      "path": "dist/wish-config.js",
+      "bytes": 669,
+      "sha256": "6c7ab2b88146ee723e36143af2c1c4707acac01cc935d1350f4f6d2ff8b1b942"
+    },
+    {
+      "path": "dist/wish.js",
+      "bytes": 6952,
+      "sha256": "f880cba31305a44d6755242fd800124f7893811b58de45e424223e789f9224e5"
+    },
+    {
+      "path": "docs/BUILD.md",
+      "bytes": 2774,
+      "sha256": "3a37d78f34825750ce6f9b2dbd7f6d47226eb764bd91440c7f7fc67417885828"
+    },
+    {
+      "path": "docs/LINEAGE.md",
+      "bytes": 2322,
+      "sha256": "a31f8b58e81daa02c997ca964ba1a1bb20456b98db53205bbd7467a90bf8fc18"
+    },
+    {
+      "path": "docs/PLUGIN-CONTRACT.md",
+      "bytes": 10280,
+      "sha256": "16c5fab87b4d7355b7a2a2e325b53ae82c90c51d4e5eb93bcc07a43569735d27"
+    },
+    {
+      "path": "docs/PRODUCTION-COMPATIBILITY.md",
+      "bytes": 4581,
+      "sha256": "8cf390e4bb38cc4187a8b806a2792fa21e53d5ce4be070b4ba4d6dadec585800"
+    },
+    {
+      "path": "docs/PRODUCTION-LICENSE-INVENTORY.md",
+      "bytes": 4605,
+      "sha256": "99b1794fb7471a0de6afee3a7d926344506a78bfe3f889aa7da88bc9f1558e08"
+    },
+    {
+      "path": "package.json",
+      "bytes": 819,
+      "sha256": "1eff14b3605c065b31b5fc4eb1e08c0fb32f49e7cb1314e42d9063ac61d8abba"
+    },
+    {
+      "path": "plugin-examples/bloom-drive.rack.json",
+      "bytes": 83126,
+      "sha256": "58699ec285f825a48b3a7f9772f24d97ac0638ca3fb236e5a86e5693c5fadd42"
+    },
+    {
+      "path": "plugin-examples/bloom-oscillator.plugin.json",
+      "bytes": 38941,
+      "sha256": "a75d1ce9183cc7fb57760a6966559167a750d08d3b33961f2ae486ba7b2923e8"
+    },
+    {
+      "path": "plugin-examples/html-instrument-descriptor.json",
+      "bytes": 332,
+      "sha256": "d229271eba3cc05b71d5eec2272229053817fd2b0e17ede40e42525eaaf10c9f"
+    },
+    {
+      "path": "plugin-examples/soft-drive.plugin.json",
+      "bytes": 40035,
+      "sha256": "4792b4e36fce4bd96cb1183834f1561b470b75b4f48d63d8e4f4b9c35d695649"
+    },
+    {
+      "path": "src/build-offline.py",
+      "bytes": 2716,
+      "sha256": "8607ac201c4f83498d7e24338b50a8df0849bfaae73772004f0c40f50e3f159b"
+    },
+    {
+      "path": "src/build-slice.py",
+      "bytes": 4056,
+      "sha256": "fb7b0f787ad63f3a689b744e2f80f0cb1022384c3dbcac7a6b1bb54ee20ac541"
+    },
+    {
+      "path": "src/ensemble/audio-dom-doubles.cjs",
+      "bytes": 3711,
+      "sha256": "27d5d0244f3034aa421b0cf3708b33cacbf62c39630aaaccbdd4c404fbb5b0a2"
+    },
+    {
+      "path": "src/lucky/README.md",
+      "bytes": 6346,
+      "sha256": "4a738ab8d0b5caccd0a28224b19cdcac71c2792d1faf38c45db1424f7613a65f"
+    },
+    {
+      "path": "src/lucky/audio-runtime.js",
+      "bytes": 5887,
+      "sha256": "ef813721813b224aa6d0cf1de3acaef9750f36727b78d17bfabc2b6147d194f9"
+    },
+    {
+      "path": "src/lucky/build-lucky.py",
+      "bytes": 2271,
+      "sha256": "1050b52bc6818b8ea8103ded6062e821fff28e705f485595e5ed4405b4b7c685"
+    },
+    {
+      "path": "src/lucky/composition.js",
+      "bytes": 13274,
+      "sha256": "45cb6f94513dfb424370acdd01c8e375065d30108b2ae4eb1cd036471e8b4fcd"
+    },
+    {
+      "path": "src/lucky/engine.original.js",
+      "bytes": 1072347,
+      "sha256": "7a2e62e9a15777bd5b096ea85a1c9731795288990dfe06095da8e447c8936ef4"
+    },
+    {
+      "path": "src/lucky/original-provenance.json",
+      "bytes": 664,
+      "sha256": "95ea409c1b3963c951694e3fbdf33f7931932a08dc528d5d6dab3bb623a24199"
+    },
+    {
+      "path": "src/lucky/player.html",
+      "bytes": 15365,
+      "sha256": "392d4e2c0861a57e7c33bfa804e286309d6db46496372143b6288020d16650df"
+    },
+    {
+      "path": "src/lucky/player.js",
+      "bytes": 24190,
+      "sha256": "73f9507248a14afaffa3fb0c3710284f27defaba2b1ff54332ee321bfdb6061a"
+    },
+    {
+      "path": "src/lucky/tests/audio.test.cjs",
+      "bytes": 4230,
+      "sha256": "fce0cc286c73d12385e4c08036f2425138a3c41ce677b23663d8f9ba0b4b7bd7"
+    },
+    {
+      "path": "src/lucky/tests/browser-audio-stress.cjs",
+      "bytes": 2333,
+      "sha256": "3bdac7a528c4a22a116d59b1469beaf0488044879b989661c33c527d0a691864"
+    },
+    {
+      "path": "src/lucky/tests/browser-check.cjs",
+      "bytes": 7189,
+      "sha256": "fdab82b3d7d69bb14b5f7b9a6fb5a74c4a3f20ac68093fd8899c425b175a66e0"
+    },
+    {
+      "path": "src/lucky/tests/composition.test.cjs",
+      "bytes": 5691,
+      "sha256": "47e26ef450bc4271697bcb971f023965f9ded082baf7d0ec3af1c8f61fc525c6"
+    },
+    {
+      "path": "src/lucky/tests/held-out-evaluation.cjs",
+      "bytes": 3324,
+      "sha256": "7321c625cf26984ae01ef8a905cee13f53977ccc7b44cbe9ef007d12673c676f"
+    },
+    {
+      "path": "src/lucky/tests/original-engine-loader.cjs",
+      "bytes": 1492,
+      "sha256": "636219906f1b2873024ea7dd3b0be193fe2f8911c20d1694ca8777e0885073a8"
+    },
+    {
+      "path": "src/lucky/tests/public-build.test.cjs",
+      "bytes": 1108,
+      "sha256": "e6860d6b8abef9bd672adfb09f552b975915b2c65f29632750971b77fb64febf"
+    },
+    {
+      "path": "src/lucky/tests/render-evaluation.cjs",
+      "bytes": 4184,
+      "sha256": "4e6edd3154715aeb050b7f38d8cc7a4d706040ed8628815695350d9ab83c46e7"
+    },
+    {
+      "path": "src/rack/build-rack.py",
+      "bytes": 2009,
+      "sha256": "27ed6d4999dabf136ac8c2ded86f6e60a64372f5383fde263151d0e07faa4ac8"
+    },
+    {
+      "path": "src/rack/engine.js",
+      "bytes": 12394,
+      "sha256": "8df200d0ba0a9b83adbb70419ffb6c7d94d0b78e8b4d8ef0c7c7e5f079779ce9"
+    },
+    {
+      "path": "src/rack/rack.html",
+      "bytes": 4577,
+      "sha256": "abca5c29955efc7d99cbaa098ee9ef782c8823a95111a1367d9203da2ddfa88f"
+    },
+    {
+      "path": "src/rack/ui.js",
+      "bytes": 12370,
+      "sha256": "1b921f5b7df1490585457bbd1be52f0b7e3ddb15ef981dc9ec2bd6187543e486"
+    },
+    {
+      "path": "src/rack/vendor/FAUST-COPYING.txt",
+      "bytes": 27544,
+      "sha256": "92a42adab3110694eb7731691f57f229fcaba31570d1727eb7be3f197307378c"
+    },
+    {
+      "path": "src/rack/vendor/bloom-oscillator.json",
+      "bytes": 36479,
+      "sha256": "1f904ab12d9bf8295e112be3b7ebc986c1ce41d7bdc16af9de8f6c10b8ec57ba"
+    },
+    {
+      "path": "src/rack/vendor/provenance.json",
+      "bytes": 1036,
+      "sha256": "9f78e16e921bea228de2cba9972faf563652369036a69bde51fd8d8083f73ab7"
+    },
+    {
+      "path": "src/rack/vendor/soft-drive.json",
+      "bytes": 37764,
+      "sha256": "c11b5f6afb32734fa9ba5f4a980e352e652be0988e16233a06a0856128b208c4"
+    },
+    {
+      "path": "src/rack/vendor/wasm.js",
+      "bytes": 2597,
+      "sha256": "830ba87c116554527b0d276ab0f4e198b1b20b3bf8f82c39f2f36ed2e84e28f2"
+    },
+    {
+      "path": "src/rack/vendor/worklet.js",
+      "bytes": 2059,
+      "sha256": "3fffa7f22114e9bc08e97ae6ddc3299e6807618828ec0bc777ac8a94b091ec4d"
+    },
+    {
+      "path": "src/surface/field-keys.html",
+      "bytes": 24577,
+      "sha256": "ffafeffaac634f4dbcf52304c80063a4e1c49655852fdb82c24360f67998ee89"
+    },
+    {
+      "path": "src/surface/pad.html",
+      "bytes": 6533,
+      "sha256": "40056bfd95b6d9100e043bcbc52757f4360a7eaa3a0834c4ffa49026c5cf371f"
+    },
+    {
+      "path": "src/surface/pad.js",
+      "bytes": 18214,
+      "sha256": "8cdcecadcb412dd79e6110d74ea14f073cb2b5a8c11f4d000df151f6cf1d5f03"
+    },
+    {
+      "path": "src/triton/build-triton.py",
+      "bytes": 11535,
+      "sha256": "d49e58143164f94dc01debf3e5da4e06ce18c29c6aed0513c5eedad0b6b91476"
+    },
+    {
+      "path": "src/triton/inherited-runtime.html",
+      "bytes": 757479,
+      "sha256": "4eced0d8da0d9623c11014a29ba57ecb9751ff735ea1c5bd647478177a219404"
+    },
+    {
+      "path": "src/triton/inherited-runtime.provenance.json",
+      "bytes": 640,
+      "sha256": "859c0eb585d9f8119bf2dc7a3b0c469c2ab60da861e2578010d23173f15f1932"
+    },
+    {
+      "path": "src/triton/room-target.js",
+      "bytes": 1064,
+      "sha256": "4fa46a1aa2a544e7a1a7f1bc91940aa8a314f403208787511688156c83e7c923"
+    },
+    {
+      "path": "src/triton/runtime.css",
+      "bytes": 1246,
+      "sha256": "9da48361a1ecafccc43ea8e4c9de4c4be29472655a18c45edb920929e9370783"
+    },
+    {
+      "path": "src/triton/runtime.html",
+      "bytes": 1042,
+      "sha256": "ef2020cfab8e1d54eed5e534abed8f5f81f90055bf10f7372d00c866257b6ad8"
+    },
+    {
+      "path": "src/triton/runtime.js",
+      "bytes": 12772,
+      "sha256": "dfe6f087f19b0c1ab0a2c8050236e2771dbd4c230007e8529e0d2c4503f98bfd"
+    },
+    {
+      "path": "src/triton/transport.js",
+      "bytes": 1682,
+      "sha256": "df594650efa8fe1d850ce2b9110822d5ede4d60587c829841d444717286c435f"
+    },
+    {
+      "path": "src/triton/triton.test.cjs",
+      "bytes": 18237,
+      "sha256": "0cb50703487e4cab26ec1e512198f640a21e8ea6d9fcaba64cd812c0f0a9bb9a"
+    },
+    {
+      "path": "src/triton/views.css",
+      "bytes": 1030,
+      "sha256": "62d73d437911170ed4c3c0a74f743a2650da53c5791432f9229bf3e59c0f7b35"
+    },
+    {
+      "path": "tests/bridge-new.test.mjs",
+      "bytes": 11796,
+      "sha256": "cff21b5f610431f19d66a0de3115f9eca99b8855e3fd5be69caa5efaad220c35"
+    },
+    {
+      "path": "tests/bridge-test-rig.mjs",
+      "bytes": 4323,
+      "sha256": "c8d6d666b31a9dc172d1f9c52d1fefe56dbe39d87b739d8401f1b1f74e06bcbf"
+    },
+    {
+      "path": "tests/bridge.test.mjs",
+      "bytes": 11951,
+      "sha256": "91566735d2d1512f55727a643d19baae18067e25278ec417926ae21a27645406"
+    },
+    {
+      "path": "tests/catalog.test.mjs",
+      "bytes": 1038,
+      "sha256": "2eebd0a0cf583030a745189c0b83f35c78d4e5280fb5732d2403f62cea91c7d7"
+    },
+    {
+      "path": "tests/field-keys.test.mjs",
+      "bytes": 12201,
+      "sha256": "b14807f939dd6d0d99b79b3c91f66b840396b30fa343453460ab3492b16b1add"
+    },
+    {
+      "path": "tests/instrument-bus.test.mjs",
+      "bytes": 10059,
+      "sha256": "91634aa5dc9a966b1a24d8322a660e40387acbc9c03e1a4d0cf0e694b5cfee7b"
+    },
+    {
+      "path": "tests/loader.test.mjs",
+      "bytes": 3857,
+      "sha256": "b561e83ecb3a3e22d2f09c0e313966efc7fe42c20c36b853348a616c4f8038f9"
+    },
+    {
+      "path": "tests/midi.test.mjs",
+      "bytes": 14547,
+      "sha256": "9d25bade4a0cfbf63507e2fb3f01ac9b5b00fc7b3b5c35069e99e011bea1b7dc"
+    },
+    {
+      "path": "tests/player.test.mjs",
+      "bytes": 20205,
+      "sha256": "aab3a699f33b817ae98c9878f02252617dbd807f092e83fcd8519008be8b3d80"
+    },
+    {
+      "path": "tests/plugin-contract.test.mjs",
+      "bytes": 11905,
+      "sha256": "ccba2e31035fd7c0152de17da598165c25c80e4514acf8e7dde5d4317d2afe05"
+    },
+    {
+      "path": "tests/portable.test.mjs",
+      "bytes": 1811,
+      "sha256": "58fbcca508ccdaaa314bd28f6714c0829c9d64681f2aff7ad0ed605c4c2eb3ed"
+    },
+    {
+      "path": "tests/rack-notes.test.mjs",
+      "bytes": 3514,
+      "sha256": "dd15abbe646a8d51a852219e94142d041d19d215f9695e47ea0d391d009ef3d0"
+    },
+    {
+      "path": "tests/surface.test.mjs",
+      "bytes": 5047,
+      "sha256": "700d1b84fc18f9f002989f4f1644460d01539eca88b1e775ab2fd4e8412c9981"
+    },
+    {
+      "path": "tests/wish.test.mjs",
+      "bytes": 9676,
+      "sha256": "4d39d4ca2b9c223e02a16aba5c876214e33cd1ae670e327d86355e1b39ebd7f5"
+    },
+    {
+      "path": "tools/plugin-intake.mjs",
+      "bytes": 5309,
+      "sha256": "6c98e59e79a22b67fd3ecd43bc43d3211d83251c46829b9ae27e1103f1653615"
+    },
+    {
+      "path": "tools/production-browser-check.mjs",
+      "bytes": 8828,
+      "sha256": "25586fe98b9054ad909a4a24c6a2965ceee40ade954e100f0618c00bfa6bbd8d"
+    },
+    {
+      "path": "tools/production-lifecycle-check.mjs",
+      "bytes": 6881,
+      "sha256": "b24d27e757382eada233c44ae7fe2dcef7756bd3c5dad3f45b53a6c5df1b1917"
+    },
+    {
+      "path": "tools/production-offline-check.mjs",
+      "bytes": 4723,
+      "sha256": "a38a1ee6a6548c4b9189b06a212f5d52091f50fa4eeb403e231dc01666259639"
+    }
+  ]
+}

@@ -1,0 +1,174 @@
+{
+  "format": "midi-room.production-handoff/1",
+  "generated_at": "2026-09-05T19:07:58.671350+00:00",
+  "status": "Local staged build and public source ready. No deployment or external repository write performed by this agent.",
+  "cache_version": "9fc791f85bb8d621",
+  "canonical_page": "https://persona500.com/midi-room/",
+  "wish_card_id": "midi-room-card",
+  "builtins": [
+    "triton-rack",
+    "lucky-dreamer",
+    "improvisator",
+    "drum-pad",
+    "field-keys",
+    "dsp-rack"
+  ],
+  "launch_contract": "?instrument=<allowlisted-id>; ?plugin=, #instrument= and #plugin= aliases. Direct instruments/<id>.html. Relative base paths.",
+  "files": [
+    {
+      "path": "app.js",
+      "bytes": 45486,
+      "sha256": "ff4d9f163880752e7f7709331668c695cc204dd97c2cf7e1bc26132d81ce3c24"
+    },
+    {
+      "path": "bridge.js",
+      "bytes": 30452,
+      "sha256": "841ba19bb4d09c888b484f7252411b4d607774824af23fae80acac607a15777d"
+    },
+    {
+      "path": "catalog.js",
+      "bytes": 1697,
+      "sha256": "ccda8d736a7dea31a21646dc1b36c4b9c3791f62438e6a20869cb0bd309d7f81"
+    },
+    {
+      "path": "icon-192.png",
+      "bytes": 2448,
+      "sha256": "111e3ea23aabd971d08df4ea47ab6e838f76dba884ad832b6982fe30166ad60f"
+    },
+    {
+      "path": "icon-512.png",
+      "bytes": 7105,
+      "sha256": "c143ce04e29d8bb5d537dec089d29c5be0ba3200da0cd9538546d6bc40d06c90"
+    },
+    {
+      "path": "icon.svg",
+      "bytes": 313,
+      "sha256": "1685a07266e25fe747dffa5ede02ad7761372d58f34cdad2ad1bac6fbf8b29b6"
+    },
+    {
+      "path": "index.html",
+      "bytes": 12368,
+      "sha256": "1e1daa28f18ef5bd32b505f79fd94dc315265b90b403e56526d78766d55eef19"
+    },
+    {
+      "path": "instrument-bus.js",
+      "bytes": 14132,
+      "sha256": "e72db1085bad3e1598c7bccb129b22a950b86829b78b266247924708ef3e2730"
+    },
+    {
+      "path": "instruments/drum-pad.html",
+      "bytes": 27676,
+      "sha256": "f40cbd92cc19a46ff68498dd03fcb2ef0be483962bb4b9c26753cbca60528656"
+    },
+    {
+      "path": "instruments/dsp-rack.html",
+      "bytes": 195085,
+      "sha256": "4769db6aa5f324358e6d8c6076dc3e7f81e2e14a88b618ea79af668754397673"
+    },
+    {
+      "path": "instruments/field-keys.html",
+      "bytes": 24577,
+      "sha256": "ffafeffaac634f4dbcf52304c80063a4e1c49655852fdb82c24360f67998ee89"
+    },
+    {
+      "path": "instruments/improvisator.html",
+      "bytes": 776062,
+      "sha256": "1ccc863bde7d5b55871c6f15afa185cbbb7088bd58f8f2a496ce6c7724c3caf1"
+    },
+    {
+      "path": "instruments/lucky-dreamer.html",
+      "bytes": 1131083,
+      "sha256": "2b3503797b1ee52e8fb911fe588eb4c8dff6a2c4401544e11312fb8007fb3f04"
+    },
+    {
+      "path": "instruments/triton-rack.html",
+      "bytes": 776070,
+      "sha256": "fe970bd96d0a1eee22b0a02364a5eae9cd3062c7bc6e7275c3b305386892ad5a"
+    },
+    {
+      "path": "licenses/FAUST-COPYING.txt",
+      "bytes": 27544,
+      "sha256": "92a42adab3110694eb7731691f57f229fcaba31570d1727eb7be3f197307378c"
+    },
+    {
+      "path": "licenses/HOST-MIT.txt",
+      "bytes": 1439,
+      "sha256": "82692049ae6c2832600819157720673d7e5baafe8ddbb8d7249c34daaa498c6d"
+    },
+    {
+      "path": "loader.js",
+      "bytes": 2871,
+      "sha256": "3687ea89655708f4c2df5af91c6cd3eb8837698c4fd8b79af9c10edb17288d9e"
+    },
+    {
+      "path": "manifest.webmanifest",
+      "bytes": 564,
+      "sha256": "e2753686aca871de9047fb97b395da89311e233e91877da1d16d1d2fc638c0df"
+    },
+    {
+      "path": "midi-room-local.html",
+      "bytes": 3298760,
+      "sha256": "cf06e17fe5325f6b0b98ffc9b4fdeba0ad6341b63cd48138a97f5bea1fea3131"
+    },
+    {
+      "path": "midi.js",
+      "bytes": 12524,
+      "sha256": "c4ab0eb4eb62eba25221e1d341dca5b412800607dceadaa6e3a985229fde963d"
+    },
+    {
+      "path": "plugin-contract.js",
+      "bytes": 18268,
+      "sha256": "aced69dc07bf95d285546a1ae39042eadfc2f4bce5a7b442045344781e9e6107"
+    },
+    {
+      "path": "style.css",
+      "bytes": 14965,
+      "sha256": "599ea0f719a0f3d1bdec18f6cf3fecea8ab8d1d1128f230d6262241b0b47ff8c"
+    },
+    {
+      "path": "surface-router.js",
+      "bytes": 7964,
+      "sha256": "4d6fb22e60535c71065131763408c21d5274759c3cab657b45c506b248907b72"
+    },
+    {
+      "path": "sw.js",
+      "bytes": 1836,
+      "sha256": "8ffbbec1496f8d7a26fc2e048c2c355e6c82f05cc5b00eb6ffa7ff94cc951de1"
+    },
+    {
+      "path": "wish-config.js",
+      "bytes": 669,
+      "sha256": "6c7ab2b88146ee723e36143af2c1c4707acac01cc935d1350f4f6d2ff8b1b942"
+    },
+    {
+      "path": "wish.js",
+      "bytes": 6952,
+      "sha256": "f880cba31305a44d6755242fd800124f7893811b58de45e424223e789f9224e5"
+    }
+  ],
+  "verification": {
+    "public_host_node_tests": 138,
+    "triton_runtime_tests": 20,
+    "lucky_focused_tests": 17,
+    "p5_playback_component_tests": 4,
+    "p5_scoped_eslint": "pass, no warnings",
+    "browser_engines": [
+      "Chromium 151",
+      "Playwright WebKit 26.5"
+    ],
+    "hosted_builtins_play_and_stop": 6,
+    "touch_lifecycle_builtin_checks_per_engine": 5,
+    "offline_builtins_per_engine": 6,
+    "offline_update_lifecycle": "waiting worker preserves active conductor; explicit update stops/reloads and retires scoped old cache",
+    "public_rebuild": "All six instruments, portable page and SW deleted and rebuilt byte-identically without reference/",
+    "privacy_scan": "No targeted private-path, manuscript, private-prompt-marker or external executable dependency findings; public client configuration explicitly allowed",
+    "copy_after_functional_browser_checks": "TRITON document title, compatibility help, and Lucky Keep feedback wording only; runtime unchanged. Final offline/update and public rebuild rerun on current bytes."
+  },
+  "limits": [
+    "Playwright WebKit is not installed Safari, physical iPhone, hardware MIDI, OS installation UI or human listening verification.",
+    "Hosting and PWA installation do not provide missing Web MIDI API.",
+    "Licenses are component-scoped; inherited TRITON/Lucky blanket license clearance is not asserted. Full privacy/rights inventory in docs/PRODUCTION-LICENSE-INVENTORY.md."
+  ],
+  "public_source": "../midi-room-public",
+  "public_source_export_manifest": "../midi-room-public/verification/public-source-export.json"
+}

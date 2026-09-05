@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#101114">
+  <meta name="description" content="Six instruments by DRINOMAN. Play with touch or computer keys; connect hardware MIDI where supported.">
+  <title>MIDI Room</title>
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="stylesheet" href="./style.css">
+  <script type="module" src="./app.js"></script>
+</head>
+<body data-default-instrument="catalog">
+  <header class="toolbar">
+    <a class="brand" href="./" aria-label="MIDI Room home"><svg viewBox="0 0 28 28" aria-hidden="true"><path d="M4 6h20v17H4zM10 6v17M17 6v17"/><path class="fill" d="M8 6h4v10H8zM15 6h4v10h-4z"/></svg><span>MIDI<span class="brand-soft"> ROOM</span></span></a>
+    <div class="tools">
+      <button id="midiButton" class="midi-button" type="button" aria-label="Connect MIDI"><i id="midiLight"></i><span id="midiLabel">MIDI</span></button>
+      <button id="openButton" class="open-button" type="button"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 4h6l2 3h6v10H3zM10 10v5M7.5 12.5h5"/></svg><span>Open</span></button>
+      <button id="menuButton" class="icon-button" type="button" aria-label="Player options" aria-haspopup="dialog">•••</button>
+    </div>
+    <input id="fileInput" type="file" accept=".html,.htm,.json,text/html,application/json" hidden>
+  </header>
+
+  <nav class="rack-strip" aria-label="Instrument rack"><div id="rackTabs" class="rack-tabs"></div><button id="addButton" class="add-button" type="button" aria-label="Add instrument" aria-haspopup="dialog">＋</button></nav>
+  <main id="stage" aria-label="Instrument player">
+    <section id="welcome" class="welcome">
+      <div class="welcome-content">
+        <p class="room-byline">DRINOMAN’s workshop</p>
+        <h1>Make a little noise.</h1>
+        <p class="room-intro">Pick an instrument. Touch and computer keys work here. A MIDI controller is optional.</p>
+        <div id="instrumentCatalog" class="instrument-catalog" aria-label="Instruments"></div>
+        <div class="room-import"><button id="openMain" class="quiet-button" type="button">Open your own HTML instrument or plugin</button><p class="file-hint">Your files stay in this browser.</p></div>
+        <button id="demoButton" hidden type="button">TRITON Rack</button>
+      </div>
+      <div class="welcome-foot">Drop a file anywhere to open it.</div>
+    </section>
+    <div id="frameMount" hidden></div>
+    <div id="loading" class="loading" hidden role="status"><span class="spinner"></span><span>Opening instrument…</span></div>
+    <div id="dropOverlay" class="drop-overlay" hidden><b>Drop to play</b><span>HTML instruments &amp; DSP racks</span></div>
+  </main>
+
+  <footer id="transport" class="transport" aria-label="Playback status">
+    <div class="now-playing"><span id="audioLight" class="audio-light"></span><span id="instrumentName">Instrument</span><small id="audioLabel">Ready</small></div>
+    <button id="patchButton" class="stop-button" type="button" aria-haspopup="dialog">Wires</button>
+    <button id="stopButton" class="stop-button" type="button" aria-label="Stop all sound" disabled><span aria-hidden="true">■</span> Stop</button>
+  </footer>
+  <aside id="saveTray" class="save-tray" hidden aria-label="Files ready to save"></aside>
+  <div id="toast" class="toast" hidden role="status"></div>
+
+  <dialog id="settings" aria-labelledby="settingsTitle">
+    <div class="dialog-head"><h2 id="settingsTitle">Player</h2><button class="icon-button" id="closeSettings" type="button" aria-label="Close options">✕</button></div>
+    <div class="setting"><label for="inputSelect">MIDI input</label><select id="inputSelect"><option value="auto">Auto</option></select></div>
+    <p id="midiDetail" class="secondary">Controllers connect automatically after permission.</p>
+    <button class="row-button" id="installApp" type="button" hidden>Install MIDI Room</button>
+    <button class="row-button" id="updateApp" type="button" hidden>Update and reload</button>
+    <p id="offlineStatus" class="secondary" role="status">Built-in instruments can be kept offline after the first visit. Use your browser’s Install or Add to Home Screen action.</p>
+    <p class="source-link"><a href="https://github.com/mrdirno/midi-room" target="_blank" rel="noopener">Source project ↗</a> · <a href="https://github.com/mrdirno/midi-room/commits/main/" target="_blank" rel="noopener">Git history ↗</a></p>
+    <details id="creditDetails"><summary>Credits and source lineage</summary><div id="creditsBody"></div><p><a href="./licenses/HOST-MIT.txt" target="_blank" rel="noopener">Host MIT notice</a> · <a href="./licenses/FAUST-COPYING.txt" target="_blank" rel="noopener">Faust notice</a></p></details>
+    <button class="row-button" id="reconnectButton" type="button">Connect MIDI <span aria-hidden="true">↗</span></button>
+    <button class="row-button" id="reloadButton" type="button" disabled>Restart instrument <span aria-hidden="true">↻</span></button>
+    <button class="row-button" id="saveInstrument" type="button" disabled>Save instrument HTML <span aria-hidden="true">↓</span></button>
+    <button class="row-button" id="savePortable" type="button">Save portable MIDI Room <span aria-hidden="true">↓</span></button>
+    <button class="row-button" id="closeInstrument" type="button" disabled>Close instrument <span aria-hidden="true">×</span></button>
+    <button class="row-button" id="roomCheck" type="button">Connection log <span aria-hidden="true">↗</span></button>
+    <button class="row-button" id="wishButton" type="button">Wish It Better <span aria-hidden="true">✧</span></button>
+    <details><summary>Local files &amp; compatibility</summary><p>Open reads a saved standalone HTML instrument, DSP plugin or rack JSON on this device. The file is not uploaded. DSP Rack shares audio among compiled instruments and effects; ordinary HTML instruments keep separate audio engines.</p><p>Save portable MIDI Room keeps this player and all six built-in instruments in one HTML file. The installed room also keeps its built-ins available offline after the first complete visit.</p><p>Touch and computer keys use Web Audio. Hardware MIDI is optional and requires a browser that offers Web MIDI. If hardware MIDI is unavailable, you can still play the built-in instruments.</p><p>Imported files that need separate assets, internet access, MIDI output or SysEx are not supported here. Stop cancels active performances and notes. Use the instrument’s Play control or keys to start again.</p></details>
+  </dialog>
+  <dialog id="unsupported" aria-labelledby="unsupportedTitle">
+    <div class="dialog-head"><h2 id="unsupportedTitle">Touch works here.</h2><button id="closeUnsupported" class="icon-button" type="button" aria-label="Close MIDI notice">✕</button></div>
+    <p id="unsupportedText">Hardware MIDI needs a MIDI-capable browser.</p>
+    <a id="browserLink" class="primary" href="https://midiweb.cc/" target="_blank" rel="noopener">Get MIDIWeb Browser ↗</a>
+    <button id="copyAppLink" class="primary" type="button" hidden>Copy app link</button>
+    <button id="keepTouch" class="quiet-button" type="button">Keep playing with touch</button>
+  </dialog>
+  <dialog id="addDialog" aria-labelledby="addTitle">
+    <div class="dialog-head"><h2 id="addTitle">Add instrument</h2><button id="closeAdd" class="icon-button" aria-label="Close">✕</button></div>
+    <button id="addLocal" class="primary full" type="button">Open instrument / plugin ＋</button>
+    <button id="addEnsemble" class="row-button" type="button">TRITON Rack <span>∞</span></button>
+    <button id="addLuckyDreamer" class="row-button" type="button">Lucky Dreamer <span>⚄</span></button>
+    <button id="addImprovisator" class="row-button" type="button">Improvisator <span>∞</span></button>
+    <button id="addDrumPad" class="row-button" type="button">Drum Pad <span>▦</span></button>
+    <button id="addDSPRack" class="row-button" type="button">DSP Rack <span>≋</span></button>
+    <button id="addFieldKeys" class="row-button" type="button">Field Keys <span>♬</span></button>
+    <p class="secondary">Four slots. Tap a card to send your keyboard there.</p>
+  </dialog>
+  <dialog id="connections" aria-labelledby="wireTitle">
+    <div class="dialog-head"><h2 id="wireTitle">Virtual wires</h2><button id="closeConnections" class="icon-button" aria-label="Close wires">✕</button></div>
+    <div id="wireList" class="wire-list"></div><p id="wireEmpty" class="secondary">Add an instrument, then connect it here.</p>
+    <div class="wire-selectors"><label class="setting" for="wireFrom">From<select id="wireFrom"></select></label><span aria-hidden="true">→</span><label class="setting" for="wireTo">To<select id="wireTo"></select></label></div>
+    <label class="setting" for="wireMode">Share<select id="wireMode"><option value="follow">All compatible events</option><option value="notes">Notes</option><option value="field">Field + transport events</option><option value="vibe">VibeBus signals</option></select></label>
+    <button id="wireConnect" class="primary full" type="button">Connect</button>
+    <p id="wireStatus" class="fixed-status" role="status">Enable audio in each instrument. Connections stay local.</p>
+    <details><summary>How wires work</summary><p>Notes arrive as virtual MIDI inputs. SDK-ready instruments can also share key, scale, energy and clock. Vibe Cards can share their named VibeBus signals. A connection carries events; audio is mixed by your browser.</p><p>Feedback loops are blocked. Closing an instrument removes its wires. Add Drum Pad and select a TRITON target in its Sound menu. Card focus never changes tempo.</p><p>Existing HTML instruments can receive notes through Web MIDI. Sending notes or following a shared field requires the small MidiRoom SDK. External assets, MIDI output and SysEx remain unsupported.</p></details>
+  </dialog>
+  <dialog id="wishDialog" aria-labelledby="wishTitle">
+    <div class="dialog-head"><h2 id="wishTitle">Wish It Better</h2><button id="closeWish" class="icon-button" aria-label="Close wish">✕</button></div>
+    <form id="wishForm" data-wish-well>
+      <label class="sr-only" for="wishText">What would make this better?</label>
+      <textarea id="wishText" rows="5" maxlength="2000" placeholder="I wish…" required></textarea>
+      <div class="wish-actions"><button id="wishSubmit" type="submit" class="primary">Send wish ✧</button><button id="wishCopy" type="button" class="stop-button">Copy</button></div>
+      <p id="wishStatus" class="fixed-status" role="status">Only your wish is sent. Music and logs stay here.</p>
+    </form>
+    <a class="source-link" href="https://github.com/mrdirno/vibe-cards/blob/main/WISH_IT_BETTER.md" target="_blank" rel="noopener">Wish It Better network ↗</a>
+  </dialog>
+  <dialog id="logDialog" aria-labelledby="logTitle"><div class="dialog-head"><h2 id="logTitle">Connection log</h2><button id="closeLog" class="icon-button" aria-label="Close log">✕</button></div><label class="sr-only" for="roomLogText">Copyable connection report</label><textarea id="roomLogText" rows="9" readonly></textarea><button id="copyRoomLog" type="button" class="primary full">Copy report</button><p id="roomLogStatus" class="fixed-status" role="status"></p></dialog>
+  <template id="roomCredits"><p>Music tools by Aldrin Payopay / DRINOMAN. TRITON and Improvisator use the supplied oscillator-model engine; no TRITON ROM recordings are bundled. The inherited phrase library credits <a href="https://magenta.tensorflow.org/datasets/groove" target="_blank" rel="noopener">Groove MIDI Dataset</a> (Google LLC, CC BY 4.0; timing/velocity phrases transformed) and <a href="https://github.com/OpenScore/StringQuartets" target="_blank" rel="noopener">OpenScore String Quartets</a> (CC0). Lucky Dreamer keeps its supplied synthesis and rhythm lineage. DSP Rack includes Faust-generated modules; its original license notices remain in the source.</p></template>
+  <noscript>This player needs JavaScript enabled.</noscript>
+</body>
+</html>

@@ -1,0 +1,12 @@
+node_modules/
+.DS_Store
+__pycache__/
+*.pyc
+.env*
+reference/
+work/
+*.wav
+*.m4a
+src/lucky/tests/audio-evidence/
+workspace/
+*.log

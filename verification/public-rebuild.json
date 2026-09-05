@@ -1,0 +1,47 @@
+{
+  "check": "Delete and rebuild all six generated instruments, portable page, and service worker with no private reference tree.",
+  "private_reference_present": false,
+  "byte_identical": true,
+  "artifacts": [
+    {
+      "path": "dist/instruments/triton-rack.html",
+      "sha256": "fe970bd96d0a1eee22b0a02364a5eae9cd3062c7bc6e7275c3b305386892ad5a",
+      "matches_original_build": true
+    },
+    {
+      "path": "dist/instruments/improvisator.html",
+      "sha256": "1ccc863bde7d5b55871c6f15afa185cbbb7088bd58f8f2a496ce6c7724c3caf1",
+      "matches_original_build": true
+    },
+    {
+      "path": "dist/instruments/lucky-dreamer.html",
+      "sha256": "2b3503797b1ee52e8fb911fe588eb4c8dff6a2c4401544e11312fb8007fb3f04",
+      "matches_original_build": true
+    },
+    {
+      "path": "dist/instruments/drum-pad.html",
+      "sha256": "f40cbd92cc19a46ff68498dd03fcb2ef0be483962bb4b9c26753cbca60528656",
+      "matches_original_build": true
+    },
+    {
+      "path": "dist/instruments/field-keys.html",
+      "sha256": "ffafeffaac634f4dbcf52304c80063a4e1c49655852fdb82c24360f67998ee89",
+      "matches_original_build": true
+    },
+    {
+      "path": "dist/instruments/dsp-rack.html",
+      "sha256": "4769db6aa5f324358e6d8c6076dc3e7f81e2e14a88b618ea79af668754397673",
+      "matches_original_build": true
+    },
+    {
+      "path": "dist/midi-room-local.html",
+      "sha256": "cf06e17fe5325f6b0b98ffc9b4fdeba0ad6341b63cd48138a97f5bea1fea3131",
+      "matches_original_build": true
+    },
+    {
+      "path": "dist/sw.js",
+      "sha256": "8ffbbec1496f8d7a26fc2e048c2c355e6c82f05cc5b00eb6ffa7ff94cc951de1",
+      "matches_original_build": true
+    }
+  ]
+}
