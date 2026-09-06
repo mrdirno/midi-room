@@ -4,23 +4,47 @@
   const $=id=>document.getElementById(id), sdk=window.MidiRoom?.controlVersion===1 ? window.MidiRoom : null;
   const roles=[['kick','Kick',36],['snare','Snare',38],['clap','Clap',39],['tom-low','Low tom',41],['hat-closed','Closed hat',42],['tom-mid','Mid tom',43],['tom-high','High tom',45],['hat-open','Open hat',46],['cymbal','Cymbal',47]];
   const localProfile={version:1,definitionId:'local.drum-pad',definitionVersion:'1',profileId:'local-kit-1',kind:'drums',name:'Local drum kit',voices:roles.map(([id,label,note])=>({id,label,note,channel:9,mode:'oneshot',...(id.startsWith('hat')?{chokeGroup:'hats'}:{})}))};
-  let profile=localProfile, assignments=defaultAssignments(profile), inputNotes=Array.from({length:16},(_,i)=>36+i), target='local', bindingId=null, ctx=null, master=null, serial=0, totalHits=0, mapRevision=0, learn=false, recording=false, recordStart=0, recordBpm=120, lastTargets=[];
+  let profile=localProfile, assignments=defaultAssignments(profile), inputNotes=Array.from({length:16},(_,i)=>36+i), target='local', columns=4, bindingId=null, ctx=null, master=null, serial=0, totalHits=0, mapRevision=0, learn=false, recording=false, recordStart=0, recordBpm=120, lastTargets=[];
   const held=new Map(), voices=new Set(), inputs=new Map(), midiHeld=new Map(), pedals=new Map(), journal=[], take=[];
   let midiAccess=null, connecting=null, audioGeneration=0;
   const log=(event,detail={})=>{journal.push({event,...detail});if(journal.length>48)journal.shift();};
   const status=(text,error=false)=>{$('status').textContent=text;$('status').classList.toggle('error',error);};
   const key=()=>[profile.definitionId,profile.definitionVersion,profile.profileId].join(':');
-  function snapshot(){return {version:1,targetKey:key(),assignments,inputNotes,touchVelocity:+$('velocity').value};}
+  function snapshot(){return {version:1,targetKey:key(),assignments,inputNotes,touchVelocity:+$('velocity').value,padColumns:columns};}
+  // Fewer columns means bigger pads. A player asked for this on 2026-09-06: the
+  // pads were a fixed 4 across and too small to hit on a phone. 16 pads stay 16;
+  // only how they tile changes, so every saved assignment still lands on its pad.
+  function applyColumns(value){
+    columns=Math.min(6,Math.max(2,Math.round(Number(value))||4));
+    const root=document.documentElement.style;
+    root.setProperty('--pad-columns',columns);
+    root.setProperty('--pad-rows',Math.ceil(16/columns));
+    root.setProperty('--pad-floor',({2:150,3:130,4:90,5:80,6:70})[columns]+'px');
+    if($('columns').value!==String(columns))$('columns').value=String(columns);
+  }
   function restore(value){
     if(!value || value.version!==1 || value.targetKey!==key() || !Array.isArray(value.assignments) || value.assignments.length!==16 || !value.assignments.every(a=>validAssignment(profile,a)) || !Array.isArray(value.inputNotes) || value.inputNotes.length!==16 || !value.inputNotes.every(n=>Number.isInteger(n)&&n>=0&&n<=127) || new Set(value.inputNotes).size!==16) return false;
     assignments=value.assignments.map(a=>a?{...a}:null);inputNotes=[...value.inputNotes]; if(Number.isInteger(value.touchVelocity)&&value.touchVelocity>=1&&value.touchVelocity<=127)$('velocity').value=value.touchVelocity;
+    if(Number.isInteger(value.padColumns))applyColumns(value.padColumns);
     $('velocityValue').value=$('velocity').value;mapRevision++;draw();return true;
   }
   function persist(){const value=snapshot();if(sdk)sdk.requestControl('save-map',{key:key(),value});else try{localStorage.setItem('drum-pad.v1:'+key(),JSON.stringify(value));}catch{status('Assignments work here. Use Save to keep a copy.');}}
   function loadSaved(){if(sdk)sdk.requestControl('load-map',{key:key()});else try{restore(JSON.parse(localStorage.getItem('drum-pad.v1:'+key())||'null'));}catch{}}
-  function draw(){
-    for(let i=0;i<16;i++){const b=$('pads').children[i],a=assignments[i];b.querySelector('strong').textContent=a?.label||'Unassigned';b.querySelector('small').textContent=a?'In '+inputNotes[i]+' / Out '+a.note:'Assign';b.classList.toggle('empty',!a);b.setAttribute('aria-label','Pad '+(i+1)+': '+(a?.label||'Unassigned'));b.classList.toggle('active',[...held.values()].some(h=>h.pad===i));}
+  function drawLabels(){
+    const pads=$('pads');
+    for(let i=0;i<16;i++){const b=pads.children[i],a=assignments[i];b.querySelector('strong').textContent=a?.label||'Unassigned';b.querySelector('small').textContent=a?'In '+inputNotes[i]+' / Out '+a.note:'Assign';b.classList.toggle('empty',!a);b.setAttribute('aria-label','Pad '+(i+1)+': '+(a?.label||'Unassigned'));}
   }
+  // Called on every press and every release, so it must stay cheap. It rewrote all
+  // sixteen labels and aria-labels on each hit -- 224 DOM operations, measured, for a
+  // change of one class -- and that work runs on the thread that schedules the sound.
+  // Touch nothing but the pads whose pressed state actually changed.
+  function drawActive(){
+    const pads=$('pads'), down=new Set();
+    for(const h of held.values())down.add(h.pad);
+    for(let i=0;i<16;i++){const b=pads.children[i],want=down.has(i);
+      if(b.classList.contains('active')!==want)b.classList.toggle('active',want);}
+  }
+  function draw(){drawLabels();drawActive();}
   function ensureAudio(){if(!ctx){const AudioContextClass=window.AudioContext||window.webkitAudioContext;ctx=new AudioContextClass();master=ctx.createGain();master.gain.value=.65;master.connect(ctx.destination);}return ctx;}
   function kill(v,when=ctx?.currentTime||0){if(!v||v.dead)return;v.dead=true;try{v.gain.gain.cancelScheduledValues(when);v.gain.gain.setTargetAtTime(0,when,.004);for(const n of v.sources)n.stop(when+.025);}catch{}voices.delete(v);}
   function localHit(a,velocity){
@@ -45,11 +69,15 @@
   function capture(data){if(recording&&take.length<50000)take.push({ms:performance.now()-recordStart,data:[...data]});}
   function press(owner,pad,velocity){
     if(held.has(owner)||held.size>=128||!assignments[pad])return;const a={...assignments[pad]},h={id:'hit-'+(++serial),pad,a,target,bindingId,revision:mapRevision,generation:audioGeneration,queuedAt:performance.now(),started:false,released:false,cancelled:false};held.set(owner,h);
-    const start=()=>{if(h.cancelled||h.generation!==audioGeneration||h.started)return;if(held.get(owner)!==h&&!(h.released&&h.a.mode==='oneshot'&&performance.now()-h.queuedAt<750))return;h.started=true;if(h.target==='local')h.voice=localHit(a,velocity);else if(h.bindingId)sdk?.requestControl('hit',{bindingId:h.bindingId,hitId:h.id,phase:'on',assignment:a,velocity});else{status('Choose an available sound.',true);return;}capture([144|a.channel,a.note,velocity]);if(h.released)capture([128|a.channel,a.note,0]);totalHits++;};
+    const start=()=>{if(h.cancelled||h.generation!==audioGeneration||h.started)return;if(held.get(owner)!==h&&!(h.released&&h.a.mode==='oneshot'&&performance.now()-h.queuedAt<750))return;h.started=true;if(h.target==='local')h.voice=localHit(a,velocity);else if(h.bindingId)sdk?.requestControl('hit',{bindingId:h.bindingId,hitId:h.id,phase:'on',assignment:a,velocity});else{status('Choose an available sound.',true);return;}capture([144|a.channel,a.note,velocity]);if(sends(owner))sdk.emit({kind:'midi',data:[144|a.channel,a.note,velocity]});if(h.released)capture([128|a.channel,a.note,0]);totalHits++;};
     if(target==='local'){const c=ensureAudio();if(c.state==='running')start();else c.resume().then(start).catch(()=>status('Tap again to enable audio.',true));}else start();
-    draw();
+    drawActive();
   }
-  function release(owner,cancel=false){const h=held.get(owner);if(!h)return;h.released=true;h.cancelled=cancel;held.delete(owner);if(h.target!=='local'&&h.bindingId)sdk?.requestControl('hit',{bindingId:h.bindingId,hitId:h.id,phase:'off'});else if(h.a.mode==='gate')kill(h.voice);if(h.started)capture([128|h.a.channel,h.a.note,0]);draw();}
+  function release(owner,cancel=false){const h=held.get(owner);if(!h)return;h.released=true;h.cancelled=cancel;held.delete(owner);if(h.target!=='local'&&h.bindingId)sdk?.requestControl('hit',{bindingId:h.bindingId,hitId:h.id,phase:'off'});else if(h.a.mode==='gate')kill(h.voice);if(h.started){capture([128|h.a.channel,h.a.note,0]);if(sends(owner))sdk.emit({kind:'midi',data:[128|h.a.channel,h.a.note,0]});}drawActive();}
+  const sends=owner=>!!sdk&&!owner.startsWith('wire');
+  // Leaving this instrument's panel lifts your fingers off it. It must not stop the
+  // kit: a cymbal already ringing should ring out while you look at another rack tab.
+  function releasePointers(){for(const owner of [...held.keys()])if(owner.startsWith('pointer:')||owner.startsWith('key:'))release(owner,true);}
   function releaseAll(){audioGeneration++;for(const owner of [...held.keys()])release(owner,true);for(const v of [...voices])kill(v);sdk?.requestControl('cancel');}
   function releaseInput(input){
     for(const owner of [...held.keys()])if(owner.startsWith(input+':'))release(owner);
@@ -97,13 +125,16 @@
   }
   function chooseProfile(next){releaseAll();profile=next;assignments=defaultAssignments(next);mapRevision++;draw();loadSaved();if($('mapDialog').open)editOptions();}
   if(sdk){
-    sdk.declare({name:'Drum Pad',send:[],receive:[]});
+    sdk.declare({name:'Drum Pad',send:['midi'],receive:['midi']});
+    // Notes a wire delivers are played, not forwarded: re-emitting them would
+    // send every note twice down a chain of three instruments.
+    sdk.on('midi',event=>{if(Array.isArray(event?.data))receive(event.data,'wire');});
     sdk.onControl(event=>{
       if(event.action==='targets') {lastTargets=event.targets;const selected=$('target').value;$('target').replaceChildren(new Option('Local drum kit','local'));for(const t of event.targets)$('target').add(new Option(t.profile.name+' · '+t.id.slice(0,5),t.id));if([...$('target').options].some(o=>o.value===selected))$('target').value=selected;else if(target!=='local'){$('target').add(new Option('Target closed — choose sound','missing'));$('target').value='missing';}}
       if(event.action==='binding') {bindingId=event.bindingId;if(event.target){target=event.target;chooseProfile(event.profile);status('External sound: '+event.profile.name);}else if(target==='local'){chooseProfile(localProfile);status('Local drum kit');}else{releaseAll();bindingId=null;status('Target closed. Choose a sound.',true);}}
       if(event.action==='saved-map'&&event.key===key())restore(event.value);
       if(event.action==='storage-unavailable')status('Use Save to keep assignments in a file.');
-      if(event.action==='release-surface')releaseAll();
+      if(event.action==='release-surface')releasePointers();
     });
     sdk.describe({version:1,definitionId:'local.drum-pad.surface',definitionVersion:'1',profileId:'pads-16',kind:'surface',name:'Drum Pad',voices:[]});
   }
@@ -120,6 +151,7 @@
   $('resetMap').onclick=()=>{assignments=defaultAssignments(profile);inputNotes=Array.from({length:16},(_,i)=>36+i);mapRevision++;persist();draw();editOptions();};
   $('learn').onclick=()=>{learn=!learn;$('learn').textContent=learn?'Play one MIDI note':'Learn MIDI';connectMIDI();};
   $('midi').onclick=connectMIDI;$('velocity').oninput=()=>{$('velocityValue').value=$('velocity').value;persist();};
+  $('columns').onchange=()=>{applyColumns($('columns').value);persist();};
   $('save').onclick=()=>{$('saveDialog').showModal();};$('help').onclick=()=>{$('helpDialog').showModal();};
   for(const b of document.querySelectorAll('[data-close]'))b.onclick=()=>$(b.dataset.close).close();$('mapDialog').addEventListener('close',()=>{learn=false;$('learn').textContent='Learn MIDI';});
   function download(blob,name){const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),60000);}
@@ -136,5 +168,5 @@
   window.addEventListener('midiroom:dispose',()=>{releaseAll();for(const binding of inputs.values())binding.port.onmidimessage=null;if(midiAccess)midiAccess.onstatechange=null;try{ctx?.close().catch(()=>{});}catch{}});
   // Read-only diagnostics; tests exercise the actual buttons and audio engine.
   window.DrumPad=Object.freeze({snapshot,report:()=>({held:held.size,hits:totalHits,localVoices:voices.size,mode:target,profile:profile.profileId}),audioContext:()=>ctx});
-  draw();loadSaved();log('opened');
+  applyColumns(columns);draw();loadSaved();log('opened');
 })();

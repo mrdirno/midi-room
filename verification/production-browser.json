@@ -1,16 +1,16 @@
 {
-  "at": "2026-09-05T21:08:19.797Z",
+  "at": "2026-09-06T23:05:51.109Z",
   "scope": "Real Playwright Chromium and WebKit rendering/audio with scripted trusted pointer/keyboard gestures. No physical hardware MIDI, installed Safari app, iPhone or subjective listening claim.",
-  "base": "http://127.0.0.1:57570/nested/midi-room/",
+  "base": "http://127.0.0.1:52547/nested/midi-room/",
   "checks": [
     {
       "browser": "chromium",
-      "version": "151.0.7922.34",
+      "version": "145.0.7632.6",
       "check": "catalog and native API availability",
       "midi": "function",
       "audio": "function",
       "secure": true,
-      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/151.0.7922.34 Safari/537.36"
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36"
     },
     {
       "browser": "chromium",
@@ -20,8 +20,8 @@
       "sandbox": "allow-scripts allow-downloads allow-modals",
       "audio": {
         "state": "running",
-        "time": 0.4533333333333333,
-        "peak": 0.3993901014328003,
+        "time": 0.448,
+        "peak": 0.3998372256755829,
         "sampleRate": 48000
       },
       "active": {
@@ -72,7 +72,7 @@
                 "effective": 132,
                 "accepted": false,
                 "revision": 0,
-                "at": 1788642501180
+                "at": 1788735951878
               }
             ]
           },
@@ -102,8 +102,8 @@
       "sandbox": "allow-scripts allow-downloads allow-modals",
       "audio": {
         "state": "running",
-        "time": 0.39466666666666667,
-        "peak": 0.4272884726524353,
+        "time": 0.336,
+        "peak": 0.4083397388458252,
         "sampleRate": 48000
       },
       "active": {
@@ -148,7 +148,7 @@
               "effective": 132,
               "accepted": false,
               "revision": 0,
-              "at": 1788642504071
+              "at": 1788735953117
             }
           ]
         },
@@ -211,7 +211,7 @@
                 "effective": 132,
                 "accepted": false,
                 "revision": 0,
-                "at": 1788642504071
+                "at": 1788735953117
               }
             ]
           },
@@ -279,7 +279,7 @@
             "owner": "touch:key:0",
             "channel": 0,
             "note": 48,
-            "start": 0.010666666666666666,
+            "start": 0.005333333333333333,
             "held": true,
             "releaseAt": null
           }
@@ -300,9 +300,9 @@
               "owner": "touch:key:0",
               "channel": 0,
               "note": 48,
-              "start": 0.010666666666666666,
+              "start": 0.005333333333333333,
               "held": false,
-              "releaseAt": 0.22533333333333336
+              "releaseAt": 0.188
             }
           ],
           "field": {
@@ -323,8 +323,8 @@
       "sandbox": "allow-scripts allow-downloads allow-modals",
       "audio": {
         "state": "running",
-        "time": 0.33066666666666666,
-        "peak": 0.030587930232286453,
+        "time": 0.336,
+        "peak": 0.031211208552122116,
         "sampleRate": 48000
       },
       "active": {
@@ -559,13 +559,13 @@
         "mode": "worklet",
         "playing": true,
         "time": 0.10133333333333333,
-        "peak": 0.061090946197509766,
+        "peak": 0.03701615706086159,
         "nonFinite": 0
       },
       "active": {
         "historyMode": "session",
         "historyCount": 1,
-        "seed": 987433324,
+        "seed": 3249529206,
         "style": null,
         "playing": true,
         "solo": null,
@@ -580,8 +580,8 @@
           "lanes": {}
         },
         "stats": {
-          "next": 27136,
-          "peak": 0.061090946197509766,
+          "next": 26112,
+          "peak": 0.03701615706086159,
           "nonFinite": 0,
           "clamps": 0,
           "frames": 24064,
@@ -598,16 +598,16 @@
         "locks": []
       },
       "stopped": {
-        "audioLabel": "LUCKY DREAMER\nany style\nsounds\n?\nBruldozer\nleaden, relentless\n#gbw4fg\n",
+        "audioLabel": "LUCKY DREAMER\nROLL A BAND · KEEP WHAT LANDS\n\nEvery roll is a whole ban",
         "lucky": {
           "historyMode": "session",
           "historyCount": 1,
-          "seed": 987433324,
+          "seed": 3249529206,
           "style": null,
           "playing": false,
           "solo": null,
           "bar": 0,
-          "time": 0.5066666666666667,
+          "time": 0.304,
           "mode": "worklet",
           "audioState": "suspended",
           "destroyed": false,
@@ -617,11 +617,11 @@
             "lanes": {}
           },
           "stats": {
-            "next": 51200,
-            "peak": 0.7113949656486511,
+            "next": 38144,
+            "peak": 0.38010743260383606,
             "nonFinite": 0,
             "clamps": 0,
-            "frames": 48128,
+            "frames": 36096,
             "lateRecoveries": 0
           },
           "lateRecoveries": 0,
@@ -657,12 +657,12 @@
     },
     {
       "browser": "webkit",
-      "version": "26.5",
+      "version": "26.0",
       "check": "catalog and native API availability",
       "midi": "undefined",
       "audio": "function",
       "secure": true,
-      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.5 Safari/605.1.15"
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0 Safari/605.1.15"
     },
     {
       "browser": "webkit",
@@ -672,8 +672,8 @@
       "sandbox": "allow-scripts allow-downloads allow-modals",
       "audio": {
         "state": "running",
-        "time": 0.41333333333333333,
-        "peak": 0.4009758234024048,
+        "time": 0.4266666666666667,
+        "peak": 0.3928567171096802,
         "sampleRate": 48000
       },
       "active": {
@@ -724,7 +724,7 @@
                 "effective": 132,
                 "accepted": false,
                 "revision": 0,
-                "at": 1788642511091
+                "at": 1788735958440
               }
             ]
           },
@@ -754,8 +754,8 @@
       "sandbox": "allow-scripts allow-downloads allow-modals",
       "audio": {
         "state": "running",
-        "time": 0.32,
-        "peak": 0.37726137042045593,
+        "time": 0.304,
+        "peak": 0.34155890345573425,
         "sampleRate": 48000
       },
       "active": {
@@ -800,7 +800,7 @@
               "effective": 132,
               "accepted": false,
               "revision": 0,
-              "at": 1788642512310
+              "at": 1788735959554
             }
           ]
         },
@@ -863,7 +863,7 @@
                 "effective": 132,
                 "accepted": false,
                 "revision": 0,
-                "at": 1788642512310
+                "at": 1788735959554
               }
             ]
           },
@@ -903,7 +903,7 @@
         "profile": "local-kit-1"
       },
       "stopped": {
-        "audioLabel": "Drum Pad\nAssign\nSave\n?\nSound\nMIDI\nKick\nIn 36 / Out 36\nSnare\nIn 37 / Ou",
+        "audioLabel": "Drum Pad\nAssign\nSave\n?\nSound\n\nMIDI\n\nKick\nIn 36 / Out 36\n\nSnare\nIn 37 /",
         "pad": {
           "held": 0,
           "hits": 1,
@@ -931,7 +931,7 @@
             "owner": "touch:key:0",
             "channel": 0,
             "note": 48,
-            "start": 0.005333333333333333,
+            "start": 0,
             "held": true,
             "releaseAt": null
           }
@@ -944,7 +944,7 @@
         "midiInputs": []
       },
       "stopped": {
-        "audioLabel": "MIDI ROOM · INSTRUMENT 02\n\nField Keys\n⌁\n\nWarm bells. A softer edge.\n\nK",
+        "audioLabel": "MIDI ROOM · INSTRUMENT 02\n\nField Keys\n⌁\nWarm bells. A softer edge.\n\nKE",
         "field": {
           "enabled": false,
           "voices": [
@@ -952,9 +952,9 @@
               "owner": "touch:key:0",
               "channel": 0,
               "note": 48,
-              "start": 0.005333333333333333,
+              "start": 0,
               "held": false,
-              "releaseAt": 0.17733333333333334
+              "releaseAt": 0.15866666666666668
             }
           ],
           "field": {
@@ -975,8 +975,8 @@
       "sandbox": "allow-scripts allow-downloads allow-modals",
       "audio": {
         "state": "running",
-        "time": 0.31733333333333336,
-        "peak": 0.0303204208612442,
+        "time": 0.296,
+        "peak": 0.028527334332466125,
         "sampleRate": 48000
       },
       "active": {
@@ -1411,7 +1411,7 @@
         ]
       },
       "stopped": {
-        "audioLabel": "DSP Rack\n\nLayer instruments. Shape the mix.\n\nEnable audio\nStop\n\nStoppe",
+        "audioLabel": "DSP Rack\nLayer instruments. Shape the mix.\nEnable audio\nStop\nStopped. ",
         "rack": {
           "ready": false
         }
@@ -1429,13 +1429,13 @@
         "mode": "worklet",
         "playing": true,
         "time": 0.10133333333333333,
-        "peak": 0.19872939586639404,
+        "peak": 0.22616632282733917,
         "nonFinite": 0
       },
       "active": {
         "historyMode": "session",
         "historyCount": 1,
-        "seed": 668095751,
+        "seed": 4238931364,
         "style": null,
         "playing": true,
         "solo": null,
@@ -1450,8 +1450,8 @@
           "lanes": {}
         },
         "stats": {
-          "next": 26752,
-          "peak": 0.19872939586639404,
+          "next": 26368,
+          "peak": 0.22616632282733917,
           "nonFinite": 0,
           "clamps": 0,
           "frames": 24064,
@@ -1468,16 +1468,16 @@
         "locks": []
       },
       "stopped": {
-        "audioLabel": "LUCKY DREAMER\nROLL A BAND · KEEP WHAT LANDS\n\nEvery roll is a whole ban",
+        "audioLabel": "LUCKY DREAMER\nROLL A BAND · KEEP WHAT LANDS\nEvery roll is a whole band",
         "lucky": {
           "historyMode": "session",
           "historyCount": 1,
-          "seed": 668095751,
+          "seed": 4238931364,
           "style": null,
           "playing": false,
           "solo": null,
           "bar": 0,
-          "time": 0.25333333333333335,
+          "time": 0.20266666666666666,
           "mode": "worklet",
           "audioState": "suspended",
           "destroyed": false,
@@ -1487,8 +1487,8 @@
             "lanes": {}
           },
           "stats": {
-            "next": 26752,
-            "peak": 0.19872939586639404,
+            "next": 26368,
+            "peak": 0.22616632282733917,
             "nonFinite": 0,
             "clamps": 0,
             "frames": 24064,

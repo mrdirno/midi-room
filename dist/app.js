@@ -480,7 +480,6 @@ function cancelOutgoing(session) { bus.panicSource(session.nonce); }
 function focusSession(session) {
   if (!session || session.retired) return;
   if (active && active !== session) {
-    post(active,{type:'hardware-panic'}); focusRouter.release(active.nonce);
     surfaceRouter.cancel(active.nonce,'focus-changed');
     post(active,{type:'surface-control',version:1,action:'release-surface'});
   }
@@ -523,7 +522,12 @@ function renderConnections() {
   for (const id of ['wireFrom','wireTo']) {
     const select = $(id), saved = select.value;
     select.replaceChildren();
-    for (const session of sessions) select.add(new Option(sessionName(session), session.nonce));
+    for (const session of sessions) {
+      // A player should not be able to pick an end of the wire that can never work
+      // and only find out after pressing Connect.
+      const mute = id === 'wireFrom' ? !session.capabilities.send.length : !session.capabilities.receive.length;
+      select.add(new Option(sessionName(session) + (mute ? (id === 'wireFrom' ? ' — sends nothing' : ' — receives nothing') : ''), session.nonce));
+    }
     select.value = sessions.some(session => session.nonce === saved) ? saved : (id === 'wireTo' ? active?.nonce : sessions.find(session => session !== active)?.nonce) || sessions[0]?.nonce || '';
   }
   $('wireConnect').disabled = sessions.length < 2;
@@ -546,7 +550,17 @@ function connectWire(from = $('wireFrom').value, to = $('wireTo').value, mode = 
   if (!source || !target) return false;
   const requested = ({notes:['midi'],field:['field','transport'],vibe:['signal'],follow:busKinds})[mode] || ['midi'];
   const kinds = requested.filter(kind => source.capabilities.send.includes(kind) && target.capabilities.receive.includes(kind));
-  if (!kinds.length) { $('wireStatus').textContent = 'This source has no compatible output. SDK-ready instruments can send notes and field.'; return false; }
+  if (!kinds.length) {
+    const from = sessionName(source), to = sessionName(target);
+    const sends = requested.some(kind => source.capabilities.send.includes(kind));
+    const receives = requested.some(kind => target.capabilities.receive.includes(kind));
+    const why = !sends && !receives ? from + ' does not send this, and ' + to + ' does not receive it.'
+      : !sends ? from + ' does not send this.'
+      : to + ' does not receive this.';
+    const others = sessions.filter(s => s !== target && s.capabilities.send.some(kind => target.capabilities.receive.includes(kind))).map(sessionName);
+    $('wireStatus').textContent = why + (others.length ? ' These can play into ' + to + ': ' + others.join(', ') + '.' : ' Add another instrument to wire this one to.');
+    return false;
+  }
   try {
     bus.addRoute({id:'cable-' + nonce(),from,to,kinds,signals:[...new Set([...legacySignals,...(source.signals || [])])]});
     logRoom('wire.connected',{kinds});
@@ -683,7 +697,11 @@ window.addEventListener('drop', event => {
   if (event.dataTransfer.files.length !== 1) { notify('Open one instrument, plugin or rack at a time.'); return; }
   openFile(event.dataTransfer.files[0]);
 });
-document.addEventListener('visibilitychange', () => { if (document.hidden) stopSound(); else broker.discover(); });
+let stoppedWhileHidden = false;
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) { stoppedWhileHidden = present().some(session => session.audio === 'running'); stopSound(); }
+  else { broker.discover(); if (stoppedWhileHidden) { stoppedWhileHidden = false; notify('Sound stopped while this tab was in the background. Tap an instrument to play again.'); } }
+});
 window.addEventListener('pagehide', () => { stopSound(); });
 
 

@@ -249,9 +249,16 @@ test('rack keeps instruments alive and hardware reaches only the focused slot', 
   h.app.broker.options.onMIDI({inputId:'keyboard',data:[0x90,60,90]});
   assert.equal(notes(a),0); assert.equal(notes(b),1);
   h.app.focusSession(a);
-  assert.ok(b.port.messages.some(m=>m.type==='hardware-panic'));
+  // Leaving a slot no longer silences it. This used to send hardware-panic -- an
+  // all-notes-off -- which stopped the instrument's sequencer and its wired notes
+  // too, and a player reported exactly that on 2026-09-06. The panic was cleaning up
+  // after focusRouter.release(), which had just dropped b's claim on the held note so
+  // the real note-off went nowhere. Do neither, and the router does the right thing on
+  // its own: it remembers which slot started each note and sends the off to that slot.
+  assert.equal(b.port.messages.some(m=>m.type==='hardware-panic'),false);
   h.app.broker.options.onMIDI({inputId:'keyboard',data:[0x80,60,0]});
-  assert.equal(notes(a),0); assert.equal(notes(b),1); // Old held note was already released; late off does not reach the new focus.
+  assert.equal(notes(a),0);                           // the late off does not reach the new focus
+  assert.equal(notes(b),2);                           // it reaches the slot holding the note, as a real note-off
   assert.equal(h.nodes.get('frameMount').children.length,2);
 });
 
