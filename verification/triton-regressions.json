@@ -1,6 +1,6 @@
 {
-  "testedAt": "2026-09-06T23:05:03.572Z",
-  "artifactSha256": "c68e0dc55cf64bbd33420cadb0e099b44ed93d175a4b5c0af11ddd01b544eee0",
+  "testedAt": "2026-09-07T23:03:07.726Z",
+  "artifactSha256": "b64b4cd401e47d6b4a21bc66bfe74c14a74564f571db96eede33dc9bcbe7e817",
   "method": "Node VM execution of original and candidate implementation with explicit DOM, AudioContext and timer doubles",
   "tests": [
     {

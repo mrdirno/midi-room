@@ -14,7 +14,16 @@ test('cloud engine and app inputs are pinned exact extractions; shipped page exc
   const source = path.join(root, 'src/lucky-cloud');
   assert.equal(sha(fs.readFileSync(path.join(source, 'engine.original.js'))), 'f5f482f5eebe55ef90b5d9b25e548b4a1b5b5381a74f72c9d418d02440ecaea1');
   assert.equal(sha(fs.readFileSync(path.join(source, 'app.original.js'))), '57cc5b3097f413b1eecdc27d542c8deadfc2885e533b5028b0189030df89f5d4');
-  assert.equal(sha(script(html, 'engine-src')), 'f5f482f5eebe55ef90b5d9b25e548b4a1b5b5381a74f72c9d418d02440ecaea1');
+  // The shipped engine is the pinned engine plus EXACTLY the repairs in engine-patches.json.
+  // Applying that same list here keeps this a drift detector: any other change to the engine
+  // block, or a repair that is not written down, still fails.
+  const patches = JSON.parse(fs.readFileSync(path.join(source, 'engine-patches.json'), 'utf8')).patches;
+  let patched = fs.readFileSync(path.join(source, 'engine.original.js'), 'utf8');
+  for (const p of patches) {
+    assert.equal(patched.split(p.old).length - 1, p.count, `engine patch anchor drift: ${p.id}`);
+    patched = patched.split(p.old).join(p.new);
+  }
+  assert.equal(sha(script(html, 'engine-src')), sha(Buffer.from(patched)));
   assert.match(html, /id="cloudKit"/);
   assert.match(html, /LUCKY DREAMER/);
   assert.equal((html.match(/data:image\/[^;]+;base64,/g) || []).length, 5, 'original five cloud artworks remain');
@@ -27,7 +36,7 @@ test('public-safe inputs rebuild the identical cloud page without any private re
   const temp = fs.mkdtempSync(path.join(__dirname, '.public-rebuild-'));
   try {
     const dest = path.join(temp, 'src/lucky-cloud'); fs.mkdirSync(dest, {recursive: true});
-    for (const name of ['engine.original.js', 'app.original.js', 'cloud.css', 'integration.css', 'shell.html', 'lifecycle.js', 'sound-bank.js', 'provenance.json', 'build-cloud.py']) fs.copyFileSync(path.join(root, 'src/lucky-cloud', name), path.join(dest, name));
+    for (const name of ['engine.original.js', 'app.original.js', 'cloud.css', 'integration.css', 'shell.html', 'lifecycle.js', 'sound-bank.js', 'provenance.json', 'build-cloud.py', 'engine-patches.json']) fs.copyFileSync(path.join(root, 'src/lucky-cloud', name), path.join(dest, name));
     cp.execFileSync('python3', [path.join(dest, 'build-cloud.py')], {stdio: 'pipe'});
     assert.deepEqual(fs.readFileSync(path.join(temp, 'dist/instruments/lucky-dreamer.html')), fs.readFileSync(path.join(root, 'dist/instruments/lucky-dreamer.html')));
     assert.equal(fs.existsSync(path.join(temp, 'reference')), false);

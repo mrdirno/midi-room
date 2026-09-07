@@ -1,0 +1,12 @@
+{
+ "_doc": "Counted repairs applied to the sha-pinned engine.original.js at BUILD time. The engine file is never edited \u2014 provenance.json pins its hash. build-cloud.py applies these and raises if a count is wrong; contracts.test.cjs applies the same list and asserts the shipped page's engine block is the pinned engine plus EXACTLY these and nothing else. One list, two readers, so the test cannot drift from the build. Adding a repair is one entry here.",
+ "patches": [
+  {
+   "id": "wish-460af7e0-lead-chord-fit",
+   "why": "makeLine draws a melodic interval from the style's own table, then _snapChord may only move the note onto a chord tone if the RESULTING interval is also in that table. Instrumented over 200 pieces the snap ran 11,636 times and was blocked 5,144 times, and in 5,132 of those a chord tone was sitting inside its own search radius. The note stayed a semitone off a chord tone to protect an interval statistic. Allowing the landing interval to differ by one semitone from the drawn one keeps the style's shape (_sameClass still holds step-versus-leap and direction) and lets the note land. Measured over 60 seeds: chord tones 45.3% -> 54.5%, semitone clashes 44.0% -> 33.9%, leap rate 0.259 -> 0.256.",
+   "old": "    if (ivOk && got !== wantIv && !ivOk[got]) continue;",
+   "new": "    if (ivOk && got !== wantIv && !ivOk[got] && Math.abs(got - wantIv) > 1) continue;",
+   "count": 1
+  }
+ ]
+}

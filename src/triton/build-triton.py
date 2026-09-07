@@ -75,6 +75,53 @@ replace('const r=Math.max(.03,prog.aEG.r), tr=Math.max(rt||ctx.currentTime,ctx.c
 replace('Math.max(0,(st-ctx.currentTime)*1000)+80);', 'Math.max(0,(st-voiceCtx.currentTime)*1000)+80);')
 replace('const v={units,note,t,killed:false,oscs:oscRefs,baseHz,lgP,lfoP:prog.lfo.pitch,_take:_tk||null};', 'const v={units,note,t,killed:false,oscs:oscRefs,baseHz,lgP,lfoP:prog.lfo.pitch,_take:_tk||null,_off:(typeof exporting!=="undefined"&&exporting)};')
 replace('if(prog.cat==="DRUMS"){ drumHit(note,vel,when,prog.kit||"std"); return null; }', 'if(prog.cat==="DRUMS"){return drumHit(note,vel,when,prog.kit||"std");}')
+# ---- wishes a80f6280 / 5ab162f7: "those noise styled drums suck ... they sound like noise" ----
+# Measured before the change, rendering the real drumHit() through a real OfflineAudioContext
+# in headless Chromium, against a white-noise control put through the same window:
+#     snare   centroid 12063 Hz  high-band 0.937  low-band 0.025
+#     control centroid 12127 Hz  high-band 0.923  low-band 0.011
+# The snare was, numerically, the control: a single triangle at 0.5*vel buried under a
+# HIGHPASS-1700 noise at 0.8*vel, unbounded to Nyquist. A snare is a head with two audible
+# modes plus wires, and the wires are band-limited — they are not hiss.
+# The toms measured 0.000 energy above 2 kHz: a bare sine with no stick at all, which is why
+# they read as a synth blip rather than a struck skin.
+replace('''  else if(k===2||k===1){ const os=ctx.createOscillator(); os.type="triangle";
+    os.frequency.setValueAtTime(ana?180:196,t); os.frequency.exponentialRampToValueAtTime(ana?140:150,t+.08);
+    const og=ctx.createGain(); og.gain.setValueAtTime(.5*vel,t); og.gain.setTargetAtTime(0,t,ana?.04:.05);
+    os.connect(og); og.connect(o); os.start(t); os.stop(t+.3);
+    const sn=noise(), bp=ctx.createBiquadFilter(); bp.type="highpass"; bp.frequency.value=ana?1400:1700;
+    g.gain.setValueAtTime(.8*vel,t); g.gain.setTargetAtTime(0,t+.002,.07);
+    sn.connect(bp); bp.connect(g); sn.start(t); sn.stop(t+.4); }''',
+'''  else if(k===2||k===1){
+    /* head: the fundamental, and the second mode a fifth above it that makes a drum sound
+       tuned rather than thudded. Both drop in pitch as the skin relaxes. */
+    tone(ana?180:196, ana?140:150, .085, .70*vel, "triangle");
+    tone(ana?312:332, ana?280:300, .05,  .34*vel, "triangle");
+    /* wires: a broad band where a real snare carries its rattle, plus a narrower sheen on
+       top. Band-limited on purpose — the old highpass let everything up to Nyquist through,
+       which is the definition of hiss. */
+    nz(ana?3100:3600, .075, .40*vel, .7);
+    nz(ana?5600:6400, .045, .20*vel, 1.6);
+    /* the stick hitting the head, before either of the above has moved */
+    nz(ana?1200:1400, .012, .30*vel, 1.1); }''')
+replace('''  else if(k===5||k===7||k===9){ const f=k===5?95:k===7?135:190; const os=ctx.createOscillator(); os.type="sine";
+    os.frequency.setValueAtTime(f*1.6,t); os.frequency.exponentialRampToValueAtTime(f,t+.12);
+    g.gain.setValueAtTime(.9*vel,t); g.gain.setTargetAtTime(0,t+.004,ana?.15:.12);
+    os.connect(g); os.start(t); os.stop(t+.7); }''',
+'''  else if(k===5||k===7||k===9){ const f=k===5?95:k===7?135:190; const os=ctx.createOscillator(); os.type="sine";
+    os.frequency.setValueAtTime(f*1.6,t); os.frequency.exponentialRampToValueAtTime(f,t+.12);
+    g.gain.setValueAtTime(.9*vel,t); g.gain.setTargetAtTime(0,t+.004,ana?.15:.12);
+    os.connect(g); os.start(t); os.stop(t+.7);
+    /* stick and shell. The pitch drop was already right; what was missing was any evidence
+       that something hard hit something hollow. */
+    nz(f*13, .018, .30*vel, 1.1);
+    tone(f*2.7, f*2.4, .05, .16*vel, "sine"); }''')
+# ---- end drum voices ----------------------------------------------------------
+
+# The counted snare/tom repairs run HERE, before the block below rewrites
+# ctx.createOscillator() to tracked(...) inside drumHit — after that rewrite the pinned
+# anchors no longer exist. New oscillators added here are picked up by that same rewrite,
+# so they are tracked and killed with the voice like every other one.
 a=html.index('function drumHit(note,vel,when,kit){')
 b=html.index('\n</script>',a)
 drums=html[a:b]
@@ -363,6 +410,224 @@ replace('''  sdk.declare({name:document.body.dataset.instrument==='improvisator'
 '''  const improv=document.body.dataset.instrument==='improvisator';
   sdk.declare({name:improv?'Improvisator':'TRITON Rack',send:improv?['midi']:[],receive:['midi']});''')
 # ---- end persona500 port ------------------------------------------------------
+
+# ---- wish 83d41a5c: Save said "Render failed: Load failed" after a good render ----
+# The render already holds every byte as a Blob. prepareRenderedFiles threw that away and
+# fetch()ed the blob: URL back instead — asking the network for a file that was already in
+# memory. fetch() is governed by connect-src, and persona500 serves
+# "connect-src 'self' https: ws: wss:" with no blob:; default-src's blob: does NOT fill in
+# for a directive that is present. So every WAV/ZIP save ended in "Render failed: Load failed"
+# (WebKit) / "Failed to fetch" (Chromium) after a render that had fully succeeded.
+# Keeping the Blob costs nothing — it is the same object the URL already points at — and it
+# makes Save work under any connect-src, including a host we do not control.
+# The blob: URLs stay: the download chips are <a download href="blob:...">, which default-src
+# allows, and they were never the failing half.
+replace('''  if(!SAVE_OUT) SAVE_OUT={name,wavUrl:null,midUrl:null,zipUrl:null};
+  SAVE_OUT.midUrl=URL.createObjectURL(new Blob([mid],{type:"audio/midi"}));''',
+'''  if(!SAVE_OUT) SAVE_OUT={name,wavUrl:null,midUrl:null,zipUrl:null,wavBlob:null,midBlob:null,zipBlob:null};
+  SAVE_OUT.midBlob=new Blob([mid],{type:"audio/midi"});
+  SAVE_OUT.midUrl=URL.createObjectURL(SAVE_OUT.midBlob);''')
+replace('''  SAVE_OUT={ name,
+    wavUrl:wavBytes? URL.createObjectURL(new Blob([wavBytes],{type:"audio/wav"})) : null,
+    midUrl:mid? URL.createObjectURL(new Blob([mid],{type:"audio/midi"})) : null,
+    zipUrl:zipBlob? URL.createObjectURL(zipBlob) : null };''',
+'''  const savWav=wavBytes? new Blob([wavBytes],{type:"audio/wav"}) : null,
+        savMid=mid? new Blob([mid],{type:"audio/midi"}) : null;
+  SAVE_OUT={ name, wavBlob:savWav, midBlob:savMid, zipBlob:zipBlob||null,
+    wavUrl:savWav? URL.createObjectURL(savWav) : null,
+    midUrl:savMid? URL.createObjectURL(savMid) : null,
+    zipUrl:zipBlob? URL.createObjectURL(zipBlob) : null };''')
+replace("""  if(SAVE_OUT.wavUrl)jobs.push(fetch(SAVE_OUT.wavUrl).then(function(r){return r.blob();}).then(function(b){SP.prepared.wav=preparedItem(b,'wav',outputName('.wav'));}));
+  if(SAVE_OUT.midUrl)jobs.push(fetch(SAVE_OUT.midUrl).then(function(r){return r.blob();}).then(function(b){SP.prepared.mid=preparedItem(b,'mid',outputName('.mid'));}));
+  if(SAVE_OUT.zipUrl)jobs.push(fetch(SAVE_OUT.zipUrl).then(function(r){return r.blob();}).then(function(b){SP.prepared.zip=preparedItem(b,'zip',outputName('-session.zip'));}));""",
+"""  /* Blob first, network never. The fetch arm survives only for a SAVE_OUT built by an
+     older copy of this page still sitting in a service-worker cache. */
+  function blobOrFetch(blob,url){return blob?Promise.resolve(blob):(url?fetch(url).then(function(r){return r.blob();}):null);}
+  var jWav=blobOrFetch(SAVE_OUT.wavBlob,SAVE_OUT.wavUrl);if(jWav)jobs.push(jWav.then(function(b){SP.prepared.wav=preparedItem(b,'wav',outputName('.wav'));}));
+  var jMid=blobOrFetch(SAVE_OUT.midBlob,SAVE_OUT.midUrl);if(jMid)jobs.push(jMid.then(function(b){SP.prepared.mid=preparedItem(b,'mid',outputName('.mid'));}));
+  var jZip=blobOrFetch(SAVE_OUT.zipBlob,SAVE_OUT.zipUrl);if(jZip)jobs.push(jZip.then(function(b){SP.prepared.zip=preparedItem(b,'zip',outputName('-session.zip'));}));""")
+# ---- end wish 83d41a5c --------------------------------------------------------
+
+# ---- wish 5ab162f7: "saving should save a full song length 3:20 ... give user option of length" ----
+# Measured before the change: the save renders exactly what you sat and listened to — length
+# comes from the last event in TAKE.ev plus a 2.6 s tail, not from any constant. Held PLAY for
+# 0 s -> 8 notes / 2.77 s; 200 s -> 714 notes / 202.53 s. There was no length control anywhere.
+# Neither hard part needed building. The render is ALREADY an offline bounce (renderPass sizes
+# its OfflineAudioContext from the events it is handed), and the composer already sustains any
+# length without repeating — 614 distinct bars over 20 minutes, written in 28 ms. What was
+# missing was a way to ask for a song and a way to write it down without playing it, and
+# spawnVoice has done the second since round 10: under DRY it logs to the take and returns
+# before making a sound. So this composes the song, hands it to the bounce, and puts the live
+# take back. 480 s is the ceiling because takeTrim() keeps a rolling 8 minutes.
+replace('''      <button class="sp-small save" id="spSave" type="button">Save take</button>
+      <div id="spSaveDoors" aria-live="polite">PLAY creates one rolling take. Your MIDI or screen-key notes join it. The drummer plays the TRITON kit in the PERCUSSION slot.</div>''',
+'''      <button class="sp-small save" id="spSave" type="button">Save take</button>
+      <label class="sp-small" for="spLength" style="display:inline-flex;gap:.4em;align-items:center;">Length
+        <select id="spLength" style="font:inherit;padding:.15em .3em;">
+          <option value="0">as played</option>
+          <option value="60">1:00</option>
+          <option value="120">2:00</option>
+          <option value="200" selected>3:20</option>
+          <option value="300">5:00</option>
+          <option value="480">8:00</option>
+        </select></label>
+      <div id="spSaveDoors" aria-live="polite">PLAY creates one rolling take. Your MIDI or screen-key notes join it. The drummer plays the TRITON kit in the PERCUSSION slot. Save writes a whole song at the length you pick — it renders faster than it plays.</div>''')
+replace("""$p('spSave').addEventListener('click',saveDoors);""",
+"""$p('spSave').addEventListener('click',saveDoors);
+SP.renderSeconds=Number($p('spLength').value)||0;
+$p('spLength').addEventListener('change',function(){SP.renderSeconds=Number(this.value)||0;});""")
+# emitBar's two wall-clock arms must not fire while the song is being written down: queueUI
+# arms a setTimeout at (at - ctx.currentTime)*1000, so composing 200 s in a tight loop would
+# schedule ~104 timers firing up to 200 s into the future, and pumpComposer would defer the
+# very work the loop is waiting on. nextBar() generates a section synchronously when the
+# queue is empty, so skipping the pump costs nothing. This is the same guard the Dream side
+# has carried since round 10.
+replace('''  if(SP.pendingFx){var g=SP.generation;setTimeout(function(){if(g===SP.generation)applySoulFX();},Math.max(0,(at-ctx.currentTime)*1000));SP.pendingFx=false;}''',
+'''  if(SP.pendingFx&&!(typeof DRY!=="undefined"&&DRY)){var g=SP.generation;setTimeout(function(){if(g===SP.generation)applySoulFX();},Math.max(0,(at-ctx.currentTime)*1000));SP.pendingFx=false;}''')
+replace('''  queueUI(at,bar,patches);pumpComposer();return barLen;''',
+'''  if(!(typeof DRY!=="undefined"&&DRY)){queueUI(at,bar,patches);pumpComposer();}
+  return barLen;''')
+# The render percentage was being written into #ldrSaveLbl, which lives inside #ldrScale, which
+# body.soulMode hides. On a 3:20 render that left "RENDERING" frozen with no sign of life.
+replace('''function setSaveUI(t){
+  const e=document.getElementById("ldrSaveLbl");''',
+'''function setSaveUI(t){
+  /* mirror into the Improvisator's own save area: #ldrSaveLbl sits inside #ldrScale, and
+     body.soulMode hides that, so this text was invisible on the page that renders longest. */
+  if(t){ const sd=document.getElementById("spSaveDoors"); if(sd&&document.body.classList.contains("soulMode")) sd.textContent=t; }
+  const e=document.getElementById("ldrSaveLbl");''')
+replace('''var _exportTake=exportTake;exportTake=async function(kind,src){
+  if(!SP.ownsTake)return _exportTake(kind,src);
+  var oldP=DREAM.p,oldSeed=DREAM.seed,oldCur=cur;DREAM.p=null;DREAM.seed=hashSeed(SP.seed)%100000;cur=fxProgram();
+  try{return await _exportTake(kind,'take');}finally{DREAM.p=oldP;DREAM.seed=oldSeed;cur=oldCur;if(state.powered)applySoulFX();}
+};''',
+'''/* Write the whole song into the take without playing it. Every note goes through the same
+   emitBar the live path uses, so this IS the music you would have heard — spawnVoice logs it
+   and returns before making a sound while DRY is set. Yields to the event loop every 16 bars
+   so a long render does not freeze the page. */
+async function soulComposeSong(seconds){
+  var at=0,n=0,barLen;
+  DRY=true;
+  TAKE.ev=[];TAKE.t0=0;TAKE.on=true;TAKE.open={};
+  try{
+    SP.composer=new K.Composer(SP.seed,settings);
+    while(at<seconds&&n<4000){
+      barLen=emitBar(at);
+      if(!(barLen>0))break;
+      at+=barLen;n++;
+      if(n%16===0){setSaveUI('WRITING '+Math.round(at/seconds*100)+'%');await new Promise(function(r){setTimeout(r,0);});}
+    }
+  }finally{DRY=false;TAKE.on=false;}
+  return {bars:n,span:at};
+}
+var _exportTake=exportTake;exportTake=async function(kind,src){
+  if(!SP.ownsTake)return _exportTake(kind,src);
+  var oldP=DREAM.p,oldSeed=DREAM.seed,oldCur=cur;DREAM.p=null;DREAM.seed=hashSeed(SP.seed)%100000;cur=fxProgram();
+  var want=Math.min(480,Number(SP.renderSeconds)||0),keepTake=null,keepComposer=SP.composer,keepTempo=state.tempo;
+  try{
+    if(want>0){
+      keepTake={ev:TAKE.ev,t0:TAKE.t0,on:TAKE.on,open:TAKE.open};
+      var song=await soulComposeSong(want);
+      SP.diagnostics.lastSongBars=song.bars;
+    }
+    return await _exportTake(kind,'take');
+  }finally{
+    if(keepTake){TAKE.ev=keepTake.ev;TAKE.t0=keepTake.t0;TAKE.on=keepTake.on;TAKE.open=keepTake.open;}
+    SP.composer=keepComposer;state.tempo=keepTempo;
+    DREAM.p=oldP;DREAM.seed=oldSeed;cur=oldCur;if(state.powered)applySoulFX();}
+};''')
+# ---- end wish 5ab162f7 ---------------------------------------------------------
+
+# ---- wishes a80f6280 / e4c6e175 / 5ab162f7 / 4c01b6b4: the drummer's feel ----
+# "The drums are inconsistent they keep switching beat types" — measured: grooveName() drew a
+# fresh, unrelated groove from all six every section. Sections are eight bars, so at ~110 bpm
+# that is a new beat type roughly every seventeen seconds, unrelated to what the music is doing.
+# A song has ONE feel. The seed now picks one FAMILY for the piece and the section's own role
+# picks how hard it is played inside that family — dissolve (density .55) and shadow (.72) get
+# the open member, lift (1.26) and departure (1.18) the full one. Rolling still re-deals the
+# family, because grooveSalt still feeds the draw: a different drummer, not a different drummer
+# every seventeen seconds.
+# "the African or syncopated rhythms are the coolest but we haven't translated them into the
+# improvisator" / "Lucky dreamer still has the best rhythms ... need to see how to merge" —
+# three twelve-pulse bell families now play here too. div is the pulse under the beat: 4 =
+# sixteenths, 3 = a twelve-pulse bar, which is how these cycles are actually counted. The bar
+# stays four beats long either way, so the harmony needs no meter change; only the grid moves.
+replace('''var GROOVES={
+  straight:{label:'straight',hits:[[0,'kick',1],[4,'snare',.9],[8,'kick',.86],[12,'snare',.92]],hat:2,hatVel:.42},
+  backbeat:{label:'backbeat',hits:[[0,'kick',1],[4,'snare',.94],[7,'kick',.7],[10,'kick',.78],[12,'snare',.95]],hat:2,hatVel:.4},
+  halftime:{label:'half time',hits:[[0,'kick',1],[8,'snare',.95],[11,'kick',.66]],hat:4,hatVel:.5},
+  brushes:{label:'brushes',hits:[[0,'kick',.8],[4,'rim',.7],[8,'kick',.6],[12,'rim',.74]],hat:2,hatVel:.26},
+  broken:{label:'broken',hits:[[0,'kick',1],[3,'kick',.62],[4,'snare',.9],[9,'kick',.8],[12,'snare',.9],[14,'snare',.5]],hat:2,hatVel:.36},
+  drive:{label:'drive',hits:[[0,'kick',1],[2,'kick',.6],[4,'snare',.95],[8,'kick',1],[10,'kick',.6],[12,'snare',.95]],hat:1,hatVel:.3}
+};
+var GROOVE_KEYS=Object.keys(GROOVES);
+var FILL=[[8,'tomHi',.8],[10,'tomMid',.84],[12,'tomLo',.88],[14,'snare',.9],[15,'snare',.7]];''',
+'''/* Twelve-pulse timelines, transcribed, with the velocity shape they are played with.
+   bemba: the Bemba of northern Zimbabwe, struck on axe blades; in Cuba the bell of the
+   Sarabanda rhythm of Palo Monte. ashanti: the Ashanti and Akan peoples of Ghana, and the
+   Dunumba of Guinea. bembe: Ewe and Yoruba of West Africa, and the whole Cuban 6/8 repertoire.
+   These are the same figures the Lucky Dreamer plays. They are carried over rather than
+   invented, and they are named so the credit travels with them. The bell is voiced on the
+   kit's rim, which is the nearest thing the TRITON kit has to a struck blade — it is a stand-in,
+   not a gankogui. */
+var BELLS={
+  bemba:[[0,1],[2,.68],[3,.82],[5,.55],[7,.55],[9,.82],[10,.68]],
+  ashanti:[[0,1],[2,.68],[3,.82],[5,.55],[7,.55],[8,.68],[10,.68]],
+  bembe:[[0,1],[2,.68],[4,.68],[5,.55],[7,.55],[9,.82],[11,.55]]
+};
+var GROOVES={
+  straight:{label:'straight',div:4,hits:[[0,'kick',1],[4,'snare',.9],[8,'kick',.86],[12,'snare',.92]],hat:2,hatVel:.42},
+  backbeat:{label:'backbeat',div:4,hits:[[0,'kick',1],[4,'snare',.94],[7,'kick',.7],[10,'kick',.78],[12,'snare',.95]],hat:2,hatVel:.4},
+  halftime:{label:'half time',div:4,hits:[[0,'kick',1],[8,'snare',.95],[11,'kick',.66]],hat:4,hatVel:.5},
+  brushes:{label:'brushes',div:4,hits:[[0,'kick',.8],[4,'rim',.7],[8,'kick',.6],[12,'rim',.74]],hat:2,hatVel:.26},
+  broken:{label:'broken',div:4,hits:[[0,'kick',1],[3,'kick',.62],[4,'snare',.9],[9,'kick',.8],[12,'snare',.9],[14,'snare',.5]],hat:2,hatVel:.36},
+  drive:{label:'drive',div:4,hits:[[0,'kick',1],[2,'kick',.6],[4,'snare',.95],[8,'kick',1],[10,'kick',.6],[12,'snare',.95]],hat:1,hatVel:.3},
+  /* Go-go: the pocket from Chuck Brown's bands — the kick pushes the third beat and the
+     conga-ish rim answers between the backbeats. Sixteenths, swung by the humanize term. */
+  gogoOpen:{label:'go-go, open',div:4,hits:[[0,'kick',1],[6,'kick',.62],[4,'snare',.88],[12,'snare',.9],[7,'rim',.5],[15,'rim',.46]],hat:2,hatVel:.3},
+  gogo:{label:'go-go',div:4,hits:[[0,'kick',1],[3,'kick',.6],[6,'kick',.7],[4,'snare',.9],[12,'snare',.94],[5,'rim',.52],[7,'rim',.46],[13,'rim',.52],[15,'rim',.44]],hat:2,hatVel:.32},
+  gogoFull:{label:'go-go, full',div:4,hits:[[0,'kick',1],[3,'kick',.62],[6,'kick',.72],[10,'kick',.6],[4,'snare',.92],[12,'snare',.95],[14,'snare',.5],[5,'rim',.54],[7,'rim',.48],[11,'rim',.5],[13,'rim',.54],[15,'rim',.46]],hat:1,hatVel:.28},
+  /* The kit answers the bell rather than marking a backbeat, which is why the drum hits sit
+     off the beat here. Playing these as a backbeat is what makes a 6/8 sound like a mistake. */
+  bellOpen:{label:'bell, open',div:3,hits:[[0,'kick',.95],[7,'snare',.7]]},
+  bellMid:{label:'bell',div:3,hits:[[0,'kick',1],[3,'snare',.8],[6,'kick',.7],[9,'snare',.88]]},
+  bellFull:{label:'bell, full',div:3,hits:[[0,'kick',1],[2,'kick',.6],[3,'snare',.84],[6,'kick',.74],[8,'snare',.6],[9,'snare',.9],[11,'kick',.58]]}
+};
+/* A family is the song's feel; the rungs run open -> full and the section's role picks one. */
+var FAMILIES={
+  pocket:{rungs:['brushes','straight','backbeat','drive']},
+  broken:{rungs:['halftime','brushes','broken','drive']},
+  gogo:{rungs:['gogoOpen','gogo','gogo','gogoFull']},
+  bemba:{bell:'bemba',rungs:['bellOpen','bellMid','bellMid','bellFull']},
+  ashanti:{bell:'ashanti',rungs:['bellOpen','bellMid','bellMid','bellFull']},
+  bembe:{bell:'bembe',rungs:['bellOpen','bellMid','bellMid','bellFull']}
+};
+var FAMILY_KEYS=Object.keys(FAMILIES);
+var GROOVE_KEYS=Object.keys(GROOVES);
+var FILL=[[8,'tomHi',.8],[10,'tomMid',.84],[12,'tomLo',.88],[14,'snare',.9],[15,'snare',.7]];
+var FILL12=[[6,'tomHi',.8],[7,'tomMid',.84],[8,'tomLo',.88],[10,'snare',.9],[11,'snare',.7]];''')
+replace('''function grooveName(bar){return GROOVE_KEYS[hashSeed(SP.seed+':groove:'+SP.grooveSalt+':'+(bar.sectionIndex||0))%GROOVE_KEYS.length];}
+function grooveHits(bar,beats){
+  var steps=Math.max(4,Math.round(beats*4)),g=GROOVES[grooveName(bar)],out=[],i,h;
+  for(i=0;i<g.hits.length;i++){h=g.hits[i];if(h[0]<steps)out.push({step:h[0],voice:h[1],vel:h[2]});}
+  if(g.hat)for(i=0;i<steps;i+=g.hat)out.push({step:i,voice:(i%(g.hat*4)===0?'hatOpen':'hat'),vel:g.hatVel*(i%4===0?1:.78)});
+  if((bar.globalIndex+1)%8===0)for(i=0;i<FILL.length;i++){h=FILL[i];if(h[0]<steps)out.push({step:h[0],voice:h[1],vel:h[2]});}''',
+'''function feelName(){return FAMILY_KEYS[hashSeed(SP.seed+':feel:'+SP.grooveSalt)%FAMILY_KEYS.length];}
+function grooveName(bar){
+  var fam=FAMILIES[feelName()],d=(bar.sectionRole&&bar.sectionRole.density)||1;
+  /* the six section roles carry densities .55 to 1.26 — that ladder IS the rung */
+  return fam.rungs[d<0.75?0:d<1.0?1:d<1.2?2:3];
+}
+function grooveHits(bar,beats){
+  var fam=FAMILIES[feelName()],g=GROOVES[grooveName(bar)],div=g.div||4,
+      steps=Math.max(4,Math.round(beats*div)),out=[],i,h,bl;
+  for(i=0;i<g.hits.length;i++){h=g.hits[i];if(h[0]<steps)out.push({step:h[0],voice:h[1],vel:h[2]});}
+  if(fam.bell){bl=BELLS[fam.bell];for(i=0;i<bl.length;i++)if(bl[i][0]<steps)out.push({step:bl[i][0],voice:'rim',vel:bl[i][1]*.52});}
+  if(g.hat)for(i=0;i<steps;i+=g.hat)out.push({step:i,voice:(i%(g.hat*4)===0?'hatOpen':'hat'),vel:g.hatVel*(i%4===0?1:.78)});
+  if((bar.globalIndex+1)%8===0){var fl=(div===3)?FILL12:FILL;for(i=0;i<fl.length;i++){h=fl[i];if(h[0]<steps)out.push({step:h[0],voice:h[1],vel:h[2]});}}''')
+replace('''    return {beat:clamp(o.step/4+jitter,0,beats-0.001),note:KIT[o.voice],vel:clamp(o.vel*(0.86+0.14*(settings.motion||0.6)),0.05,0.98)};''',
+'''    return {beat:clamp(o.step/div+jitter,0,beats-0.001),note:KIT[o.voice],vel:clamp(o.vel*(0.86+0.14*(settings.motion||0.6)),0.05,0.98)};''')
+# ---- end drummer feel ----------------------------------------------------------
 html=html.replace('</head>','<style>'+(root/'views.css').read_text()+'</style></head>')
 html=re.sub(r'<title>.*?</title>', '<title>TRITON Rack · MIDI Room</title>', html,count=1)
 replace('<head>', '<head>\n<link rel="canonical" href="https://persona500.com/midi-room/instruments/triton-rack.html">')

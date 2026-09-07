@@ -45,7 +45,14 @@ shell=shell.replace('<div id="toast"></div>','<div id="toast" role="status" aria
 shell=shell.replace('<div id="sheet"><div class="sbox">','<div id="sheet" role="dialog" aria-modal="true" aria-label="Lucky Dreamer options" aria-hidden="true"><div class="sbox" tabindex="-1">')
 shell=shell.replace('id="sClose">','id="sClose" aria-label="Close options">')
 css=(src/'cloud.css').read_text()+'\n'+(src/'integration.css').read_text()
-for marker,value in [('/*CLOUD_STYLE*/',css),('/*CLOUD_ENGINE*/',(src/'engine.original.js').read_text()),('/*CLOUD_SOUNDS*/',(src/'sound-bank.js').read_text()),('/*CLOUD_APP*/',app)]:
+
+# Counted repairs to the sha-pinned engine. The list lives in engine-patches.json so the
+# contracts test can apply the identical list — one source of truth, two readers.
+engine=(src/'engine.original.js').read_text()
+for _p in json.loads((src/'engine-patches.json').read_text())['patches']:
+    if engine.count(_p['old'])!=_p['count']:raise SystemExit('Cloud engine patch drift: '+_p['id'])
+    engine=engine.replace(_p['old'],_p['new'])
+for marker,value in [('/*CLOUD_STYLE*/',css),('/*CLOUD_ENGINE*/',engine),('/*CLOUD_SOUNDS*/',(src/'sound-bank.js').read_text()),('/*CLOUD_APP*/',app)]:
     if shell.count(marker)!=1:raise SystemExit('Cloud shell marker drift: '+marker)
     if marker!='/*CLOUD_STYLE*/' and re.search(r'</script',value,re.I):raise SystemExit('Raw script boundary in '+marker)
     shell=shell.replace(marker,value)

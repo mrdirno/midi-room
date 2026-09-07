@@ -10461,7 +10461,7 @@ function _snapChord(pcs, midi, prevEmit, wantIv, within, ivOk) {
        fitter's accent, not the music's. With this the emitted histogram is
        supported on exactly the declared set and only the WEIGHTS can drift,
        which is what A5b measures. */
-    if (ivOk && got !== wantIv && !ivOk[got]) continue;
+    if (ivOk && got !== wantIv && !ivOk[got] && Math.abs(got - wantIv) > 1) continue;
     pc = ((m % 12) + 12) % 12;
     for (i = 0; i < pcs.length; i++) if (pcs[i] === pc) {
       var cost = Math.abs(got - wantIv) * 8 + d;

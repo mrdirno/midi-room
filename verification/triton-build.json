@@ -3,8 +3,8 @@
   "source": "inherited-runtime.html",
   "sourceSha256": "4eced0d8da0d9623c11014a29ba57ecb9751ff735ea1c5bd647478177a219404",
   "artifact": "dist/instruments/triton-rack.html",
-  "artifactSha256": "698362eca92b68165efcf705ae210e93517e8747a2bad3b9adba5e401204e72b",
-  "bytes": 786664,
+  "artifactSha256": "b64b4cd401e47d6b4a21bc66bfe74c14a74564f571db96eede33dc9bcbe7e817",
+  "bytes": 793129,
   "countedPatches": [
     {
       "anchor": "<h1>KORG TRITON-Rack</h1>",
@@ -155,6 +155,14 @@
       "count": 1
     },
     {
+      "anchor": "  else if(k===2||k===1){ const os=ctx.createOscillator(); os.type=\"triangle\";\n    os.frequency.setValueAtTime(",
+      "count": 1
+    },
+    {
+      "anchor": "  else if(k===5||k===7||k===9){ const f=k===5?95:k===7?135:190; const os=ctx.createOscillator(); os.type=\"sine",
+      "count": 1
+    },
+    {
       "anchor": "const v={units:1,t,killed:false};\n  v.kill=()=>{ if(!v.killed){ v.killed=true; unreg(v); } };",
       "count": 3
     },
@@ -244,6 +252,54 @@
     },
     {
       "anchor": "  sdk.declare({name:document.body.dataset.instrument==='improvisator'?'Improvisator':'TRITON Rack',send:[],rec",
+      "count": 1
+    },
+    {
+      "anchor": "  if(!SAVE_OUT) SAVE_OUT={name,wavUrl:null,midUrl:null,zipUrl:null};\n  SAVE_OUT.midUrl=URL.createObjectURL(new",
+      "count": 1
+    },
+    {
+      "anchor": "  SAVE_OUT={ name,\n    wavUrl:wavBytes? URL.createObjectURL(new Blob([wavBytes],{type:\"audio/wav\"})) : null,\n ",
+      "count": 1
+    },
+    {
+      "anchor": "  if(SAVE_OUT.wavUrl)jobs.push(fetch(SAVE_OUT.wavUrl).then(function(r){return r.blob();}).then(function(b){SP.",
+      "count": 1
+    },
+    {
+      "anchor": "      <button class=\"sp-small save\" id=\"spSave\" type=\"button\">Save take</button>\n      <div id=\"spSaveDoors\" a",
+      "count": 1
+    },
+    {
+      "anchor": "$p('spSave').addEventListener('click',saveDoors);",
+      "count": 1
+    },
+    {
+      "anchor": "  if(SP.pendingFx){var g=SP.generation;setTimeout(function(){if(g===SP.generation)applySoulFX();},Math.max(0,(",
+      "count": 1
+    },
+    {
+      "anchor": "  queueUI(at,bar,patches);pumpComposer();return barLen;",
+      "count": 1
+    },
+    {
+      "anchor": "function setSaveUI(t){\n  const e=document.getElementById(\"ldrSaveLbl\");",
+      "count": 1
+    },
+    {
+      "anchor": "var _exportTake=exportTake;exportTake=async function(kind,src){\n  if(!SP.ownsTake)return _exportTake(kind,src)",
+      "count": 1
+    },
+    {
+      "anchor": "var GROOVES={\n  straight:{label:'straight',hits:[[0,'kick',1],[4,'snare',.9],[8,'kick',.86],[12,'snare',.92]],",
+      "count": 1
+    },
+    {
+      "anchor": "function grooveName(bar){return GROOVE_KEYS[hashSeed(SP.seed+':groove:'+SP.grooveSalt+':'+(bar.sectionIndex||0",
+      "count": 1
+    },
+    {
+      "anchor": "    return {beat:clamp(o.step/4+jitter,0,beats-0.001),note:KIT[o.voice],vel:clamp(o.vel*(0.86+0.14*(settings.m",
       "count": 1
     },
     {

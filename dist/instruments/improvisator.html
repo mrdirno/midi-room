@@ -601,7 +601,16 @@ body[data-instrument="improvisator"] h1{font-size:clamp(2rem,7vw,3.4rem)}
       <button class="sp-small" id="spRollGroove" type="button">Roll groove</button>
       <button class="sp-small" id="spEvolve" type="button" aria-pressed="false">Voice motion off</button>
       <button class="sp-small save" id="spSave" type="button">Save take</button>
-      <div id="spSaveDoors" aria-live="polite">PLAY creates one rolling take. Your MIDI or screen-key notes join it. The drummer plays the TRITON kit in the PERCUSSION slot.</div>
+      <label class="sp-small" for="spLength" style="display:inline-flex;gap:.4em;align-items:center;">Length
+        <select id="spLength" style="font:inherit;padding:.15em .3em;">
+          <option value="0">as played</option>
+          <option value="60">1:00</option>
+          <option value="120">2:00</option>
+          <option value="200" selected>3:20</option>
+          <option value="300">5:00</option>
+          <option value="480">8:00</option>
+        </select></label>
+      <div id="spSaveDoors" aria-live="polite">PLAY creates one rolling take. Your MIDI or screen-key notes join it. The drummer plays the TRITON kit in the PERCUSSION slot. Save writes a whole song at the length you pick — it renders faster than it plays.</div>
     </div>
 
     <details class="sp-controls" id="spControls">
@@ -2104,13 +2113,18 @@ function drumHit(note,vel,when,kit){
     const c=noise(), hp=ctx.createBiquadFilter(); hp.type="highpass"; hp.frequency.value=1500;
     const cg=ctx.createGain(); cg.gain.setValueAtTime((ana?.18:.35)*vel,t); cg.gain.setTargetAtTime(0,t,.008);
     c.connect(hp); hp.connect(cg); cg.connect(o); c.start(t); c.stop(t+.05); }
-  else if(k===2||k===1){ const os=tracked('createOscillator'); os.type="triangle";
-    os.frequency.setValueAtTime(ana?180:196,t); os.frequency.exponentialRampToValueAtTime(ana?140:150,t+.08);
-    const og=ctx.createGain(); og.gain.setValueAtTime(.5*vel,t); og.gain.setTargetAtTime(0,t,ana?.04:.05);
-    os.connect(og); og.connect(o); os.start(t); os.stop(t+.3);
-    const sn=noise(), bp=ctx.createBiquadFilter(); bp.type="highpass"; bp.frequency.value=ana?1400:1700;
-    g.gain.setValueAtTime(.8*vel,t); g.gain.setTargetAtTime(0,t+.002,.07);
-    sn.connect(bp); bp.connect(g); sn.start(t); sn.stop(t+.4); }
+  else if(k===2||k===1){
+    /* head: the fundamental, and the second mode a fifth above it that makes a drum sound
+       tuned rather than thudded. Both drop in pitch as the skin relaxes. */
+    tone(ana?180:196, ana?140:150, .085, .70*vel, "triangle");
+    tone(ana?312:332, ana?280:300, .05,  .34*vel, "triangle");
+    /* wires: a broad band where a real snare carries its rattle, plus a narrower sheen on
+       top. Band-limited on purpose — the old highpass let everything up to Nyquist through,
+       which is the definition of hiss. */
+    nz(ana?3100:3600, .075, .40*vel, .7);
+    nz(ana?5600:6400, .045, .20*vel, 1.6);
+    /* the stick hitting the head, before either of the above has moved */
+    nz(ana?1200:1400, .012, .30*vel, 1.1); }
   else if(k===3){ [0,.028,.055].forEach((d,i)=>{ const sn=noise(),
       bp=ctx.createBiquadFilter(); bp.type="bandpass"; bp.frequency.value=1100; bp.Q.value=1.4;
       const cg=ctx.createGain(); cg.gain.setValueAtTime((i===2?.9:.5)*vel,t+d);
@@ -2119,7 +2133,11 @@ function drumHit(note,vel,when,kit){
   else if(k===5||k===7||k===9){ const f=k===5?95:k===7?135:190; const os=tracked('createOscillator'); os.type="sine";
     os.frequency.setValueAtTime(f*1.6,t); os.frequency.exponentialRampToValueAtTime(f,t+.12);
     g.gain.setValueAtTime(.9*vel,t); g.gain.setTargetAtTime(0,t+.004,ana?.15:.12);
-    os.connect(g); os.start(t); os.stop(t+.7); }
+    os.connect(g); os.start(t); os.stop(t+.7);
+    /* stick and shell. The pitch drop was already right; what was missing was any evidence
+       that something hard hit something hollow. */
+    nz(f*13, .018, .30*vel, 1.1);
+    tone(f*2.7, f*2.4, .05, .16*vel, "sine"); }
   else if(k===6||k===8||k===10){ const open=k===10, sn=noise(),
       hp=ctx.createBiquadFilter(); hp.type="highpass"; hp.frequency.value=ana?7600:6800;
       const m=ctx.createBiquadFilter(); m.type="peaking"; m.frequency.value=9200; m.Q.value=1; m.gain.value=6;
@@ -7709,6 +7727,9 @@ function saveChips(){
   if(typeof phoneFit==="function") phoneFit();
 }
 function setSaveUI(t){
+  /* mirror into the Improvisator's own save area: #ldrSaveLbl sits inside #ldrScale, and
+     body.soulMode hides that, so this text was invisible on the page that renders longest. */
+  if(t){ const sd=document.getElementById("spSaveDoors"); if(sd&&document.body.classList.contains("soulMode")) sd.textContent=t; }
   const e=document.getElementById("ldrSaveLbl");
   if(e){ if(!t&&SAVE_OUT&&typeof saveChips==="function") saveChips(); /* a clear falls back to the last bounce's chips */
     else e.textContent=t||""; }
@@ -7788,8 +7809,9 @@ function saveScoreOnly(src){
     try{ ["wavUrl","midUrl","zipUrl"].forEach(k=>{ if(SAVE_OUT[k]) URL.revokeObjectURL(SAVE_OUT[k]); }); }catch(_){ }
     SAVE_OUT=null;
   } else if(SAVE_OUT&&SAVE_OUT.midUrl){ try{ URL.revokeObjectURL(SAVE_OUT.midUrl); }catch(_){ } }
-  if(!SAVE_OUT) SAVE_OUT={name,wavUrl:null,midUrl:null,zipUrl:null};
-  SAVE_OUT.midUrl=URL.createObjectURL(new Blob([mid],{type:"audio/midi"}));
+  if(!SAVE_OUT) SAVE_OUT={name,wavUrl:null,midUrl:null,zipUrl:null,wavBlob:null,midBlob:null,zipBlob:null};
+  SAVE_OUT.midBlob=new Blob([mid],{type:"audio/midi"});
+  SAVE_OUT.midUrl=URL.createObjectURL(SAVE_OUT.midBlob);
   saveChips();
   ldrDownload(mid,"audio/midi",name+".mid");
 }
@@ -8057,9 +8079,11 @@ async function exportTake(kind,src){
   /* stash the bounce behind persistent chips FIRST, then attempt the
      convenience auto-download — if the browser eats it, the chips remain */
   if(SAVE_OUT){ try{ ["wavUrl","midUrl","zipUrl"].forEach(k=>{ if(SAVE_OUT[k]) URL.revokeObjectURL(SAVE_OUT[k]); }); }catch(_){ } }
-  SAVE_OUT={ name,
-    wavUrl:wavBytes? URL.createObjectURL(new Blob([wavBytes],{type:"audio/wav"})) : null,
-    midUrl:mid? URL.createObjectURL(new Blob([mid],{type:"audio/midi"})) : null,
+  const savWav=wavBytes? new Blob([wavBytes],{type:"audio/wav"}) : null,
+        savMid=mid? new Blob([mid],{type:"audio/midi"}) : null;
+  SAVE_OUT={ name, wavBlob:savWav, midBlob:savMid, zipBlob:zipBlob||null,
+    wavUrl:savWav? URL.createObjectURL(savWav) : null,
+    midUrl:savMid? URL.createObjectURL(savMid) : null,
     zipUrl:zipBlob? URL.createObjectURL(zipBlob) : null };
   saveChips();
   const auto=(url,fn)=>{ const a=document.createElement("a"); a.href=url; a.download=fn;
@@ -10946,16 +10970,50 @@ var ROLE_DUR={bass:.92,chord:.92,lead:.98,drums:.50};
 var KIT={kick:48,snare:50,rim:51,tomLo:53,tomMid:55,tomHi:57,hat:54,hatOpen:58};
 /* Sixteenth-note grids over one 4/4 bar: [step, voice, velocity]. Anything the
    drummer plays is one of these plus a fill, so a rolled groove is always a groove. */
-var GROOVES={
-  straight:{label:'straight',hits:[[0,'kick',1],[4,'snare',.9],[8,'kick',.86],[12,'snare',.92]],hat:2,hatVel:.42},
-  backbeat:{label:'backbeat',hits:[[0,'kick',1],[4,'snare',.94],[7,'kick',.7],[10,'kick',.78],[12,'snare',.95]],hat:2,hatVel:.4},
-  halftime:{label:'half time',hits:[[0,'kick',1],[8,'snare',.95],[11,'kick',.66]],hat:4,hatVel:.5},
-  brushes:{label:'brushes',hits:[[0,'kick',.8],[4,'rim',.7],[8,'kick',.6],[12,'rim',.74]],hat:2,hatVel:.26},
-  broken:{label:'broken',hits:[[0,'kick',1],[3,'kick',.62],[4,'snare',.9],[9,'kick',.8],[12,'snare',.9],[14,'snare',.5]],hat:2,hatVel:.36},
-  drive:{label:'drive',hits:[[0,'kick',1],[2,'kick',.6],[4,'snare',.95],[8,'kick',1],[10,'kick',.6],[12,'snare',.95]],hat:1,hatVel:.3}
+/* Twelve-pulse timelines, transcribed, with the velocity shape they are played with.
+   bemba: the Bemba of northern Zimbabwe, struck on axe blades; in Cuba the bell of the
+   Sarabanda rhythm of Palo Monte. ashanti: the Ashanti and Akan peoples of Ghana, and the
+   Dunumba of Guinea. bembe: Ewe and Yoruba of West Africa, and the whole Cuban 6/8 repertoire.
+   These are the same figures the Lucky Dreamer plays. They are carried over rather than
+   invented, and they are named so the credit travels with them. The bell is voiced on the
+   kit's rim, which is the nearest thing the TRITON kit has to a struck blade — it is a stand-in,
+   not a gankogui. */
+var BELLS={
+  bemba:[[0,1],[2,.68],[3,.82],[5,.55],[7,.55],[9,.82],[10,.68]],
+  ashanti:[[0,1],[2,.68],[3,.82],[5,.55],[7,.55],[8,.68],[10,.68]],
+  bembe:[[0,1],[2,.68],[4,.68],[5,.55],[7,.55],[9,.82],[11,.55]]
 };
+var GROOVES={
+  straight:{label:'straight',div:4,hits:[[0,'kick',1],[4,'snare',.9],[8,'kick',.86],[12,'snare',.92]],hat:2,hatVel:.42},
+  backbeat:{label:'backbeat',div:4,hits:[[0,'kick',1],[4,'snare',.94],[7,'kick',.7],[10,'kick',.78],[12,'snare',.95]],hat:2,hatVel:.4},
+  halftime:{label:'half time',div:4,hits:[[0,'kick',1],[8,'snare',.95],[11,'kick',.66]],hat:4,hatVel:.5},
+  brushes:{label:'brushes',div:4,hits:[[0,'kick',.8],[4,'rim',.7],[8,'kick',.6],[12,'rim',.74]],hat:2,hatVel:.26},
+  broken:{label:'broken',div:4,hits:[[0,'kick',1],[3,'kick',.62],[4,'snare',.9],[9,'kick',.8],[12,'snare',.9],[14,'snare',.5]],hat:2,hatVel:.36},
+  drive:{label:'drive',div:4,hits:[[0,'kick',1],[2,'kick',.6],[4,'snare',.95],[8,'kick',1],[10,'kick',.6],[12,'snare',.95]],hat:1,hatVel:.3},
+  /* Go-go: the pocket from Chuck Brown's bands — the kick pushes the third beat and the
+     conga-ish rim answers between the backbeats. Sixteenths, swung by the humanize term. */
+  gogoOpen:{label:'go-go, open',div:4,hits:[[0,'kick',1],[6,'kick',.62],[4,'snare',.88],[12,'snare',.9],[7,'rim',.5],[15,'rim',.46]],hat:2,hatVel:.3},
+  gogo:{label:'go-go',div:4,hits:[[0,'kick',1],[3,'kick',.6],[6,'kick',.7],[4,'snare',.9],[12,'snare',.94],[5,'rim',.52],[7,'rim',.46],[13,'rim',.52],[15,'rim',.44]],hat:2,hatVel:.32},
+  gogoFull:{label:'go-go, full',div:4,hits:[[0,'kick',1],[3,'kick',.62],[6,'kick',.72],[10,'kick',.6],[4,'snare',.92],[12,'snare',.95],[14,'snare',.5],[5,'rim',.54],[7,'rim',.48],[11,'rim',.5],[13,'rim',.54],[15,'rim',.46]],hat:1,hatVel:.28},
+  /* The kit answers the bell rather than marking a backbeat, which is why the drum hits sit
+     off the beat here. Playing these as a backbeat is what makes a 6/8 sound like a mistake. */
+  bellOpen:{label:'bell, open',div:3,hits:[[0,'kick',.95],[7,'snare',.7]]},
+  bellMid:{label:'bell',div:3,hits:[[0,'kick',1],[3,'snare',.8],[6,'kick',.7],[9,'snare',.88]]},
+  bellFull:{label:'bell, full',div:3,hits:[[0,'kick',1],[2,'kick',.6],[3,'snare',.84],[6,'kick',.74],[8,'snare',.6],[9,'snare',.9],[11,'kick',.58]]}
+};
+/* A family is the song's feel; the rungs run open -> full and the section's role picks one. */
+var FAMILIES={
+  pocket:{rungs:['brushes','straight','backbeat','drive']},
+  broken:{rungs:['halftime','brushes','broken','drive']},
+  gogo:{rungs:['gogoOpen','gogo','gogo','gogoFull']},
+  bemba:{bell:'bemba',rungs:['bellOpen','bellMid','bellMid','bellFull']},
+  ashanti:{bell:'ashanti',rungs:['bellOpen','bellMid','bellMid','bellFull']},
+  bembe:{bell:'bembe',rungs:['bellOpen','bellMid','bellMid','bellFull']}
+};
+var FAMILY_KEYS=Object.keys(FAMILIES);
 var GROOVE_KEYS=Object.keys(GROOVES);
 var FILL=[[8,'tomHi',.8],[10,'tomMid',.84],[12,'tomLo',.88],[14,'snare',.9],[15,'snare',.7]];
+var FILL12=[[6,'tomHi',.8],[7,'tomMid',.84],[8,'tomLo',.88],[10,'snare',.9],[11,'snare',.7]];
 
 /* colour starts on major because that is what the room has always opened in;
    the toggle is the new thing, not a new default sound. */
@@ -11036,19 +11094,26 @@ function patchesForBar(bar){
 /* One groove per section, chosen from the seed, so a passage keeps its feel;
    a fill lands on every eighth bar. Rolling changes the salt and nothing else —
    that is the whole mechanic. The room deals you a drummer, you keep what lands. */
-function grooveName(bar){return GROOVE_KEYS[hashSeed(SP.seed+':groove:'+SP.grooveSalt+':'+(bar.sectionIndex||0))%GROOVE_KEYS.length];}
+function feelName(){return FAMILY_KEYS[hashSeed(SP.seed+':feel:'+SP.grooveSalt)%FAMILY_KEYS.length];}
+function grooveName(bar){
+  var fam=FAMILIES[feelName()],d=(bar.sectionRole&&bar.sectionRole.density)||1;
+  /* the six section roles carry densities .55 to 1.26 — that ladder IS the rung */
+  return fam.rungs[d<0.75?0:d<1.0?1:d<1.2?2:3];
+}
 function grooveHits(bar,beats){
-  var steps=Math.max(4,Math.round(beats*4)),g=GROOVES[grooveName(bar)],out=[],i,h;
+  var fam=FAMILIES[feelName()],g=GROOVES[grooveName(bar)],div=g.div||4,
+      steps=Math.max(4,Math.round(beats*div)),out=[],i,h,bl;
   for(i=0;i<g.hits.length;i++){h=g.hits[i];if(h[0]<steps)out.push({step:h[0],voice:h[1],vel:h[2]});}
+  if(fam.bell){bl=BELLS[fam.bell];for(i=0;i<bl.length;i++)if(bl[i][0]<steps)out.push({step:bl[i][0],voice:'rim',vel:bl[i][1]*.52});}
   if(g.hat)for(i=0;i<steps;i+=g.hat)out.push({step:i,voice:(i%(g.hat*4)===0?'hatOpen':'hat'),vel:g.hatVel*(i%4===0?1:.78)});
-  if((bar.globalIndex+1)%8===0)for(i=0;i<FILL.length;i++){h=FILL[i];if(h[0]<steps)out.push({step:h[0],voice:h[1],vel:h[2]});}
+  if((bar.globalIndex+1)%8===0){var fl=(div===3)?FILL12:FILL;for(i=0;i<fl.length;i++){h=fl[i];if(h[0]<steps)out.push({step:h[0],voice:h[1],vel:h[2]});}}
   var human=(settings.humanize==null?1:settings.humanize)*0.014;
   return out.map(function(o,n){
     var jitter=(((hashSeed(SP.seed+':swing:'+bar.globalIndex+':'+n)%100)/100)-0.5)*human;
     /* Clamp inside the bar. Human jitter on a step-0 hit goes marginally negative,
        and emitBar drops anything before the downbeat — which silently loses the
        kick and the opening hat, the two hits a listener is most sure of. */
-    return {beat:clamp(o.step/4+jitter,0,beats-0.001),note:KIT[o.voice],vel:clamp(o.vel*(0.86+0.14*(settings.motion||0.6)),0.05,0.98)};
+    return {beat:clamp(o.step/div+jitter,0,beats-0.001),note:KIT[o.voice],vel:clamp(o.vel*(0.86+0.14*(settings.motion||0.6)),0.05,0.98)};
   });
 }
 /* The room's wires carry MIDI, not audio, so this is what makes the Improvisator
@@ -11082,7 +11147,7 @@ function emitBar(at){
   try{bar=SP.composer.nextBar();}catch(ex){SP.diagnostics.lastError='bar: '+ex.message;console.error(ex);soulStop(true);return .5;}
   var spb=60/bar.bpm,beats=bar.lengthBeats||bar.meter||4,barLen=beats*spb,patches=patchesForBar(bar);
   /* A planned bar cannot write shared tempo. */
-  if(SP.pendingFx){var g=SP.generation;setTimeout(function(){if(g===SP.generation)applySoulFX();},Math.max(0,(at-ctx.currentTime)*1000));SP.pendingFx=false;}
+  if(SP.pendingFx&&!(typeof DRY!=="undefined"&&DRY)){var g=SP.generation;setTimeout(function(){if(g===SP.generation)applySoulFX();},Math.max(0,(at-ctx.currentTime)*1000));SP.pendingFx=false;}
   for(var i=0;i<bar.events.length;i++){
     var e=bar.events[i],role=e.role==='bass'?'bass':e.role==='melody'?'lead':'chord';
     var p=cleanProgram(patches[role],role),when=at+e.beat*spb+(e.micro||0);
@@ -11099,7 +11164,8 @@ function emitBar(at){
         if(dv)dv._conductor='soul';SP.diagnostics.notes++;}}
   }
   SP.diagnostics.bars++;SP.diagnostics.lastQuality=bar.quality;SP.diagnostics.lastRoles=Array.from(new Set(bar.events.map(function(e){return e.role;})));
-  queueUI(at,bar,patches);pumpComposer();return barLen;
+  if(!(typeof DRY!=="undefined"&&DRY)){queueUI(at,bar,patches);pumpComposer();}
+  return barLen;
 }
 function tick(){
   if(!SP.on||!ctx||ctx.state!=='running')return;
@@ -11188,9 +11254,12 @@ function genericDownload(item){var url=URL.createObjectURL(new Blob([item.blob],
 function savePrepared(item){if(!item)return;var f=shareableFile(item);if(f){setStatus('opening Save to Files','work');try{navigator.share({files:[f],title:'TRITON Soul take'}).then(function(){setStatus('saved or shared');}).catch(function(ex){if(ex&&ex.name==='AbortError'){setStatus('save cancelled');return;}console.error(ex);genericDownload(item);setStatus('native save blocked · download started');});}catch(ex){console.error(ex);genericDownload(item);setStatus('native save blocked · download started');}return;}genericDownload(item);setStatus('download started');}
 function preparedButton(item,label){var b=document.createElement('button'),native=!!shareableFile(item);b.type='button';b.className='sp-door';b.textContent=native?('SAVE '+label+' TO FILES'):('DOWNLOAD '+label);b.onclick=function(){savePrepared(item);};return b;}
 async function prepareRenderedFiles(){SP.prepared={};if(typeof SAVE_OUT==='undefined'||!SAVE_OUT)return;var jobs=[];
-  if(SAVE_OUT.wavUrl)jobs.push(fetch(SAVE_OUT.wavUrl).then(function(r){return r.blob();}).then(function(b){SP.prepared.wav=preparedItem(b,'wav',outputName('.wav'));}));
-  if(SAVE_OUT.midUrl)jobs.push(fetch(SAVE_OUT.midUrl).then(function(r){return r.blob();}).then(function(b){SP.prepared.mid=preparedItem(b,'mid',outputName('.mid'));}));
-  if(SAVE_OUT.zipUrl)jobs.push(fetch(SAVE_OUT.zipUrl).then(function(r){return r.blob();}).then(function(b){SP.prepared.zip=preparedItem(b,'zip',outputName('-session.zip'));}));
+  /* Blob first, network never. The fetch arm survives only for a SAVE_OUT built by an
+     older copy of this page still sitting in a service-worker cache. */
+  function blobOrFetch(blob,url){return blob?Promise.resolve(blob):(url?fetch(url).then(function(r){return r.blob();}):null);}
+  var jWav=blobOrFetch(SAVE_OUT.wavBlob,SAVE_OUT.wavUrl);if(jWav)jobs.push(jWav.then(function(b){SP.prepared.wav=preparedItem(b,'wav',outputName('.wav'));}));
+  var jMid=blobOrFetch(SAVE_OUT.midBlob,SAVE_OUT.midUrl);if(jMid)jobs.push(jMid.then(function(b){SP.prepared.mid=preparedItem(b,'mid',outputName('.mid'));}));
+  var jZip=blobOrFetch(SAVE_OUT.zipBlob,SAVE_OUT.zipUrl);if(jZip)jobs.push(jZip.then(function(b){SP.prepared.zip=preparedItem(b,'zip',outputName('-session.zip'));}));
   await Promise.all(jobs);
 }
 function renderDownloads(){var host=$p('spSaveDoors');if(!host)return;host.innerHTML='';var p=SP.prepared||{};
@@ -11232,13 +11301,45 @@ var _ldrToggle=ldrToggle;ldrToggle=function(force){if(!LDR.on&&SP.on)soulStop(tr
 var _setProgram=setProgram;setProgram=function(i){var live=SP.on,tempo=state.tempo;var r=_setProgram(i);if(live){state.tempo=tempo;applySoulFX();render();}return r;};
 var _setCombi=setCombi;setCombi=function(i){var live=SP.on,tempo=state.tempo;var r=_setCombi(i);if(live){state.tempo=tempo;applySoulFX();render();}return r;};
 var _verbSet=verbSet;verbSet=function(p){var r=_verbSet(p);if(SP.on){settings.reverb=clamp(p/100,0,.5);syncControls();applySoulFX();}return r;};
+/* Write the whole song into the take without playing it. Every note goes through the same
+   emitBar the live path uses, so this IS the music you would have heard — spawnVoice logs it
+   and returns before making a sound while DRY is set. Yields to the event loop every 16 bars
+   so a long render does not freeze the page. */
+async function soulComposeSong(seconds){
+  var at=0,n=0,barLen;
+  DRY=true;
+  TAKE.ev=[];TAKE.t0=0;TAKE.on=true;TAKE.open={};
+  try{
+    SP.composer=new K.Composer(SP.seed,settings);
+    while(at<seconds&&n<4000){
+      barLen=emitBar(at);
+      if(!(barLen>0))break;
+      at+=barLen;n++;
+      if(n%16===0){setSaveUI('WRITING '+Math.round(at/seconds*100)+'%');await new Promise(function(r){setTimeout(r,0);});}
+    }
+  }finally{DRY=false;TAKE.on=false;}
+  return {bars:n,span:at};
+}
 var _exportTake=exportTake;exportTake=async function(kind,src){
   if(!SP.ownsTake)return _exportTake(kind,src);
   var oldP=DREAM.p,oldSeed=DREAM.seed,oldCur=cur;DREAM.p=null;DREAM.seed=hashSeed(SP.seed)%100000;cur=fxProgram();
-  try{return await _exportTake(kind,'take');}finally{DREAM.p=oldP;DREAM.seed=oldSeed;cur=oldCur;if(state.powered)applySoulFX();}
+  var want=Math.min(480,Number(SP.renderSeconds)||0),keepTake=null,keepComposer=SP.composer,keepTempo=state.tempo;
+  try{
+    if(want>0){
+      keepTake={ev:TAKE.ev,t0:TAKE.t0,on:TAKE.on,open:TAKE.open};
+      var song=await soulComposeSong(want);
+      SP.diagnostics.lastSongBars=song.bars;
+    }
+    return await _exportTake(kind,'take');
+  }finally{
+    if(keepTake){TAKE.ev=keepTake.ev;TAKE.t0=keepTake.t0;TAKE.on=keepTake.on;TAKE.open=keepTake.open;}
+    SP.composer=keepComposer;state.tempo=keepTempo;
+    DREAM.p=oldP;DREAM.seed=oldSeed;cur=oldCur;if(state.powered)applySoulFX();}
 };
 
 $p('spPlay').addEventListener('click',toggle);$p('spNew').addEventListener('click',newPassage);$p('spVoices').addEventListener('click',dealVoices);$p('spSave').addEventListener('click',saveDoors);
+SP.renderSeconds=Number($p('spLength').value)||0;
+$p('spLength').addEventListener('change',function(){SP.renderSeconds=Number(this.value)||0;});
 $p('spEvolve').addEventListener('click',function(){SP.evolve=!SP.evolve;this.classList.toggle('on',SP.evolve);this.textContent='Voice motion '+(SP.evolve?'on':'off');this.setAttribute('aria-pressed',String(SP.evolve));SP.pendingBase=true;setStatus(SP.evolve?'section voices will evolve':'scene pinned',SP.on?'live':null);});
 document.querySelectorAll('.sp-nav').forEach(function(b){b.addEventListener('click',function(){cycleRole(b.dataset.role,Number(b.dataset.dir));});});
 document.querySelectorAll('.sp-colour').forEach(function(b){b.addEventListener('click',function(){setColour(b.dataset.colour);});});
