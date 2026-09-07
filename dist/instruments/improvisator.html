@@ -3817,6 +3817,20 @@ const PROG_BANK=[
  {name:"harmonic pull",scale:"minor",prog:[0,3,thX(7,"d7","V7"),0]},
  {name:"dorian vamp",scale:"minor",prog:[thX(0,"m7","i7"),thX(5,"d7","IV7"),thX(0,"m7","i7"),thX(5,"d7","IV7")]}
 ];
+/* Which of the twelve sit under a TWELVE-PULSE bell. The 6/8 repertoire these figures come from
+   turns on a short modal vamp; a 12-bar blues or a Pachelbel canon over an agbadza bell is two
+   traditions talking past each other, and that mismatch is what the wish is about. Named, not
+   indexed, so reordering PROG_BANK above cannot silently repoint this. A figure on a sixteen-
+   pulse grid still reaches every row — this only ever narrows the twelve-pulse case. */
+const PROG_TWELVE=new Set(["doo-wop","axis","andalusian","aeolian vamp","epic minor","dorian vamp"]);
+function figGrid(card){ const f=card&&card.fig&&LDR_FIG[card.fig]; return f? f.grid : null; }
+function progPool(scale,grid){
+  const all=PROG_BANK.filter(b=>b.scale===scale);
+  if(grid!==12) return all;
+  const fit=all.filter(b=>PROG_TWELVE.has(b.name));
+  /* never hand back an empty pool — a scale with no twelve-pulse row must still deal a card */
+  return fit.length? fit : all;
+}
 function chordSpecFor(scale,ch,root){
   if(typeof ch==="number")
     return {tones:chordTones(scale,ch,root),roman:romanFor(ch,scale)};
@@ -3846,7 +3860,7 @@ function dreamPickSurprise(rng){
   const cat=c=>PROGRAMS.map((p,i)=>({p,i})).filter(x=>c.includes(x.p.cat)).map(x=>x.i);
   const pick=a=>a[Math.floor(rng()*a.length)];
   const scale=rng()<.5?"minor":"major";
-  const bp=pick(PROG_BANK.filter(b=>b.scale===scale));
+  const bp=pick(progPool(scale,f.grid));
   const kick16=f.grid===16&&rng()<.3;
   return {name:"Surprise",fig,comps,kit:pick(LDR_KITS),
     bass:pick(cat(["BASS"])),chord:pick(cat(["PAD","VOX","ORGAN","KEYBOARD"])),lead:pick(cat(["LEAD","BELL","PLUCK"])),
@@ -6535,11 +6549,11 @@ function candBass(rng){
   }
   return c;
 }
-function candChords(rng,bassC){
+function candChords(rng,bassC,drumC){
   /* THE COUNTER (round 5): a producer leaves the middle open for a vocalist —
      the changes are carried by a sparse counter-LINE, chords only as stabs */
   const scale=bassC?bassC.scale:"minor";
-  const pool=PROG_BANK.filter(b=>b.scale===scale);
+  const pool=progPool(scale,figGrid(drumC));
   const bp=pool[Math.floor(rng()*pool.length)];
   const cat=c=>PROGRAMS.map((p,i)=>({p,i})).filter(x=>c.includes(x.p.cat)).map(x=>x.i);
   const chs=cat(["PAD","VOX","ORGAN","KEYBOARD"]);
@@ -6581,7 +6595,7 @@ const FORMATS=[
 function candFor(stage,rng,kept){
   if(stage===0) return candDrums(rng);
   if(stage===1) return candBass(rng);
-  if(stage===2) return candChords(rng,kept&&kept[1]);
+  if(stage===2) return candChords(rng,kept&&kept[1],kept&&kept[0]); /* kept[0] is the drums card — the only one that knows the pulse */
   if(stage===3) return candLead(rng);
   return null; /* shape hands are FORMATS verbatim */
 }

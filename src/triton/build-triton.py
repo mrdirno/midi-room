@@ -628,6 +628,43 @@ function grooveHits(bar,beats){
 replace('''    return {beat:clamp(o.step/4+jitter,0,beats-0.001),note:KIT[o.voice],vel:clamp(o.vel*(0.86+0.14*(settings.motion||0.6)),0.05,0.98)};''',
 '''    return {beat:clamp(o.step/div+jitter,0,beats-0.001),note:KIT[o.voice],vel:clamp(o.vel*(0.86+0.14*(settings.motion||0.6)),0.05,0.98)};''')
 # ---- end drummer feel ----------------------------------------------------------
+
+# ---- wish e4c6e175: "the chord progression mapping and drum time signatures need to map" ----
+# Measured: picking bemba7 instead of gogoConga changed 7 of 20 things and all seven were drums
+# or timing — the chord in each bar, the bass notes, the chord notes and the lead notes came out
+# identical, note for note. Run the other way, changing only the progression, four things moved
+# and every drum onset stayed put. Two dials, neither aware of the other.
+# The join was missing twice over: candChords is handed the BASS card and never the drums card,
+# which is the only thing that knows which figure was picked; and PROG_BANK rows carry only
+# {name, scale, prog} — no column a pulse could match on. Both halves are added here.
+replace(''' {name:"dorian vamp",scale:"minor",prog:[thX(0,"m7","i7"),thX(5,"d7","IV7"),thX(0,"m7","i7"),thX(5,"d7","IV7")]}
+];''',
+''' {name:"dorian vamp",scale:"minor",prog:[thX(0,"m7","i7"),thX(5,"d7","IV7"),thX(0,"m7","i7"),thX(5,"d7","IV7")]}
+];
+/* Which of the twelve sit under a TWELVE-PULSE bell. The 6/8 repertoire these figures come from
+   turns on a short modal vamp; a 12-bar blues or a Pachelbel canon over an agbadza bell is two
+   traditions talking past each other, and that mismatch is what the wish is about. Named, not
+   indexed, so reordering PROG_BANK above cannot silently repoint this. A figure on a sixteen-
+   pulse grid still reaches every row — this only ever narrows the twelve-pulse case. */
+const PROG_TWELVE=new Set(["doo-wop","axis","andalusian","aeolian vamp","epic minor","dorian vamp"]);
+function figGrid(card){ const f=card&&card.fig&&LDR_FIG[card.fig]; return f? f.grid : null; }
+function progPool(scale,grid){
+  const all=PROG_BANK.filter(b=>b.scale===scale);
+  if(grid!==12) return all;
+  const fit=all.filter(b=>PROG_TWELVE.has(b.name));
+  /* never hand back an empty pool — a scale with no twelve-pulse row must still deal a card */
+  return fit.length? fit : all;
+}''')
+replace('''function candChords(rng,bassC){''','''function candChords(rng,bassC,drumC){''')
+replace('''  const pool=PROG_BANK.filter(b=>b.scale===scale);
+  const bp=pool[Math.floor(rng()*pool.length)];''',
+'''  const pool=progPool(scale,figGrid(drumC));
+  const bp=pool[Math.floor(rng()*pool.length)];''')
+replace('''  if(stage===2) return candChords(rng,kept&&kept[1]);''',
+'''  if(stage===2) return candChords(rng,kept&&kept[1],kept&&kept[0]); /* kept[0] is the drums card — the only one that knows the pulse */''')
+replace('''  const bp=pick(PROG_BANK.filter(b=>b.scale===scale));''',
+'''  const bp=pick(progPool(scale,f.grid));''')
+# ---- end wish e4c6e175 --------------------------------------------------------
 html=html.replace('</head>','<style>'+(root/'views.css').read_text()+'</style></head>')
 html=re.sub(r'<title>.*?</title>', '<title>TRITON Rack · MIDI Room</title>', html,count=1)
 replace('<head>', '<head>\n<link rel="canonical" href="https://persona500.com/midi-room/instruments/triton-rack.html">')
