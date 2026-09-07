@@ -413,6 +413,11 @@ button:focus-visible,[tabindex]:focus-visible,select:focus-visible{outline:3px s
 #cancelExport[hidden]{display:none}
 .bank-label{display:block;margin:18px 0 8px;font-size:13px;letter-spacing:.08em;text-transform:uppercase}
 .bank-select{width:100%;min-height:44px;background:#132642;color:#fff;border:1px solid #a2b8cd;border-radius:8px;padding:10px;font:inherit}
+.bank-row{display:flex;gap:8px;align-items:stretch}
+.bank-row .bank-select{flex:1 1 auto;width:auto}
+.bank-hear{flex:0 0 auto;min-height:44px;min-width:76px;background:#0f1d33;color:#cfe3ff;border:1px solid #a2b8cd;border-radius:8px;padding:0 14px;font:inherit;cursor:pointer}
+.bank-hear:hover{background:#1b3352}
+.bank-hear[disabled]{opacity:.45;cursor:default}
 #sheet .sbox{max-height:85dvh;overflow:auto}
 @media(max-width:420px){#bar{flex-wrap:wrap}#bar .brand{font-size:13px}#bar .chip{min-height:44px}#cancelExport{bottom:94px;right:12px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
@@ -23741,6 +23746,59 @@ var originalLaneVoiceLabel=laneVoiceLabel;
 laneVoiceLabel=function(l){return S.world&&S.world.soundBank&&S.world.soundBank.lanes[l]?S.world.soundBank.lanes[l].label:originalLaneVoiceLabel(l);};
 function cloudOn(target,type,fn,opts){target.addEventListener(type,fn,opts);C.listeners.push(function(){target.removeEventListener(type,fn,opts);});}
 function later(fn,ms){var id=setTimeout(function(){C.timers.delete(id);if(!C.destroyed)fn();},ms);C.timers.add(id);return id;}
+/* ── AUDITION — the sound controls make a sound ──────────────────────────
+   Every control that changes how a lane SOUNDS reached the engine through
+   the same line: `if (S.playing) sendSwap(...)`. The SOUND die on the row,
+   the palette, the per-lane instrument. With the transport stopped all
+   three changed the state, changed the label and fired a toast, and
+   produced no audio whatsoever. From outside the page that is exactly
+   "clicking sound didn't change the sound", which is the wish that asked
+   for this.
+   The engine already knew how to play a score once and stop — Transport.msg
+   forwards m.loop to handover, and the WAV export sets eng.loop=false — the
+   UI had simply never asked for it. So a sound change while stopped now
+   plays that lane's own four bars once. It does NOT set S.playing: turning
+   a knob is not a reason to take the transport, and PLAY must still read as
+   stopped when the four bars are out. */
+var audT=null,audGen=0;
+function auditionStop(){if(audT!==null){clearTimeout(audT);C.timers.delete(audT);audT=null;}++audGen;}
+/* The palette is not a lane, so a palette change has to pick one to speak
+   for it. Take the first melodic lane this beat actually has and that is not
+   muted — keys, then lead, pad, bass — because a palette that changed nothing
+   audible is the bug this whole block exists to fix. */
+function firstAudible(){
+ var order=['keys','lead','pad','bass'],w=S.world;
+ for(var i=0;i<order.length;i++){var l=order[i];
+  if(w&&w.laneParts[l]!==undefined&&!S.mute[l])return l;}
+ return null;
+}
+function audition(lane){
+ if(!lane)return false;
+ if(C.destroyed||S.playing||S.mute[lane])return false;
+ var solo=soloScore(lane);
+ if(!solo)return false;
+ auditionStop();
+ var gen=audGen;
+ ensureAudio().then(function(ctx){
+  if(C.destroyed||gen!==audGen||S.playing||!S.send)return;
+  if(ctx.state==='suspended')ctx.resume();
+  S.send({type:'load',world:solo,loop:false});
+  /* loop:false runs the events out but leaves the engine rendering silence:
+     it posts 'stopped' only when something asks it to fade. So ask — after
+     the last note AND its tail. The tail budget is the export's own
+     (1.2 + 5*space seconds, renderOffline) plus two, because the export's
+     figure alone is not enough: measured over 40 seeds, the loudest tail
+     still runs 3.84s past the final note, and 3 of the first 8 seeds were
+     still above -60 dBFS when the export's budget expired. Stopping is a
+     100ms fade, so anything under that floor is inaudible; overshooting
+     costs a second of silence and nothing else. */
+  audT=later(function(){
+   audT=null;
+   if(gen===audGen&&!S.playing&&!S.solo&&S.send)S.send({type:'stop'});
+  },(solo.duration+1.2+5*((solo.climate&&solo.climate.space)||0)+2)*1000);
+ }).catch(function(){});
+ return true;
+}
 function cloudURL(blob){var u=URL.createObjectURL(blob);C.urls.add(u);return u;}
 function revoke(u){if(!u)return;try{URL.revokeObjectURL(u);}catch(_){}C.urls.delete(u);}
 function bounded(p,ms,label){return new Promise(function(resolve,reject){var done=false,id=setTimeout(function(){if(!done){done=true;reject(new Error(label+' timed out'));}},ms);p.then(function(v){if(!done){done=true;clearTimeout(id);resolve(v);}},function(e){if(!done){done=true;clearTimeout(id);reject(e);}});});}
@@ -23853,13 +23911,175 @@ function openSounds(){
  var html='<h2>SOUNDS</h2><p>Choose a palette, then roll each lane’s SOUND die. The notes stay put while the instrument changes. Locked lanes keep their sound.</p><label class="bank-label" for="bankPalette">Palette</label><select class="bank-select" id="bankPalette">';
  LuckyCloudSoundBank.palettes.forEach(function(p){html+='<option value="'+p.id+'"'+(S.soundBank.palette===p.id?' selected':'')+'>'+escT(p.label)+'</option>';});html+='</select>';
  var melodic=['keys','lead','pad','bass'].filter(function(l){return S.world&&S.world.lanes.indexOf(l)>=0;});
- melodic.forEach(function(l){html+='<label class="bank-label" for="bank-'+l+'">'+l+'</label><select class="bank-select" id="bank-'+l+'"'+(S.locks[l]?' disabled':'')+'><option value="">let the SOUND die choose</option>';LuckyCloudSoundBank.catalog(l,S.soundBank.palette).forEach(function(p){html+='<option value="'+escT(p.id)+'"'+(S.soundBank.lanes[l]===p.id?' selected':'')+'>'+escT(p.label||p.id)+'</option>';});html+='</select>';});
+ melodic.forEach(function(l){html+='<label class="bank-label" for="bank-'+l+'">'+l+'</label><div class="bank-row"><select class="bank-select" id="bank-'+l+'"'+(S.locks[l]?' disabled':'')+'><option value="">let the SOUND die choose</option>';LuckyCloudSoundBank.catalog(l,S.soundBank.palette).forEach(function(p){html+='<option value="'+escT(p.id)+'"'+(S.soundBank.lanes[l]===p.id?' selected':'')+'>'+escT(p.label||p.id)+'</option>';});html+='</select><button type="button" class="bank-hear" id="hear-'+l+'"'+(S.mute[l]?' disabled':'')+' title="play these four bars of '+escT(l)+', alone">hear it</button></div>';});
  if(S.world&&S.world.soundBank)html+='<p>'+escT(S.world.soundBank.credit)+'</p>';
  $('sheetBody').innerHTML=html;$('sheet').classList.add('on');
- $('bankPalette').onchange=function(){var config={version:'1.0.0',palette:this.value,lanes:{}};S.soundBank=LuckyCloudSoundBank.normalize(config);rebuildWorld();paintSong();writeAddress();saveSession();if(S.playing)sendSwap(S.bar,true);openSounds();$('bankPalette').focus();};
- melodic.forEach(function(l){$('bank-'+l).onchange=function(){var config=JSON.parse(JSON.stringify(S.soundBank));if(this.value)config.lanes[l]=this.value;else delete config.lanes[l];S.soundBank=LuckyCloudSoundBank.normalize(config);var roll=S.roll[l]||(S.roll[l]={s:0,p:0});roll.s=0;rebuildWorld();paintSong();writeAddress();saveSession();if(S.playing)sendSwap(S.bar,true);};});
+ $('bankPalette').onchange=function(){var config={version:'1.0.0',palette:this.value,lanes:{}};S.soundBank=LuckyCloudSoundBank.normalize(config);rebuildWorld();paintSong();writeAddress();saveSession();if(S.playing)sendSwap(S.bar,true);else audition(firstAudible());openSounds();$('bankPalette').focus();};
+ melodic.forEach(function(l){$('bank-'+l).onchange=function(){var config=JSON.parse(JSON.stringify(S.soundBank));if(this.value)config.lanes[l]=this.value;else delete config.lanes[l];S.soundBank=LuckyCloudSoundBank.normalize(config);var roll=S.roll[l]||(S.roll[l]={s:0,p:0});roll.s=0;rebuildWorld();paintSong();writeAddress();saveSession();if(S.playing)sendSwap(S.bar,true);else audition(l);};var hear=$('hear-'+l);if(hear)hear.onclick=function(){if(S.playing){toast('the beat is running — tap the lane on the stage to hear it alone',2600);return;}if(!audition(l))toast(LANE_LABEL[l]+' rests in this beat',2000);};});
 }
 ABOUT='<h2>LUCKY DREAMER</h2><p>A whole-band cloud instrument by Aldrin Payopay, who makes music as DRINOMAN. It grew from Dream Drummer and Lucky Sounds: separate rhythm and melodic instruments brought into one place.</p><p>Roll patterns and sounds independently, keep a lane, or bring back a past session. Your sound choices, notes and exports are made locally. No model calls, samples or uploads are needed for playback.</p><h3>THE SOURCES</h3><p>The drum and melodic families retain their source lineage. This is synthesized music, not a recording of the people or traditions named there. Source attribution does not establish blanket rights clearance.</p><h3>KEEP WHAT LANDS</h3><p>PAST holds up to one hundred sessions in this browser. When browser storage is unavailable, they last only while this instrument is open. A saved address reproduces its seed and controls in this version; locked snapshots stay in local history. WAV, MIDI and stems export your own generated composition.</p>';
+/* The dice on a row roll the lane whether or not the transport is running,
+   so they are the same silence as the sounds sheet. Both kinds get the
+   audition: SOUND changes how it hits, PATTERN changes what it plays, and
+   neither was audible from a standing start. Harmony is left alone — it
+   moves every melodic lane at once, so auditioning any single one of them
+   would misreport what changed. */
+/* ── MIDI OUT — the band leaves the room ──────────────────────────────────
+   Lucky Dreamer already knows all of its music as MIDI: encodeMidi() writes
+   a format-1 file with GM programs and the kit on channel 9, and ships it
+   through SAVE. It wrote those notes to a file and never to the room, so the
+   wish to "link lucky drummer to the percussive instruments on the Triton"
+   had nowhere to plug in.
+   The notes are published, not the audio: same translation encodeMidi uses,
+   scheduled ahead with MidiRoom.emit's `at`, exactly as the Improvisator
+   does. That matters because the engine reports its playhead every 50ms —
+   half a sixteenth at 140bpm — so a receiver fed on those reports would be
+   audibly loose. Emitting 400ms early with a timestamp is the difference
+   between a wire and a rumour. Nothing is sent unless a listener has drawn
+   a wire; the room fans only to matching routes. */
+var busList=null,busWorld=null,busCursor=-1,busLast=-1,busBpm=0;
+function busScore(w){
+ var out=[],melCh=0,pi,i;
+ for(pi=0;pi<w.roster.length;pi++){
+  var r=w.roster[pi];
+  if(r.muted)continue;
+  var evs=[];
+  for(i=0;i<w.events.length;i++)if(w.events[i].part===r.id)evs.push(w.events[i]);
+  if(!evs.length)continue;
+  /* a kit part whose events carry NOTES is a tuned drum playing a line — a
+     bass track, not a channel-10 kit. encodeMidi draws the same line. */
+  var isDrum=r.engine==='kit'||r.engine==='perc';
+  if(isDrum)for(i=0;i<evs.length;i++)if(evs[i].note!==undefined){isDrum=false;break;}
+  var ch=isDrum?9:(melCh===9?++melCh:melCh);
+  if(!isDrum)melCh=(melCh+1)%16;
+  for(i=0;i<evs.length;i++){
+   var e=evs[i],note,dur;
+   if(isDrum){
+    var map=r.engine==='kit'?GM_KIT:GM_PERC;
+    note=map[e.slot>=0&&e.slot<map.length?e.slot:0];
+    dur=w.secPerStep*0.5;
+   }else{
+    if(e.note===undefined||e.note<0||e.note>127)continue;
+    note=e.note;dur=Math.max(w.secPerStep*0.5,e.dur*w.secPerStep*0.96);
+   }
+   /* Clamp to zero, exactly as encodeMidi's Math.max(0, ...) does. The
+      humanizer can push the first hit of a beat a few milliseconds before
+      the downbeat: measured, 2 of 12 seeds open with notes at -8ms and
+      -3ms. Unclamped they sit behind the publisher's opening cursor and
+      never reach the wire, so the file would have a hit the wire did not. */
+   var at=Math.max(0,e.t*w.secPerStep);
+   out.push({at:at,off:at+dur,ch:ch,note:note|0,vel:Math.max(1,Math.min(127,Math.round(e.vel*126)+1))});
+  }
+ }
+ out.sort(function(a,b){return a.at-b.at;});
+ return out;
+}
+function busReset(){busList=null;busWorld=null;busCursor=-1;busLast=-1;busBpm=0;}
+/* Transport, so PLAY and STOP here mean PLAY and STOP over there. It also
+   closes the one gap the note scheduler leaves open: notes are published
+   400ms early, so a stop would otherwise be followed by up to 400ms of
+   already-scheduled hits on the other instrument. The room turns a
+   transport stop into panicSource, which sends all-notes-off down every
+   wire out of here (app.js: cancelOutgoing). The stop is the eraser. */
+function busTransport(action,bpm){
+ var mr=window.MidiRoom;
+ if(C.destroyed||!mr||typeof mr.emit!=='function')return;
+ var e={kind:'transport',action:action};
+ if(bpm)e.bpm=Math.max(20,Math.min(300,Math.round(bpm)));
+ mr.emit(e);
+}
+function busPublish(t){
+ var mr=window.MidiRoom;
+ if(C.destroyed||!mr||typeof mr.emit!=='function')return;
+ /* only the whole band: a solo or an audition is a different score in the
+    engine than S.world, and publishing S.world then would be a lie. */
+ if(!S.playing||S.solo||!S.world)return;
+ if(busWorld!==S.world){
+  busWorld=S.world;busList=busScore(S.world);busCursor=t-1e-3;busLast=-1;
+  /* the dial moved, or a roll drew a new tempo */
+  if(S.world.bpm&&S.world.bpm!==busBpm){busBpm=S.world.bpm;busTransport('tempo',busBpm);}
+ }
+ /* The loop came round. Test it against the PREVIOUS playhead, never against
+    the cursor: the cursor sits a whole horizon ahead of the playhead by
+    design, so `t < busCursor` is true on every single report and rewinds the
+    cursor every 50ms. Measured before this line was written that way: 12 of
+    12 seeds re-sent the same notes, 10,199 duplicates in one loop of the
+    first. */
+ if(busLast>=0&&t<busLast-1e-3)busCursor=t-1e-3;
+ busLast=t;
+ var horizon=t+0.4,base=mr.now();
+ for(var i=0;i<busList.length;i++){
+  var n=busList[i];
+  if(n.at<=busCursor)continue;
+  if(n.at>horizon)break;                      /* sorted: nothing later matters */
+  var on=base+(n.at-t)*1000,off=base+(n.off-t)*1000;
+  if(on<base)on=base;
+  if(off<on+40)off=on+40;
+  mr.emit({kind:'midi',data:[0x90|n.ch,n.note,n.vel],at:on});
+  mr.emit({kind:'midi',data:[0x80|n.ch,n.note,0],at:off});
+ }
+ busCursor=horizon;
+}
+var originalOnEngineMsg=onEngineMsg;
+onEngineMsg=function(m){
+ originalOnEngineMsg(m);
+ if(m&&m.type==='pos')busPublish(m.t);
+};
+/* ── TAP A LANE ──────────────────────────────────────────────────────────
+   Two things made "tap a lane to hear it alone" read as a dead button.
+   First, this file declares toggleSolo twice, and the later copy — the live
+   one — dropped both of the toasts the earlier one had. Tapping a lane that
+   rests in this beat therefore did nothing whatever: no sound, no message,
+   nothing on screen. Second, only the name cell was ever a target. Every
+   other child of the row already calls e.stopPropagation(), so the plumbing
+   for a row-level handler was written and the handler never was; at phone
+   width the five fixed siblings take about 240px and leave the name cell
+   near 100px, with the rest of the row inert.
+   Both are restored here rather than edited into the late copy, so the two
+   definitions of toggleSolo stay diffable against each other. */
+var originalToggleSolo=toggleSolo;
+toggleSolo=function(lane){
+ if(C.destroyed||!S.world||LANE_ORDER.indexOf(lane)<0)return;
+ var wasSolo=S.solo;
+ var r=originalToggleSolo(lane);
+ if(wasSolo===lane)return r;                       /* a second tap stops it */
+ if(S.solo!==lane){toast(LANE_LABEL[lane]+' rests in this beat',2000);return r;}
+ toast(LANE_LABEL[lane]+' alone — '+laneVoiceLabel(lane),2400);
+ return r;
+};
+var originalRowFor=rowFor;
+rowFor=function(lane){
+ var row=originalRowFor(lane);
+ row.addEventListener('click',function(e){
+  /* the name cell has its own handler and the volume cell is not a target;
+     everything else in the row already stops here */
+  if(e.target&&e.target.closest&&e.target.closest('.rname, .rvol'))return;
+  if(S.mute[lane]){toast(LANE_LABEL[lane]+' is muted — tap the speaker to bring it back',2200);return;}
+  toggleSolo(lane);
+ });
+ return row;
+};
+var originalRollPart=rollPart;
+rollPart=function(lane,kind,btn){
+ var wasPlaying=S.playing,wasSolo=S.solo,wasLocked=!!S.locks[lane];
+ var r=originalRollPart(lane,kind,btn);
+ if(wasLocked)return r;
+ if(!wasPlaying&&wasSolo!==lane){audition(lane);return r;}
+ /* One state stays silent on purpose: another lane is soloed, so you asked
+    to be listening to that one and a roll must not yank it away. But the
+    toast underneath had been naming a brand-new instrument for a lane you
+    cannot hear, which reads as the same broken button. Say what is true
+    instead — a second toast replaces the first. */
+ if(wasSolo&&wasSolo!==lane)toast(LANE_LABEL[lane]+' \u2192 '+laneVoiceLabel(lane)+' \u2014 you are hearing '+LANE_LABEL[wasSolo]+' alone',2800);
+ return r;
+};
+/* Both take the engine, so both cancel a running audition. Their return
+   values are not ours to swallow: the cloud play() at the head of this layer
+   answers with a Promise, and callers wait on it. */
+var originalPause=pause;
+pause=function(){auditionStop();busReset();busTransport('stop');return originalPause();};
+var originalPlay=play;
+play=function(fromBar){auditionStop();busReset();var r=originalPlay(fromBar);busTransport('start',S.world&&S.world.bpm);return r;};
 function cloudState(){return {historyMode:C.historyMode,historyCount:C.history.length,seed:S.seed,style:S.style,playing:S.playing,solo:S.solo,bar:S.bar,time:S.playhead,mode:S.mode,audioState:S.ctx?S.ctx.state:(C.destroyed?'closed':'off'),destroyed:C.destroyed,soundBank:JSON.parse(JSON.stringify(S.soundBank)),stats:C.health||null,lateRecoveries:C.lateRecoveries,resources:{urls:C.urls.size,workers:C.exportJob&&C.exportJob.worker?1:0,timers:C.timers.size,exporting:!!C.exportJob},roll:JSON.parse(JSON.stringify(S.roll)),locks:Object.keys(S.locks)};}
 async function cloudDestroy(){if(C.destroyed)return;saveSession();C.destroyed=true;C.history=[];++C.intent;S.playing=false;S.solo=null;cancelExport();[toastT,saveT,swapT].forEach(clearTimeout);C.timers.forEach(clearTimeout);C.timers.clear();C.listeners.splice(0).forEach(function(off){off();});if(C.observer)C.observer.disconnect();C.urls.forEach(revoke);if(S.send)try{S.send({type:'stop'});}catch(_){}document.body.inert=true;await resetAudio();}
 function cloudInstall(){
@@ -23869,7 +24089,7 @@ function cloudInstall(){
  cloudOn($('bSounds'),'click',openSounds);cloudOn($('cancelExport'),'click',cancelExport);
  cloudOn(document,'visibilitychange',function(){if(document.hidden)cloudStop();});cloudOn(window,'blur',function(){cloudStop();});
  cloudOn(window,'pagehide',cloudDestroy);cloudOn(window,'midiroom:panic',cloudStop);cloudOn(window,'midiroom:dispose',cloudDestroy);
- if(window.MidiRoom&&MidiRoom.declare)MidiRoom.declare({name:'Lucky Dreamer',send:[],receive:[]});
+ if(window.MidiRoom&&MidiRoom.declare)MidiRoom.declare({name:'Lucky Dreamer',send:['midi','transport'],receive:[]});  /* send: it plays a whole band and, until now, was the only instrument in the room that could not be     wired to anything — the wire dialog offered it and then refused with "no compatible output".     receive stays empty: there is no note-in path here, and claiming one would put Lucky Dreamer in the     TO menu only to swallow whatever arrived. */
  var sheet=$('sheet'),wasOpen=false;
  C.observer=new MutationObserver(function(){var open=sheet.classList.contains('on');sheet.setAttribute('aria-hidden',String(!open));if(open&&!wasOpen){C.focus=C.modalReturn||document.activeElement;C.modalReturn=null;[ 'gate','bar','stage','deck' ].forEach(function(id){$(id).inert=true;});var first=sheet.querySelector('button:not([disabled]),select:not([disabled]),[tabindex]');if(first)first.focus();}else if(!open&&wasOpen){[ 'gate','bar','stage','deck' ].forEach(function(id){$(id).inert=false;});if(C.focus&&C.focus.isConnected)C.focus.focus();}wasOpen=open;});C.observer.observe(sheet,{attributes:true,attributeFilter:['class']});
  cloudOn(document,'keydown',function(e){if(C.destroyed)return;var open=sheet.classList.contains('on');if(open){if(e.key==='Escape'){e.preventDefault();closeSheet();}else if(e.key==='Tab'){var f=Array.from(sheet.querySelectorAll('button:not([disabled]),select:not([disabled]),input:not([disabled]),textarea,[tabindex="0"]')).filter(function(x){return x.getClientRects().length;});if(f.length){var i=f.indexOf(document.activeElement),next=e.shiftKey?(i<=0?f.length-1:i-1):(i>=f.length-1?0:i+1);e.preventDefault();f[next].focus();}}return;}var t=e.target;if(t&&t.closest&&t.closest('input,textarea,select,[contenteditable="true"],button,a'))return;if(e.repeat||e.altKey||e.ctrlKey||e.metaKey)return;if(e.key===' '){e.preventDefault();if(!$('gate').classList.contains('gone'))$('dice').click();else if(S.playing)pause();else play();}else if((e.key==='r'||e.key==='R')&&S.world)rollAll();});

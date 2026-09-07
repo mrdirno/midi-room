@@ -3,8 +3,8 @@
   "source": "inherited-runtime.html",
   "sourceSha256": "4eced0d8da0d9623c11014a29ba57ecb9751ff735ea1c5bd647478177a219404",
   "artifact": "dist/instruments/triton-rack.html",
-  "artifactSha256": "c68e0dc55cf64bbd33420cadb0e099b44ed93d175a4b5c0af11ddd01b544eee0",
-  "bytes": 776240,
+  "artifactSha256": "698362eca92b68165efcf705ae210e93517e8747a2bad3b9adba5e401204e72b",
+  "bytes": 786664,
   "countedPatches": [
     {
       "anchor": "<h1>KORG TRITON-Rack</h1>",
@@ -172,6 +172,78 @@
     },
     {
       "anchor": "if(e.repeat||e.metaKey||e.ctrlKey||e.altKey) return;",
+      "count": 1
+    },
+    {
+      "anchor": ".sp-character.on{color:#aef0ff;border-color:#3d839d;background:#0d1a21;}\n.sp-label{margin:15px 2px 7px;color:#",
+      "count": 1
+    },
+    {
+      "anchor": "    <div class=\"sp-characters\" id=\"spCharacters\"></div>\n",
+      "count": 1
+    },
+    {
+      "anchor": "      </div>\n    </div>\n\n    <div class=\"sp-actions\">\n      <button class=\"sp-small\" id=\"spEvolve\" type=\"butto",
+      "count": 1
+    },
+    {
+      "anchor": "  if (f.b > journey * 0.85 + 0.05) return;",
+      "count": 1
+    },
+    {
+      "anchor": "    var fam = MODE_DEFS[this.mode].family;\n    var pool = MODE_KEYS.filter(function (k) { return MODE_DEFS[k].",
+      "count": 1
+    },
+    {
+      "anchor": "\nvar SCENES={\n  grand:{label:'Grand',bass:'A016',chord:'A016',lead:'A016'},\n  tines:{label:'Tines',bass:'A008'",
+      "count": 1
+    },
+    {
+      "anchor": "var ROLE_CATS={bass:['BASS'],chord:['KEYBOARD','PAD','VOX','ORGAN','STRINGS'],lead:['KEYBOARD','BELL','PLUCK',",
+      "count": 1
+    },
+    {
+      "anchor": "function renderPrograms(){programLabel('bass');programLabel('chord');programLabel('lead');}",
+      "count": 1
+    },
+    {
+      "anchor": "  return Object.assign({},SP.active);\n}",
+      "count": 1
+    },
+    {
+      "anchor": "    var voice=spawnVoice(p,e.pitch,vel,when,dur,SP.pans[role]);if(voice){voice._conductor='soul';}SP.diagnosti",
+      "count": 1
+    },
+    {
+      "anchor": "function selectScene(name){var s=SCENES[name];if(!s)return;SP.scene=name;SP.base={bass:idx(s.bass),chord:idx(s",
+      "count": 1
+    },
+    {
+      "anchor": "function dealVoices(){var roles=['bass','chord','lead'];roles.forEach(function(role){var list=roleList(role),h",
+      "count": 1
+    },
+    {
+      "anchor": "  syncControls();renderCharacter(name);setStatus(name+' \u00b7 performance locked',SP.on?'live':null);}",
+      "count": 1
+    },
+    {
+      "anchor": "document.querySelectorAll('.sp-nav').forEach(function(b){b.addEventListener('click',function(){cycleRole(b.dat",
+      "count": 1
+    },
+    {
+      "anchor": "$p('spMode').addEventListener('change',function(){settings.mode=this.value;if(SP.composer){SP.composer.mode=se",
+      "count": 1
+    },
+    {
+      "anchor": "  ['bass','chord','lead'].forEach(function(r){if(!roleList(r).length)issues.push('empty '+r+' drawer');});",
+      "count": 1
+    },
+    {
+      "anchor": "populate();selectScene('grand');renderCharacter('reference');syncControls();renderPrograms();SP.composer=new K",
+      "count": 1
+    },
+    {
+      "anchor": "  sdk.declare({name:document.body.dataset.instrument==='improvisator'?'Improvisator':'TRITON Rack',send:[],rec",
       "count": 1
     },
     {

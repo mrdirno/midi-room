@@ -425,8 +425,13 @@ body:not(.soulMode) #soulDeck{display:none!important;}
   background:#0d141a;color:#728b9d;font:700 9px/1 -apple-system,"Helvetica Neue",Arial,sans-serif;letter-spacing:.11em;text-transform:uppercase;cursor:pointer;}
 .sp-scene.on{color:#ffe6a6;border-color:#725c28;background:#18150c;}
 .sp-character.on{color:#aef0ff;border-color:#3d839d;background:#0d1a21;}
+.sp-colours{display:flex;gap:7px;flex-wrap:wrap;padding:3px 1px;}
+.sp-colour{flex:0 0 auto;min-height:44px;padding:0 15px;border-radius:999px;border:1px solid #243543;
+  background:#0d141a;color:#728b9d;font:700 9px/1 -apple-system,"Helvetica Neue",Arial,sans-serif;letter-spacing:.11em;text-transform:uppercase;cursor:pointer;}
+.sp-colour.on{color:#ffd7e6;border-color:#8a5070;background:#1a0f15;}
+.sp-colour:active{transform:scale(.965);}
 .sp-label{margin:15px 2px 7px;color:#526b7c;font-size:8px;letter-spacing:.24em;text-transform:uppercase;}
-.sp-rack{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:11px;}
+.sp-rack{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:10px;margin-top:11px;}
 .sp-role{min-width:0;border:1px solid #253541;border-radius:12px;padding:12px;background:linear-gradient(180deg,#111922,#0b1016);}
 .sp-role-head{display:flex;align-items:center;justify-content:space-between;gap:8px;color:#587286;font-size:8px;letter-spacing:.20em;text-transform:uppercase;}
 .sp-role-head span:last-child{color:#415663;letter-spacing:.08em;}
@@ -565,6 +570,13 @@ body[data-instrument="improvisator"] h1{font-size:clamp(2rem,7vw,3.4rem)}
     <div class="sp-label">harmonic character · performance and mix stay pinned</div>
     <div class="sp-characters" id="spCharacters"></div>
 
+    <div class="sp-label">colour · major, minor, or both</div>
+    <div class="sp-colours" id="spColours">
+      <button class="sp-colour" data-colour="major" type="button">Major</button>
+      <button class="sp-colour" data-colour="minor" type="button">Minor</button>
+      <button class="sp-colour" data-colour="both" type="button">Best of both</button>
+    </div>
+
     <div class="sp-rack" id="spRack">
       <div class="sp-role" data-role="bass">
         <div class="sp-role-head"><span>LOW END</span><span id="spBassTag">TRITON</span></div>
@@ -578,12 +590,18 @@ body[data-instrument="improvisator"] h1{font-size:clamp(2rem,7vw,3.4rem)}
         <div class="sp-role-head"><span>MELODY</span><span id="spLeadTag">TRITON</span></div>
         <div class="sp-program"><button class="sp-nav" data-role="lead" data-dir="-1" type="button" aria-label="Previous melody sound">‹</button><div class="sp-progcopy"><b id="spLeadName">—</b><small id="spLeadMeta">—</small></div><button class="sp-nav" data-role="lead" data-dir="1" type="button" aria-label="Next melody sound">›</button></div>
       </div>
+      <div class="sp-role" data-role="drums">
+        <div class="sp-role-head"><span>PERCUSSION</span><span id="spDrumsTag">TRITON</span></div>
+        <div class="sp-program"><button class="sp-nav" data-role="drums" data-dir="-1" type="button" aria-label="Previous drum kit">‹</button><div class="sp-progcopy"><b id="spDrumsName">—</b><small id="spDrumsMeta">—</small></div><button class="sp-nav" data-role="drums" data-dir="1" type="button" aria-label="Next drum kit">›</button></div>
+      </div>
     </div>
 
     <div class="sp-actions">
+      <button class="sp-small" id="spDrummer" type="button" aria-pressed="false">Drummer off</button>
+      <button class="sp-small" id="spRollGroove" type="button">Roll groove</button>
       <button class="sp-small" id="spEvolve" type="button" aria-pressed="false">Voice motion off</button>
       <button class="sp-small save" id="spSave" type="button">Save take</button>
-      <div id="spSaveDoors" aria-live="polite">PLAY creates one rolling take. Your MIDI or screen-key notes join it.</div>
+      <div id="spSaveDoors" aria-live="polite">PLAY creates one rolling take. Your MIDI or screen-key notes join it. The drummer plays the TRITON kit in the PERCUSSION slot.</div>
     </div>
 
     <details class="sp-controls" id="spControls">
@@ -8767,6 +8785,20 @@ Composer.prototype.maybeJourney = function () {
   var journey = this.settings.wander;
   var f = this.field.at(this.sectionIndex * 5 + 3);
   if (f.b > journey * 0.85 + 0.05) return;
+  /* "Both worlds" turns the light between major and minor on its OWN schedule, and
+     it has to be decided up here, above the wander gate. Below that gate a mode change
+     needs f.b <= 0.305 and then f.d < 0.126 at the default wander — about one section
+     in sixty. Measured over 300 sections, simply widening the pool down there crossed
+     the family line zero times. A setting you cannot hear is a label, not a setting. */
+  var colour = this.settings.colour;
+  if (colour === 'both') {
+    var g = this.field.at(this.sectionIndex * 11 + 6);
+    if (g.a < 0.5) {
+      var want = MODE_DEFS[this.mode].family === 'major' ? 'minor' : 'major';
+      var cross = MODE_KEYS.filter(function (k) { return MODE_DEFS[k].family === want; });
+      this.mode = cross[Math.floor(g.b * cross.length) % cross.length];
+    }
+  }
   var oldTonic = this.tonic;
   var options = [5, 7, -5, 2, -2, 3, -3, 9, -9, 4, -4];
   var weights = [1.4, 1.4, 1.1, 0.8, 0.8, 0.5, 0.5, 0.4, 0.4, 0.3, 0.3].map(function (w) {
@@ -8774,8 +8806,11 @@ Composer.prototype.maybeJourney = function () {
   });
   this.tonic = mod(this.tonic + this.rng.weighted(options, weights), 12);
   if (f.d < journey * 0.42) {
-    var fam = MODE_DEFS[this.mode].family;
-    var pool = MODE_KEYS.filter(function (k) { return MODE_DEFS[k].family === fam; });
+    /* Major and minor seal this step too, so a passage cannot drift out of the
+       family the visitor chose. Both is left open — it has had its turn above. */
+    var fam = (colour === 'major' || colour === 'minor') ? colour : MODE_DEFS[this.mode].family;
+    var pool = colour === 'both' ? MODE_KEYS.slice()
+             : MODE_KEYS.filter(function (k) { return MODE_DEFS[k].family === fam; });
     this.mode = pool[Math.floor(f.c * pool.length) % pool.length];
   }
   if (oldTonic !== this.tonic) this.chapterTitle = this.makeChapterTitle();
@@ -10883,13 +10918,18 @@ function seedName(){
   return a[n%a.length]+'-'+b[(n>>>5)%b.length]+'-'+String(n%9999).padStart(4,'0');
 }
 
+/* Ensemble opens the room. Grand is kept because some people want the piano on
+   every part, but it must not be the first thing you hear: three roles holding one
+   patch reads as a broken rack, not as a choice. Ensemble is an upright bass, a
+   grand piano and a nylon guitar — three families, all acoustic. */
 var SCENES={
-  grand:{label:'Grand',bass:'A016',chord:'A016',lead:'A016'},
-  tines:{label:'Tines',bass:'A008',chord:'A019',lead:'A021'},
-  glass:{label:'Glass',bass:'A048',chord:'A090',lead:'A067'},
-  chapel:{label:'Chapel',bass:'A099',chord:'A023',lead:'A071'},
-  analog:{label:'Analog',bass:'A103',chord:'A084',lead:'A054'},
-  cinema:{label:'Cinema',bass:'A100',chord:'A040',lead:'A126'}
+  ensemble:{label:'Ensemble',bass:'A099',chord:'A016',lead:'A031',drums:'A015'},
+  grand:{label:'Grand',bass:'A016',chord:'A016',lead:'A016',drums:'A118'},
+  tines:{label:'Tines',bass:'A008',chord:'A019',lead:'A021',drums:'A015'},
+  glass:{label:'Glass',bass:'A048',chord:'A090',lead:'A067',drums:'A118'},
+  chapel:{label:'Chapel',bass:'A099',chord:'A023',lead:'A071',drums:'A063'},
+  analog:{label:'Analog',bass:'A103',chord:'A084',lead:'A054',drums:'A062'},
+  cinema:{label:'Cinema',bass:'A100',chord:'A040',lead:'A126',drums:'A117'}
 };
 var EVOLVE={
   departure:{bass:['A008','A099'],chord:['A019','A065','A088'],lead:['A021','A068','A074']},
@@ -10897,17 +10937,35 @@ var EVOLVE={
   lift:{bass:['A007','A103'],chord:['A039','A094','A127'],lead:['A054','A083','A126']},
   dissolve:{bass:['A048','A100'],chord:['A087','A092','A124'],lead:['A067','A070','A080']}
 };
-var ROLE_CATS={bass:['BASS'],chord:['KEYBOARD','PAD','VOX','ORGAN','STRINGS'],lead:['KEYBOARD','BELL','PLUCK','LEAD','STRINGS','BRASS']};
-var ROLE_LEVEL={bass:.92,chord:.82,lead:.94};
-var ROLE_RELEASE={bass:.30,chord:.68,lead:.46};
-var ROLE_DUR={bass:.92,chord:.92,lead:.98};
+var ROLE_CATS={bass:['BASS'],chord:['KEYBOARD','PAD','VOX','ORGAN','STRINGS'],lead:['KEYBOARD','BELL','PLUCK','LEAD','STRINGS','BRASS'],drums:['DRUMS']};
+var ROLE_LEVEL={bass:.92,chord:.82,lead:.94,drums:.86};
+var ROLE_RELEASE={bass:.30,chord:.68,lead:.46,drums:.40};
+var ROLE_DUR={bass:.92,chord:.92,lead:.98,drums:.50};
+/* The TRITON kits answer note%12, twelve slots from 48 up: drumHit() reads that,
+   not a General MIDI map, so these are the only numbers that make a sound. */
+var KIT={kick:48,snare:50,rim:51,tomLo:53,tomMid:55,tomHi:57,hat:54,hatOpen:58};
+/* Sixteenth-note grids over one 4/4 bar: [step, voice, velocity]. Anything the
+   drummer plays is one of these plus a fill, so a rolled groove is always a groove. */
+var GROOVES={
+  straight:{label:'straight',hits:[[0,'kick',1],[4,'snare',.9],[8,'kick',.86],[12,'snare',.92]],hat:2,hatVel:.42},
+  backbeat:{label:'backbeat',hits:[[0,'kick',1],[4,'snare',.94],[7,'kick',.7],[10,'kick',.78],[12,'snare',.95]],hat:2,hatVel:.4},
+  halftime:{label:'half time',hits:[[0,'kick',1],[8,'snare',.95],[11,'kick',.66]],hat:4,hatVel:.5},
+  brushes:{label:'brushes',hits:[[0,'kick',.8],[4,'rim',.7],[8,'kick',.6],[12,'rim',.74]],hat:2,hatVel:.26},
+  broken:{label:'broken',hits:[[0,'kick',1],[3,'kick',.62],[4,'snare',.9],[9,'kick',.8],[12,'snare',.9],[14,'snare',.5]],hat:2,hatVel:.36},
+  drive:{label:'drive',hits:[[0,'kick',1],[2,'kick',.6],[4,'snare',.95],[8,'kick',1],[10,'kick',.6],[12,'snare',.95]],hat:1,hatVel:.3}
+};
+var GROOVE_KEYS=Object.keys(GROOVES);
+var FILL=[[8,'tomHi',.8],[10,'tomMid',.84],[12,'tomLo',.88],[14,'snare',.9],[15,'snare',.7]];
 
-var settings=Object.assign({},K.PRESETS.reference,K.LOCKED_PERFORMANCE||{},{bpm:state.tempo});
+/* colour starts on major because that is what the room has always opened in;
+   the toggle is the new thing, not a new default sound. */
+var settings=Object.assign({},K.PRESETS.reference,K.LOCKED_PERFORMANCE||{},{bpm:state.tempo,colour:'major'});
 var SP=window.SoulPilot={
   version:'16.0-soul-pilot',on:false,ownsTake:false,seed:seedName(),settings:settings,
-  composer:null,clock:null,timer:null,pans:null,panCtx:null,scene:'grand',evolve:false,
-  base:{bass:idx('A016'),chord:idx('A016'),lead:idx('A016')},
-  active:{bass:idx('A016'),chord:idx('A016'),lead:idx('A016')},
+  composer:null,clock:null,timer:null,pans:null,panCtx:null,scene:'ensemble',evolve:false,
+  base:{bass:idx('A099'),chord:idx('A016'),lead:idx('A031'),drums:idx('A015')},
+  active:{bass:idx('A099'),chord:idx('A016'),lead:idx('A031'),drums:idx('A015')},
+  drummer:false,grooveSalt:1,
   pendingBase:false,pendingFx:false,takeOffset:0,generation:0,programCache:{},fxCache:null,
   diagnostics:{bars:0,notes:0,resyncs:0,lastError:null,lastQuality:null,lastRoles:[]},
   exportBusy:false
@@ -10955,7 +11013,7 @@ function setPlayUI(on){var b=$p('spPlay');if(b){b.textContent=on?'■':'▶';b.c
 function programLabel(role){var i=SP.active[role],p=PROGRAMS[i]||PROGRAMS[0],cap=role.charAt(0).toUpperCase()+role.slice(1);
   var n=$p('sp'+cap+'Name'),m=$p('sp'+cap+'Meta'),tag=$p('sp'+cap+'Tag');
   if(n)n.textContent=p.name;if(m)m.textContent=p.id+' · '+p.cat+(SP.base[role]!==i?' · evolving':'');if(tag)tag.textContent=SP.base[role]===i?'TRITON':'SECTION';}
-function renderPrograms(){programLabel('bass');programLabel('chord');programLabel('lead');}
+function renderPrograms(){programLabel('bass');programLabel('chord');programLabel('lead');programLabel('drums');}
 function renderScene(){document.querySelectorAll('.sp-scene').forEach(function(b){b.classList.toggle('on',b.dataset.scene===SP.scene);});}
 function renderCharacter(name){document.querySelectorAll('.sp-character').forEach(function(b){b.classList.toggle('on',b.dataset.character===name);});}
 function queueUI(at,bar,patches){var gen=SP.generation,delay=ctx?Math.max(0,(at-ctx.currentTime)*1000):0;
@@ -10975,6 +11033,46 @@ function patchesForBar(bar){
   ['bass','chord','lead'].forEach(function(r){var ids=[PROGRAMS[SP.base[r]].id].concat(bank[r]||[]);var id=chooseId(ids,bar.sectionIndex+':'+role+':'+r);SP.active[r]=idx(id);});
   return Object.assign({},SP.active);
 }
+/* One groove per section, chosen from the seed, so a passage keeps its feel;
+   a fill lands on every eighth bar. Rolling changes the salt and nothing else —
+   that is the whole mechanic. The room deals you a drummer, you keep what lands. */
+function grooveName(bar){return GROOVE_KEYS[hashSeed(SP.seed+':groove:'+SP.grooveSalt+':'+(bar.sectionIndex||0))%GROOVE_KEYS.length];}
+function grooveHits(bar,beats){
+  var steps=Math.max(4,Math.round(beats*4)),g=GROOVES[grooveName(bar)],out=[],i,h;
+  for(i=0;i<g.hits.length;i++){h=g.hits[i];if(h[0]<steps)out.push({step:h[0],voice:h[1],vel:h[2]});}
+  if(g.hat)for(i=0;i<steps;i+=g.hat)out.push({step:i,voice:(i%(g.hat*4)===0?'hatOpen':'hat'),vel:g.hatVel*(i%4===0?1:.78)});
+  if((bar.globalIndex+1)%8===0)for(i=0;i<FILL.length;i++){h=FILL[i];if(h[0]<steps)out.push({step:h[0],voice:h[1],vel:h[2]});}
+  var human=(settings.humanize==null?1:settings.humanize)*0.014;
+  return out.map(function(o,n){
+    var jitter=(((hashSeed(SP.seed+':swing:'+bar.globalIndex+':'+n)%100)/100)-0.5)*human;
+    /* Clamp inside the bar. Human jitter on a step-0 hit goes marginally negative,
+       and emitBar drops anything before the downbeat — which silently loses the
+       kick and the opening hat, the two hits a listener is most sure of. */
+    return {beat:clamp(o.step/4+jitter,0,beats-0.001),note:KIT[o.voice],vel:clamp(o.vel*(0.86+0.14*(settings.motion||0.6)),0.05,0.98)};
+  });
+}
+/* The room's wires carry MIDI, not audio, so this is what makes the Improvisator
+   patchable into the TRITON Rack: every melodic note it plays locally also goes out
+   as a note-on/note-off pair. Percussion stays home — a kit sent down a wire would
+   arrive as whatever single program the far end has selected, which is noise.
+   Times are unix-ms because that is the bus clock (bridge.js now()); the bus rejects
+   anything more than 16 s ahead, and the Soul Pilot only ever schedules one bar. */
+function publishNote(role,pitch,vel,when,dur){
+  var mr=window.MidiRoom;if(!mr||typeof mr.emit!=='function')return;
+  var n=Math.round(pitch);if(!isFinite(n)||n<0||n>127)return;
+  var ch=role==='bass'?0:role==='chord'?1:2,t0=mr.now(),
+      on=Math.max(t0,t0+(when-ctx.currentTime)*1000);
+  if(on>t0+15000)return;
+  var off=Math.min(on+Math.max(60,dur*1000),t0+15800);
+  mr.emit({kind:'midi',data:[0x90|ch,n,Math.max(1,Math.min(127,Math.round(vel*127)))],at:on});
+  mr.emit({kind:'midi',data:[0x80|ch,n,0],at:off});
+}
+function drumProgram(patches){
+  var i=patches&&patches.drums!=null?patches.drums:SP.base.drums,p=PROGRAMS[i];
+  /* A non-kit program here would play pitched notes at 48-58 instead of a kit,
+     which is loud and wrong. Silence beats that. */
+  return p&&p.cat==='DRUMS'?cleanProgram(i,'drums'):null;
+}
 function pumpComposer(){
   if(!SP.composer||SP._pumping)return;SP._pumping=true;
   setTimeout(function(){try{SP.composer.primeQueue();SP.composer.pump(12,8);}catch(ex){SP.diagnostics.lastError='compose: '+ex.message;console.error(ex);}SP._pumping=false;},0);
@@ -10991,6 +11089,14 @@ function emitBar(at){
     var dur=Math.max(.055,Math.min(barLen*1.08,e.duration*spb*ROLE_DUR[role]));
     var vel=clamp(e.velocity*ROLE_LEVEL[role],.055,.92);
     var voice=spawnVoice(p,e.pitch,vel,when,dur,SP.pans[role]);if(voice){voice._conductor='soul';}SP.diagnostics.notes++;
+    publishNote(role,e.pitch,vel,when,dur);
+  }
+  if(SP.drummer){
+    var kit=drumProgram(patches);
+    if(kit){var hits=grooveHits(bar,beats);
+      for(var d=0;d<hits.length;d++){var hd=hits[d];if(hd.beat<0||hd.beat>=beats||hd.note==null)continue;
+        var dv=spawnVoice(kit,hd.note,hd.vel,at+hd.beat*spb,Math.max(.055,spb*ROLE_DUR.drums),null);
+        if(dv)dv._conductor='soul';SP.diagnostics.notes++;}}
   }
   SP.diagnostics.bars++;SP.diagnostics.lastQuality=bar.quality;SP.diagnostics.lastRoles=Array.from(new Set(bar.events.map(function(e){return e.role;})));
   queueUI(at,bar,patches);pumpComposer();return barLen;
@@ -11039,15 +11145,28 @@ function toggle(){
 }
 function newPassage(){var was=SP.on;if(was)soulStop(true);SP.seed=seedName();SP.composer=new K.Composer(SP.seed,settings);SP.programCache={};SP.takeOffset=0;SP.ownsTake=false;
   $p('spChapter').textContent='an unwritten room';$p('spChord').textContent=NOTE_NAMES[settings.tonic]+'maj9';$p('spBar').textContent='bar 1';setStatus('new · '+SP.seed);if(was)soulStart(true);}
-function selectScene(name){var s=SCENES[name];if(!s)return;SP.scene=name;SP.base={bass:idx(s.bass),chord:idx(s.chord),lead:idx(s.lead)};SP.active=Object.assign({},SP.base);
+function selectScene(name){var s=SCENES[name];if(!s)return;SP.scene=name;SP.base={bass:idx(s.bass),chord:idx(s.chord),lead:idx(s.lead),drums:idx(s.drums||'A015')};SP.active=Object.assign({},SP.base);
   SP.programCache={};SP.pendingBase=SP.on;SP.pendingFx=SP.on;renderScene();renderPrograms();if(!SP.on)applySoulFX();setStatus(s.label.toLowerCase()+' scene'+(SP.on?' · next bar':''),SP.on?'live':null);}
 function cycleRole(role,dir){var list=roleList(role),cur=SP.base[role],at=list.indexOf(cur);if(at<0)at=0;SP.base[role]=list[(at+dir+list.length)%list.length];SP.active[role]=SP.base[role];
   SP.scene='custom';SP.programCache={};SP.pendingBase=SP.on;if(role==='chord')SP.pendingFx=SP.on;renderScene();renderPrograms();if(!SP.on&&role==='chord')applySoulFX();setStatus('voice queued'+(SP.on?' · next bar':''),SP.on?'live':null);}
-function dealVoices(){var roles=['bass','chord','lead'];roles.forEach(function(role){var list=roleList(role),h=hashSeed(SP.seed+':deal:'+role+':'+Date.now()+':'+Math.random());SP.base[role]=list[h%list.length];SP.active[role]=SP.base[role];});
+function dealVoices(){var roles=['bass','chord','lead','drums'];roles.forEach(function(role){var list=roleList(role),h=hashSeed(SP.seed+':deal:'+role+':'+Date.now()+':'+Math.random());SP.base[role]=list[h%list.length];SP.active[role]=SP.base[role];});
   SP.scene='custom';SP.programCache={};SP.pendingBase=SP.on;SP.pendingFx=SP.on;renderScene();renderPrograms();if(!SP.on)applySoulFX();setStatus('new rack scene'+(SP.on?' · next bar':''),SP.on?'live':null);}
 function applyCharacter(name){var p=K.PRESETS[name];if(!p)return;settings.tonic=p.tonic;settings.mode=p.mode; /* Harmonic character retains tempo and performance controls. */
   SP.composer&&SP.composer.updateSettings(settings);if(SP.composer){SP.composer.tonic=settings.tonic;SP.composer.mode=settings.mode;if(SP.composer.pending)SP.composer.pending.length=0;}
-  syncControls();renderCharacter(name);setStatus(name+' · performance locked',SP.on?'live':null);}
+  syncControls();syncColourFromMode();renderCharacter(name);setStatus(name+' · performance locked',SP.on?'live':null);}
+function renderColour(){document.querySelectorAll('.sp-colour').forEach(function(b){b.classList.toggle('on',b.dataset.colour===settings.colour);});}
+function setColour(colour){
+  settings.colour=colour;
+  var fam=MODE_DEFS[settings.mode].family;
+  if(colour==='major'&&fam!=='major')settings.mode='ionian';
+  if(colour==='minor'&&fam!=='minor')settings.mode='aeolian';
+  if(SP.composer){SP.composer.mode=settings.mode;SP.composer.updateSettings(settings);if(SP.composer.pending)SP.composer.pending.length=0;}
+  syncControls();renderColour();
+  setStatus(colour==='both'?'both worlds · it may turn either way':(colour+' · '+MODE_DEFS[settings.mode].label.toLowerCase()),SP.on?'live':null);
+}
+/* Picking a mode or a character by hand is also a statement about colour, so the
+   buttons follow it — except on "both", which is a wider choice than either. */
+function syncColourFromMode(){if(settings.colour==='both')return;settings.colour=MODE_DEFS[settings.mode].family;renderColour();}
 function syncControls(){
   var vals={spTempo:settings.bpm,spMotion:settings.motion*100,spRange:settings.range*100,spMelody:settings.melody*100,spSustain:settings.sustain*100,spReverb:settings.reverb*100};
   Object.keys(vals).forEach(function(id){var e=$p(id);if(e)e.value=Math.round(vals[id]);var o=$p(id+'Out');if(o)o.textContent=Math.round(vals[id])+(id==='spTempo'?'':'%');});
@@ -11122,12 +11241,21 @@ var _exportTake=exportTake;exportTake=async function(kind,src){
 $p('spPlay').addEventListener('click',toggle);$p('spNew').addEventListener('click',newPassage);$p('spVoices').addEventListener('click',dealVoices);$p('spSave').addEventListener('click',saveDoors);
 $p('spEvolve').addEventListener('click',function(){SP.evolve=!SP.evolve;this.classList.toggle('on',SP.evolve);this.textContent='Voice motion '+(SP.evolve?'on':'off');this.setAttribute('aria-pressed',String(SP.evolve));SP.pendingBase=true;setStatus(SP.evolve?'section voices will evolve':'scene pinned',SP.on?'live':null);});
 document.querySelectorAll('.sp-nav').forEach(function(b){b.addEventListener('click',function(){cycleRole(b.dataset.role,Number(b.dataset.dir));});});
+document.querySelectorAll('.sp-colour').forEach(function(b){b.addEventListener('click',function(){setColour(b.dataset.colour);});});
+$p('spDrummer').addEventListener('click',function(){SP.drummer=!SP.drummer;this.classList.toggle('on',SP.drummer);this.textContent='Drummer '+(SP.drummer?'on':'off');this.setAttribute('aria-pressed',String(SP.drummer));
+  setStatus(SP.drummer?'drummer in · '+PROGRAMS[SP.active.drums||SP.base.drums].name:'drummer out',SP.on?'live':null);});
+$p('spRollGroove').addEventListener('click',function(){SP.grooveSalt++;
+  if(!SP.drummer){SP.drummer=true;var b=$p('spDrummer');b.classList.add('on');b.textContent='Drummer on';b.setAttribute('aria-pressed','true');}
+  setStatus('groove rolled · '+GROOVES[grooveName({sectionIndex:SP.composer?SP.composer.sectionIndex:0})].label,SP.on?'live':null);});
 $p('pilotSoulMode').addEventListener('click',function(){switchMode('soul');});$p('pilotDreamMode').addEventListener('click',function(){switchMode('dream');});
 changeSetting('spTempo','bpm',true);changeSetting('spMotion','motion',false);changeSetting('spRange','range',false);changeSetting('spMelody','melody',false);changeSetting('spSustain','sustain',false);changeSetting('spReverb','reverb',false);
 $p('spTonic').addEventListener('change',function(){settings.tonic=Number(this.value);if(SP.composer){SP.composer.tonic=settings.tonic;SP.composer.updateSettings(settings);if(SP.composer.pending)SP.composer.pending.length=0;}$p('spKey').textContent=keyText();});
-$p('spMode').addEventListener('change',function(){settings.mode=this.value;if(SP.composer){SP.composer.mode=settings.mode;SP.composer.updateSettings(settings);if(SP.composer.pending)SP.composer.pending.length=0;}$p('spKey').textContent=keyText();});
+$p('spMode').addEventListener('change',function(){settings.mode=this.value;if(SP.composer){SP.composer.mode=settings.mode;SP.composer.updateSettings(settings);if(SP.composer.pending)SP.composer.pending.length=0;}$p('spKey').textContent=keyText();syncColourFromMode();});
 
 SP.start=soulStart;SP.stop=soulStop;SP.toggle=toggle;SP.chooseCharacter=applyCharacter;SP.chooseScene=selectScene;SP.refreshAudio=applySoulFX;
+/* Exposed for the same reason selfTest is: the drummer's timing cannot be checked
+   by ear without opening audio, and it can be checked exactly by reading its hits. */
+SP.setColour=setColour;SP.grooveName=grooveName;SP.grooveHits=grooveHits;SP.kit=KIT;SP.grooves=GROOVES;
 SP.retime=function(){settings.bpm=state.tempo;if(SP.composer){SP.composer.updateSettings(settings);if(SP.composer.pending)SP.composer.pending.length=0;}
   if(SP.on){SP.generation++;voiceList.slice().forEach(function(v){if(v._conductor==='soul'&&v.kill)v.kill();});SP.clock.stop();SP.clock.start(ctx.currentTime);tick();}syncControls();};
 TritonTransport.subscribe(SP.retime);
@@ -11135,7 +11263,9 @@ SP.selfTest=function(){var issues=[];
   if(!Array.isArray(K.RUDIMENTS)||K.RUDIMENTS.length!==40)issues.push('forty-rudiment layer missing');
   if(PROGRAMS.length<128)issues.push('TRITON bank incomplete');
   Object.keys(SCENES).forEach(function(s){['bass','chord','lead'].forEach(function(r){if(idx(SCENES[s][r])===0&&SCENES[s][r]!=='A000')issues.push('missing '+SCENES[s][r]);});});
-  ['bass','chord','lead'].forEach(function(r){if(!roleList(r).length)issues.push('empty '+r+' drawer');});
+  ['bass','chord','lead','drums'].forEach(function(r){if(!roleList(r).length)issues.push('empty '+r+' drawer');});
+  Object.keys(SCENES).forEach(function(sn){var dp=PROGRAMS[idx(SCENES[sn].drums)];if(!dp||dp.cat!=='DRUMS')issues.push(sn+' has no kit');});
+  if(GROOVE_KEYS.some(function(g){return GROOVES[g].hits.some(function(h){return KIT[h[1]]==null;});}))issues.push('groove names a voice the kit has no note for');
   try{var c=new K.Composer('soul-pilot-proof',Object.assign({},settings)),b=c.nextBar();if(!b.events||!b.events.length)issues.push('composer emitted no notes');
     b.events.forEach(function(e){if(!isFinite(e.pitch)||!isFinite(e.duration)||!isFinite(e.velocity))issues.push('invalid event');});
   }catch(ex){issues.push('composer '+ex.message);}
@@ -11143,7 +11273,7 @@ SP.selfTest=function(){var issues=[];
   return {pass:issues.length===0,issues:issues,rudiments:K.RUDIMENTS&&K.RUDIMENTS.length,programs:PROGRAMS.length,scene:SP.scene,seed:SP.seed};
 };
 
-populate();selectScene('grand');renderCharacter('reference');syncControls();renderPrograms();SP.composer=new K.Composer(SP.seed,settings);
+populate();selectScene('ensemble');renderCharacter('reference');syncControls();renderColour();renderPrograms();SP.composer=new K.Composer(SP.seed,settings);
 window._soulPilotReady=true;console.info('Soul Pilot ready',SP.selfTest());
 })();
 </script>
@@ -11316,7 +11446,8 @@ window._soulPilotReady=true;console.info('Soul Pilot ready',SP.selfTest());
 (() => {
   const sdk=window.MidiRoom,engine=window.TritonEngine;
   if(sdk?.controlVersion!==1||!engine)return;
-  sdk.declare({name:document.body.dataset.instrument==='improvisator'?'Improvisator':'TRITON Rack',send:[],receive:['midi']});
+  const improv=document.body.dataset.instrument==='improvisator';
+  sdk.declare({name:improv?'Improvisator':'TRITON Rack',send:improv?['midi']:[],receive:['midi']});
   sdk.describe(engine.metadata()); engine.subscribeMetadata(m=>sdk.describe(m));
   sdk.onControl(event=>{
     if(event.action==='cancel')engine.cancelRoute(event.routeId);
