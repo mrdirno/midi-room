@@ -3,8 +3,8 @@
   "source": "inherited-runtime.html",
   "sourceSha256": "4eced0d8da0d9623c11014a29ba57ecb9751ff735ea1c5bd647478177a219404",
   "artifact": "dist/instruments/triton-rack.html",
-  "artifactSha256": "f3cae757214077623fcd39eb704192f90152869f9032f7496e5e0800f9d46f57",
-  "bytes": 794162,
+  "artifactSha256": "2af109154f7c96e4c2815f96d9498c3ee02f63fc36156ec68544b158dd750406",
+  "bytes": 794367,
   "countedPatches": [
     {
       "anchor": "<h1>KORG TRITON-Rack</h1>",
@@ -264,6 +264,14 @@
     },
     {
       "anchor": "  if(SAVE_OUT.wavUrl)jobs.push(fetch(SAVE_OUT.wavUrl).then(function(r){return r.blob();}).then(function(b){SP.",
+      "count": 1
+    },
+    {
+      "anchor": "  if(!(window.SoulPilot&&window.SoulPilot.exportBusy)){\n    if(SAVE_OUT.zipUrl) auto(SAVE_OUT.zipUrl,name+\"-se",
+      "count": 1
+    },
+    {
+      "anchor": "  try{await exportTake(kind,'take');await prepareRenderedFiles();renderDownloads();",
       "count": 1
     },
     {

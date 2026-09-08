@@ -447,6 +447,34 @@ replace("""  if(SAVE_OUT.wavUrl)jobs.push(fetch(SAVE_OUT.wavUrl).then(function(r
   var jMid=blobOrFetch(SAVE_OUT.midBlob,SAVE_OUT.midUrl);if(jMid)jobs.push(jMid.then(function(b){SP.prepared.mid=preparedItem(b,'mid',outputName('.mid'));}));
   var jZip=blobOrFetch(SAVE_OUT.zipBlob,SAVE_OUT.zipUrl);if(jZip)jobs.push(jZip.then(function(b){SP.prepared.zip=preparedItem(b,'zip',outputName('-session.zip'));}));""")
 # ---- end wish 83d41a5c --------------------------------------------------------
+# ---- wish 83d41a5c, second half: a FAILED render was reported as "mix ready · tap Save" ----
+# exportTake catches its own exception and returns normally, so doExport's catch never fires on a
+# failed render. doExport then ran prepareRenderedFiles()/renderDownloads() over the PREVIOUS
+# take's SAVE_OUT and set "mix ready · tap Save" — the transient "RENDER FAILED" that setSaveUI
+# mirrors into #spSaveDoors is painted over by renderDownloads() in the same turn. Measured on
+# production bytes with renderPass forced to return null: status "mix ready · tap Save" and two
+# working download buttons carrying the earlier take's audio, byte-identical to a successful
+# render. That is the wisher's complaint pointing the other way.
+# The signal is made explicit and FAIL-CLOSED: only the path that actually assigns SAVE_OUT
+# returns true, so every early return in exportTake — the failure, the already-rendering race,
+# and "nothing to save" — reads as "no file was produced". doExport says so and stops.
+replace('''  if(!(window.SoulPilot&&window.SoulPilot.exportBusy)){
+    if(SAVE_OUT.zipUrl) auto(SAVE_OUT.zipUrl,name+"-session.zip");
+    else{ auto(SAVE_OUT.wavUrl,name+".wav");
+      if(SAVE_OUT.midUrl) setTimeout(()=>auto(SAVE_OUT.midUrl,name+".mid"),450); }
+  }
+}''',
+'''  if(!(window.SoulPilot&&window.SoulPilot.exportBusy)){
+    if(SAVE_OUT.zipUrl) auto(SAVE_OUT.zipUrl,name+"-session.zip");
+    else{ auto(SAVE_OUT.wavUrl,name+".wav");
+      if(SAVE_OUT.midUrl) setTimeout(()=>auto(SAVE_OUT.midUrl,name+".mid"),450); }
+  }
+  return true;  /* the only exit that produced a file; every other return is a failure */
+}''')
+replace("""  try{await exportTake(kind,'take');await prepareRenderedFiles();renderDownloads();""",
+"""  try{if(!await exportTake(kind,'take')){host.textContent='Render failed — nothing was saved. Try Save again.';setStatus('render failed');return;}
+  await prepareRenderedFiles();renderDownloads();""")
+# ---- end wish 83d41a5c, second half -------------------------------------------
 
 # ---- wish 5ab162f7: "saving should save a full song length 3:20 ... give user option of length" ----
 # Measured before the change: the save renders exactly what you sat and listened to — length

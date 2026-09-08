@@ -8107,6 +8107,7 @@ async function exportTake(kind,src){
     else{ auto(SAVE_OUT.wavUrl,name+".wav");
       if(SAVE_OUT.midUrl) setTimeout(()=>auto(SAVE_OUT.midUrl,name+".mid"),450); }
   }
+  return true;  /* the only exit that produced a file; every other return is a failure */
 }
 function dreamDraw(rms,wav){
   const aura=document.getElementById("aura");
@@ -11289,7 +11290,8 @@ function prepareMidi(){if(typeof TAKE==='undefined'||!TAKE.ev.length){$p('spSave
 }
 async function doExport(kind){if(SP.exportBusy)return;if(typeof TAKE==='undefined'||!TAKE.ev.length){$p('spSaveDoors').textContent='Nothing to save — press PLAY first.';return;}
   if(SP.on)soulStop(true);SP.exportBusy=true;SP.prepared={};setStatus(kind==='session'?'building stems':'rendering mix','work');var host=$p('spSaveDoors');host.innerHTML='<span class="sp-door work">RENDERING…</span>';
-  try{await exportTake(kind,'take');await prepareRenderedFiles();renderDownloads();setStatus(kind==='session'?'session ready · tap Save':'mix ready · tap Save');}catch(ex){console.error(ex);host.textContent='Render failed: '+ex.message;setStatus('render failed');}finally{SP.exportBusy=false;applySoulFX();}}
+  try{if(!await exportTake(kind,'take')){host.textContent='Render failed — nothing was saved. Try Save again.';setStatus('render failed');return;}
+  await prepareRenderedFiles();renderDownloads();setStatus(kind==='session'?'session ready · tap Save':'mix ready · tap Save');}catch(ex){console.error(ex);host.textContent='Render failed: '+ex.message;setStatus('render failed');}finally{SP.exportBusy=false;applySoulFX();}}
 function saveDoors(){if(SP.on)soulStop(true);var host=$p('spSaveDoors');if(typeof TAKE==='undefined'||!TAKE.ev.length){host.textContent='Nothing to save — press PLAY first.';return;}
   host.innerHTML='';var midi=document.createElement('button');midi.className='sp-door';midi.textContent='MIDI';midi.onclick=prepareMidi;host.appendChild(midi);
   var mix=document.createElement('button');mix.className='sp-door';mix.textContent='MIX WAV';mix.onclick=function(){doExport('mix');};host.appendChild(mix);
