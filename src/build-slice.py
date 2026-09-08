@@ -44,14 +44,15 @@ for name,filename,exports,prelude in [
 ('midiModule','midi.js','MidiBroker',''),('bridgeModule','bridge.js','bootstrapSource',''),
 ('loaderModule','loader.js','INSTRUMENT_SANDBOX,LoadSequence,prepareInstrument,safeFilename,validateInstrument','const {bootstrapSource}=bridgeModule;'),
 ('busModule','instrument-bus.js','InstrumentBus,validateInstrumentEvent',''),
+('instrumentMapModule','instrument-map.js','MAP_FORMAT,busTranslator,describeRoute,resolveSlot,translateMIDI,validateInstrumentMap',''),
 ('surfaceModule','surface-router.js','SurfaceRouter,FocusRouter,validateProfile',''),
 ('pluginModule','plugin-contract.js','extractPlugin,validatePlugin,validateRack,verifyPlugin',''),
 ('wishConfigModule','wish-config.js','WISH_CONFIG',''),('wishModule','wish.js','bindWishWell','const {WISH_CONFIG}=wishConfigModule;')]:
     script+='const '+name+'='+module(filename,exports,prelude)
     script+='const {'+exports+'}='+name+';\n'
-script+=re.sub(r'^import .+;\n','',(dist/'app.js').read_text(),flags=re.M)+'\n})();'
+script+='globalThis.INSTRUMENT_MAP_MODULE=instrumentMapModule;\n'+re.sub(r'^import .+;\n','',(dist/'app.js').read_text(),flags=re.M)+'\n})();'
 script=re.sub(r'</script',r'<\\/script',script,flags=re.I)
-embedded=''
+embedded='<script id="instrumentMap" type="application/json">'+json.dumps(json.loads((dist/'instrument-map.json').read_text()),ensure_ascii=True).replace('<','\\u003c')+'</script>\n'
 for id,name in [('bundledTriton','triton-rack.html'),('bundledImprovisator','improvisator.html'),('bundledLuckyDreamer','lucky-dreamer.html'),('bundledDrumPad','drum-pad.html'),('bundledFieldKeys','field-keys.html'),('bundledDSPRack','dsp-rack.html')]:
     if not (dist/'instruments'/name).exists(): continue
     encoded=json.dumps((dist/'instruments'/name).read_text(),ensure_ascii=True).replace('<','\\u003c')

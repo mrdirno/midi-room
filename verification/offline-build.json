@@ -1,5 +1,5 @@
 {
-  "cache_version": "60ea8c99d830124b",
+  "cache_version": "a546b5b4f7cfc806",
   "files": [
     "index.html",
     "style.css",
@@ -9,6 +9,8 @@
     "loader.js",
     "midi.js",
     "instrument-bus.js",
+    "instrument-map.js",
+    "instrument-map.json",
     "surface-router.js",
     "plugin-contract.js",
     "wish-config.js",
@@ -26,6 +28,6 @@
     "licenses/FAUST-COPYING.txt",
     "licenses/HOST-MIT.txt"
   ],
-  "bytes": 4782102,
+  "bytes": 4808964,
   "scope": "Relative to sw.js directory; built-ins and shell only. Imported private instruments, maps and exports excluded."
 }

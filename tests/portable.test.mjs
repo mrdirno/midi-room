@@ -8,9 +8,14 @@ test('portable raw-text script boundaries preserve the complete original instrum
   const scripts = [...portable.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)];
   const builtins = ['bundledTriton','bundledImprovisator','bundledDrumPad','bundledFieldKeys','bundledDSPRack'];
   if(fs.existsSync(new URL('../dist/instruments/lucky-dreamer.html',import.meta.url))) builtins.push('bundledLuckyDreamer');
-  assert.equal(scripts.length,builtins.length+1);
+  // The instruments, the note map they agree on, and the one executable block.
+  assert.equal(scripts.length,builtins.length+2);
   for(const id of builtins)assert.ok(scripts.some(s=>s[1].includes(id)),id);
-  const data = scripts.find(s => s[1].includes('application/json'));
+  const map = scripts.find(s => s[1].includes('instrumentMap'));
+  assert.ok(map,'instrumentMap');
+  assert.deepEqual(JSON.parse(map[2]), JSON.parse(fs.readFileSync(new URL('../dist/instrument-map.json', import.meta.url),'utf8')));
+  // Found by name, not by being the first JSON block: the map used to take that place.
+  const data = scripts.find(s => s[1].includes('bundledTriton'));
   assert.equal(JSON.parse(data[2]), fs.readFileSync(new URL('../dist/instruments/triton-rack.html', import.meta.url), 'utf8'));
   const field = scripts.find(s => s[1].includes('bundledFieldKeys'));
   assert.equal(JSON.parse(field[2]), fs.readFileSync(new URL('../dist/instruments/field-keys.html', import.meta.url), 'utf8'));

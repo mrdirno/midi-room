@@ -111,22 +111,27 @@ export function cancellationMIDI(event) {
 }
 
 export class InstrumentBus {
-  constructor({ now = () => globalThis.performance ? performance.timeOrigin + performance.now() : Date.now() } = {}) {
+  constructor({ now = () => globalThis.performance ? performance.timeOrigin + performance.now() : Date.now(), translate = null } = {}) {
     if (typeof now !== 'function') throw new TypeError('A monotonic clock is required.');
+    if (translate !== null && typeof translate !== 'function') throw new TypeError('A translator must be a function.');
     this.now = now;
+    // Policy lives outside the bus. The host supplies this from dist/instrument-map.json;
+    // with no translator the bus forwards bytes exactly as it always has.
+    this.translate = translate;
     this.sessions = new Map();
     this.routes = new Map();
     this.serial = 0;
     this.stats = { published: 0, delivered: 0, rejected: 0, cancelled: 0, failed: 0 };
   }
 
-  addSession({ id, send, capabilities = { send: [], receive: ['midi'] } } = {}) {
+  addSession({ id, send, capabilities = { send: [], receive: ['midi'] }, instrument = null } = {}) {
     if (typeof id !== 'string' || !ID.test(id) || typeof send !== 'function') throw new TypeError('Session id and private send callback are required.');
+    if (instrument !== null && (typeof instrument !== 'string' || !ID.test(instrument))) throw new TypeError('An instrument name must be a plain identifier.');
     if (this.sessions.has(id)) throw new Error('Session already exists.');
     if (this.sessions.size >= BUS_LIMITS.sessions) throw new RangeError('Close an instrument before adding another.');
     const output = cleanList(capabilities.send || []), input = cleanList(capabilities.receive || []);
     if (!output || !input) throw new TypeError('Unsupported instrument capabilities.');
-    this.sessions.set(id, { id, send, output, input, tokens: BUS_LIMITS.burst, tokenAt: this.now(), faultUntil: 0 });
+    this.sessions.set(id, { id, send, output, input, instrument, tokens: BUS_LIMITS.burst, tokenAt: this.now(), faultUntil: 0 });
     return id;
   }
 
@@ -191,12 +196,31 @@ export class InstrumentBus {
     for (const route of routes) {
       // A send callback may remove a route synchronously (e.g. a closed frame).
       if (this.routes.get(route.id) !== route) continue;
-      if (event.kind === 'midi' && !this._track(route, event.data)) { this._cancel(route, 'note-limit'); continue; }
-      if (this._send(route, { ...event, id, at, clock: { now, unit: 'unix-ms' } })) delivered++;
+      const carried = this._carry(source, route, event);
+      // Track what is actually SENT, not what arrived. A cancelled cable releases
+      // notes from this table, so tracking the untranslated number would leave the
+      // receiver holding a note nobody ever asks it to let go of.
+      if (carried.kind === 'midi' && !this._track(route, carried.data)) { this._cancel(route, 'note-limit'); continue; }
+      if (this._send(route, { ...carried, id, at, clock: { now, unit: 'unix-ms' } })) delivered++;
     }
     this.stats.published++;
     this.stats.delivered += delivered;
     return { ok: true, id, delivered };
+  }
+
+  /** Say what this receiver reads, in its own numbers. Any failure keeps the original. */
+  _carry(source, route, event) {
+    if (!this.translate || event.kind !== 'midi') return event;
+    const target = this.sessions.get(route.to);
+    let translated;
+    try {
+      translated = this.translate(event, { id: route.id, from: source.instrument, to: target ? target.instrument : null });
+    } catch { return event; }
+    if (!translated || translated.kind !== 'midi' || !validMIDI(translated.data)) return event;
+    // Only the bytes are taken, and only a message of the same type: a translation that
+    // turned a note-off into a note-on would leave the receiver sounding forever.
+    if ((translated.data[0] & 0xf0) !== (event.data[0] & 0xf0)) return event;
+    return { ...event, data: Array.from(translated.data) };
   }
 
   _track(route, data) {
@@ -267,7 +291,7 @@ export class InstrumentBus {
     return {
       version: BUS_VERSION,
       clock: { now: this.now(), unit: 'unix-ms' },
-      sessions: [...this.sessions.values()].map(s => ({ id: s.id, capabilities: { send: [...s.output], receive: [...s.input] } })),
+      sessions: [...this.sessions.values()].map(s => ({ id: s.id, instrument: s.instrument, capabilities: { send: [...s.output], receive: [...s.input] } })),
       routes: [...this.routes.values()].map(r => ({ id: r.id, from: r.from, to: r.to, kinds: [...r.kinds], signals: [...r.signals], activeNotes: r.notes.size, generation: r.generation })),
       stats: { ...this.stats },
     };

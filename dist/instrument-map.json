@@ -1,0 +1,213 @@
+{
+  "format": "midi-room.instrument-map/1",
+  "version": 1,
+  "summary": "What each instrument means by a MIDI note, so a cable between two of them carries the sound the sender meant.",
+  "slots": {
+    "kick": "Kick drum",
+    "snare": "Snare",
+    "rim": "Side stick",
+    "clap": "Hand clap",
+    "hatC": "Closed hi-hat",
+    "hatO": "Open hi-hat",
+    "tomL": "Low tom",
+    "tomM": "Mid tom",
+    "tomH": "High tom",
+    "crash": "Crash cymbal",
+    "ride": "Ride cymbal",
+    "shake": "Maracas",
+    "handDrumLow": "Low hand drum",
+    "handDrumMid": "Mid hand drum",
+    "handDrumHigh": "High hand drum",
+    "handSlap": "Hand slap",
+    "bongo": "Bongo",
+    "bongoL": "Low bongo",
+    "bongoH": "High bongo",
+    "congaL": "Low conga",
+    "congaM": "Mid conga",
+    "congaH": "High conga",
+    "timbL": "Low timbale",
+    "timbH": "High timbale",
+    "agogoL": "Low agogo",
+    "agogoH": "High agogo",
+    "cowbell": "Cowbell",
+    "clave": "Claves",
+    "woodblk": "Wood block",
+    "shaker": "Shaker",
+    "cabasa": "Cabasa",
+    "guiro": "Guiro",
+    "tamb": "Tambourine",
+    "triangle": "Triangle",
+    "surdo": "Surdo"
+  },
+  "fallbacks": {
+    "rim": ["snare"],
+    "ride": ["crash"],
+    "shake": ["shaker", "hatC"],
+    "tomM": ["tomL"],
+    "tomH": ["tomM", "tomL"],
+    "handDrumLow": ["tomL"],
+    "handDrumMid": ["tomM", "tomL"],
+    "handDrumHigh": ["tomH", "tomM"],
+    "handSlap": ["snare"],
+    "bongo": ["handDrumHigh", "tomH"],
+    "bongoL": ["bongo", "handDrumMid"],
+    "bongoH": ["bongo", "handDrumHigh"],
+    "congaL": ["handDrumLow", "tomL"],
+    "congaM": ["handDrumMid", "tomM"],
+    "congaH": ["handDrumHigh", "tomH"],
+    "timbL": ["handSlap", "tomM", "snare"],
+    "timbH": ["handSlap", "tomH", "snare"],
+    "agogoL": ["cowbell", "clave", "hatC"],
+    "agogoH": ["cowbell", "clave", "hatC"],
+    "cowbell": ["clave", "hatC"],
+    "clave": ["woodblk", "hatC"],
+    "woodblk": ["clave", "hatC"],
+    "shaker": ["cabasa", "hatC"],
+    "cabasa": ["shaker", "hatC"],
+    "guiro": ["shaker", "cabasa", "hatC"],
+    "tamb": ["shaker", "hatO"],
+    "triangle": ["tamb", "shaker", "hatC"],
+    "surdo": ["handDrumLow", "tomL"]
+  },
+  "instruments": {
+    "lucky-dreamer": {
+      "name": "Lucky Dreamer",
+      "sends": {
+        "percussion": {
+          "channel": 9,
+          "notes": {
+            "36": "kick", "37": "rim", "38": "snare", "39": "clap", "41": "tomL",
+            "42": "hatC", "45": "tomM", "46": "hatO", "48": "tomH", "49": "crash",
+            "51": "ride", "54": "tamb", "56": "cowbell", "60": "bongoH", "61": "bongoL",
+            "62": "congaH", "63": "congaM", "64": "congaL", "65": "timbH", "66": "timbL",
+            "67": "agogoH", "68": "agogoL", "69": "cabasa", "70": "shaker", "74": "guiro",
+            "75": "clave", "76": "woodblk", "81": "triangle"
+          },
+          "shared_notes": {
+            "41": ["tomL", "surdo"],
+            "62": ["congaH", "djembeS"],
+            "63": ["congaM", "djembeT"],
+            "64": ["congaL", "djembeB", "dunL", "dunM", "dunS"],
+            "65": ["timbH", "talking"],
+            "70": ["shaker", "shake"]
+          },
+          "audit": "Lucky Dreamer names 37 drum slots but publishes only 28 note numbers, so six numbers carry more than one drum and the map has to pick one reading. Measured over 460 bands: 32.6% of its channel-9 hits are on a shared number. Separately, its percussion slot list has 25 names against 22 notes, so dunL, dunM and dunS are all published as note 64 (the live generator never picks dunL) and arrive as a low conga. Both are sender defects; a translation downstream cannot undo them. Two rows, 60 and 61, describe drums the shipped generator never selects; they are kept because the sender table does list them, so a future style that uses one already translates."
+        },
+        "pitched": {
+          "channels": [0, 1, 2, 3],
+          "range": [22, 93],
+          "stable_lanes": false,
+          "audit": "The pitched channel number is a counter over roster order, not a lane name: channel 0 is the 808 in a style that has one and the keys in a style that does not, and muting a lane slides every later lane down. Pitch translation does not need the lane, so this does not block a cable; naming the lane from the channel would be wrong about half the time."
+        }
+      },
+      "receives": null
+    },
+    "triton-rack": {
+      "name": "TRITON Rack",
+      "sends": null,
+      "receives": {
+        "percussion": {
+          "channel": 9,
+          "kits": [
+            {
+              "name": "std",
+              "notes": [36, 47],
+              "slots": {
+                "kick": 36, "snare": 38, "clap": 39, "tomL": 41, "hatC": 42,
+                "tomM": 43, "tomH": 45, "hatO": 46, "crash": 47
+              }
+            },
+            {
+              "name": "perc",
+              "notes": [48, 59],
+              "slots": {
+                "handDrumLow": 48, "handSlap": 50, "clave": 51, "cowbell": 52,
+                "handDrumMid": 53, "shaker": 54, "handDrumHigh": 55, "bongo": 57, "tamb": 58
+              }
+            }
+          ]
+        },
+        "pitched": { "range": [0, 127] }
+      }
+    },
+    "improvisator": {
+      "name": "Improvisator",
+      "sends": {
+        "percussion": null,
+        "pitched": { "channels": [0, 1, 2], "range": [0, 127], "stable_lanes": true }
+      },
+      "receives": {
+        "percussion": {
+          "channel": 9,
+          "kits": [
+            {
+              "name": "std",
+              "notes": [36, 47],
+              "slots": {
+                "kick": 36, "snare": 38, "clap": 39, "tomL": 41, "hatC": 42,
+                "tomM": 43, "tomH": 45, "hatO": 46, "crash": 47
+              }
+            },
+            {
+              "name": "perc",
+              "notes": [48, 59],
+              "slots": {
+                "handDrumLow": 48, "handSlap": 50, "clave": 51, "cowbell": 52,
+                "handDrumMid": 53, "shaker": 54, "handDrumHigh": 55, "bongo": 57, "tamb": 58
+              }
+            }
+          ]
+        },
+        "pitched": { "range": [0, 127] }
+      }
+    },
+    "drum-pad": {
+      "name": "Drum Pad",
+      "sends": {
+        "percussion": {
+          "channel": 9,
+          "notes": {
+            "36": "kick", "38": "snare", "39": "clap", "41": "tomL", "42": "hatC",
+            "43": "tomM", "45": "tomH", "46": "hatO", "47": "crash"
+          }
+        },
+        "pitched": null
+      },
+      "receives": {
+        "percussion": {
+          "channel": 9,
+          "kits": [
+            {
+              "name": "pads",
+              "notes": [36, 44],
+              "slots": {
+                "kick": 36, "snare": 37, "clap": 38, "tomL": 39, "hatC": 40,
+                "tomM": 41, "tomH": 42, "hatO": 43, "crash": 44
+              }
+            }
+          ]
+        },
+        "pitched": null,
+        "audit": "Drum Pad's incoming window is a dense sixteen-note run from 36, so only note 36 means the same thing coming in as going out. It matches a note-on by note number alone but a note-off by input, channel and note together, so a translation that rewrites the channel of one half and not the other leaves notes held; at 128 held the pad stops responding to its own touch."
+      }
+    },
+    "field-keys": {
+      "name": "Field Keys",
+      "sends": null,
+      "receives": {
+        "percussion": null,
+        "pitched": { "range": [0, 127] },
+        "audit": "Field Keys has no percussion engine and no note vocabulary: every note number sounds a bell at its equal-tempered pitch. A drum kit cabled into it arrives as a chord of low bells, which is why percussion is declared null rather than mapped."
+      }
+    },
+    "dsp-rack": {
+      "name": "DSP Rack",
+      "sends": null,
+      "receives": {
+        "percussion": null,
+        "pitched": { "range": [23, 95] },
+        "audit": "The playable window is derived per rack from the loaded module's frequency bounds; 23 to 95 is the shipped Bloom Oscillator rack. One voice, last note wins, so a drum part cabled in silences the melody."
+      }
+    }
+  }
+}

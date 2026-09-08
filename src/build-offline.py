@@ -3,7 +3,7 @@
 from pathlib import Path
 import hashlib,json
 root=Path(__file__).resolve().parents[1];dist=root/'dist'
-names=['index.html','style.css','app.js','catalog.js','bridge.js','loader.js','midi.js','instrument-bus.js','surface-router.js','plugin-contract.js','wish-config.js','wish.js','icon.svg','icon-192.png','icon-512.png','manifest.webmanifest']
+names=['index.html','style.css','app.js','catalog.js','bridge.js','loader.js','midi.js','instrument-bus.js','instrument-map.js','instrument-map.json','surface-router.js','plugin-contract.js','wish-config.js','wish.js','icon.svg','icon-192.png','icon-512.png','manifest.webmanifest']
 names += [str(p.relative_to(dist)) for p in sorted((dist/'instruments').glob('*.html'))]
 names += [str(p.relative_to(dist)) for p in sorted((dist/'licenses').glob('*')) if p.is_file()]
 names=[n for n in names if (dist/n).is_file()]

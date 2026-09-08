@@ -49,6 +49,82 @@ The script declares behavior; it does not implement it. Use the existing MIDI Ro
 
 Standalone descriptor JSON is useful for authoring and inspection but contains no executable HTML payload. Place it in the instrument before importing the HTML. Do not include both `midi-room-plugin` and `dsp-build` declarations: one file needs one authoritative interpretation. Intake reads JSON only and never evaluates surrounding HTML or JavaScript.
 
+## What a note means: the instrument map
+
+A MIDI cable carries numbers, not sounds. Note 49 is a crash cymbal to Lucky Dreamer and
+a snare to TRITON — TRITON's kit is twelve zones and it reads every note as `note % 12`,
+so 49 lands on the snare. Nothing broke in transit. The two instruments never agreed on
+what the number meant.
+
+The agreement is a file: [`dist/instrument-map.json`](../dist/instrument-map.json). It
+names each drum with a word — `kick`, `snare`, `hatO` — and each instrument says which
+numbers it uses for those words. To carry a drum from one to the other, the room looks the
+number up in the sender's table and looks the word up in the receiver's. `dist/instrument-map.js`
+does the looking up. Nothing else in the room needs to know.
+
+Two things make it safe to ship. It **fails open**: anything the map does not describe is
+forwarded byte for byte, so a gap in the metadata can never break a cable that works today.
+And it is **pure** — the same message always translates to the same message. That matters
+more than it looks. Some instruments match a note-off by channel and note together, so a
+translation that depended on anything else would leave notes held down forever.
+
+### Adding your instrument: five rules
+
+Write one entry under `instruments`. That is the whole job — there is no code to change,
+and no list of pairs to keep up to date. Every other instrument in the file becomes
+reachable from yours the moment the entry exists.
+
+1. **Name your drums with the words already in `slots`.** Add a new word only if no
+   existing one means the same thing, and give it a plain-language label. A word nobody
+   else uses can still be reached — see rule 5.
+2. **If you send drums, say which channel and which number is which drum.** Channel 9 is
+   the drum channel wherever MIDI is spoken. Write the numbers you actually put on the
+   wire, not the ones you wish you used.
+3. **If you receive drums, list the drums you have.** Group them into kits, and give each
+   kit its own block of note numbers. The blocks may not overlap, because the note number
+   is the only thing a MIDI cable can carry and it is how the room picks which of your
+   kits to use.
+4. **Say the range of pitches you can really sound.** The room folds incoming notes into
+   it by octaves, so a bass line written below your lowest key arrives an octave up
+   instead of arriving silent.
+5. **Add a substitute for anything you might not have.** `fallbacks` maps a drum to the
+   next-best drum: a ride becomes a crash, a conga becomes a low tom. The room takes the
+   first one it finds. A drum with no substitute anywhere is a test failure, not a quiet
+   silence.
+
+Then run the tests. They generate every pair of instruments in the file and push every
+note a sender can play through the real bus:
+
+```sh
+node --test tests/instrument-map.test.mjs
+```
+
+They fail if a drum has nowhere to land, if a note arrives somewhere the receiver has no
+sound for, if a note-off could not release its note-on, or if a kit names a drum that is
+not in the vocabulary.
+
+### What the map cannot do
+
+Say this out loud, because it is the difference between a cable that works and a cable
+that disappoints.
+
+**A receiver that plays one sound at a time still plays one sound at a time.** TRITON and
+the Improvisator are monotimbral: one patch answers every channel. Lucky Dreamer sends
+drums and melody down the same cable, roughly seventy percent drums. The map routes the
+drums to the drum engine — the receiver honours the drum channel now instead of ignoring
+it — but the melody still arrives on whatever patch is loaded, and the DSP Rack, which has
+one voice, will drop a note to play the next one.
+
+**Some drums are already lost before the cable.** Lucky Dreamer names 37 drums and
+publishes 28 note numbers, so six numbers carry more than one drum and the map has to
+choose a reading. Its percussion list has 25 names against 22 numbers, so two of the dunun
+drums leave as note 64 and arrive as a low conga. Those are sender defects. No translation
+downstream can undo them, and the map records them in `audit` fields rather than hiding
+them.
+
+**A word is not a timbre.** Two synthesizers cannot sound the same. The map promises that
+a kick strikes a kick, not that it is the kick you imagined.
+
 ## Rack state
 
 A rack contains `format: "midi-room.rack/1"`, `version: 1`, `name`, and `modules`. Each module contains a unique lowercase `instanceId`, an embedded plugin, a `values` object keyed by its parameter addresses, and boolean `bypass`. Omitted values use DSP defaults; unknown addresses or values outside the compiled limits are rejected. Omitted bypass means false.

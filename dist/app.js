@@ -24,7 +24,22 @@ const sessions = [];
 const roomJournal = [];
 function logRoom(event, detail = {}) { roomJournal.push({at: new Date().toISOString(),event,...detail}); if (roomJournal.length > 64) roomJournal.shift(); }
 const MAX_INSTRUMENTS = 4;
-const bus = new InstrumentBus();
+// The portable single file has no network and no module loader, so it hands the reader
+// over directly; the served page imports it only inside the try below.
+const INSTRUMENT_MAP_MODULE = globalThis.INSTRUMENT_MAP_MODULE || null;
+// Two instruments can mean different drums by the same note number. The agreement is
+// dist/instrument-map.json; until it has loaded, and if it never does, cables carry
+// bytes unchanged exactly as they did before the map existed.
+let translateEvent = null;
+const bus = new InstrumentBus({ translate: (event, route) => translateEvent ? translateEvent(event, route) : event });
+(async () => {
+  try {
+    const embedded = document.getElementById('instrumentMap');
+    const { busTranslator, validateInstrumentMap } = INSTRUMENT_MAP_MODULE || await import('./instrument-map.js');
+    const raw = embedded ? JSON.parse(embedded.textContent) : await (await fetch(new URL('./instrument-map.json', document.baseURI))).json();
+    translateEvent = busTranslator(validateInstrumentMap(raw));
+  } catch { translateEvent = null; }
+})();
 const surfaceRouter = new SurfaceRouter({send:(id,event)=>post(present().find(s=>s.nonce===id),{type:'surface-control',...event})});
 const focusRouter = new FocusRouter((id,event)=>post(present().find(s=>s.nonce===id),event.panic ? {type:'hardware-panic'} : {type:'midi',...event}));
 let adding = false;
@@ -378,7 +393,7 @@ async function mountInstrument(source, name, append = false, plugin = null) {
   session.storageSlot = session.replace?.storageSlot || Array.from({length:MAX_INSTRUMENTS},(_,i)=>String(i)).find(slot=>!sessions.some(s=>s.storageSlot===slot));
   const documentSource = prepareInstrument(source, { nonce: session.nonce, supported });
   staging = session;
-  bus.addSession({ id: session.nonce, capabilities: session.capabilities, send: envelope => {
+  bus.addSession({ id: session.nonce, instrument: session.plugin.id, capabilities: session.capabilities, send: envelope => {
     if (envelope.kind !== 'signal' || !session.legacyVibeBus) post(session, envelope);
     if (envelope.kind === 'signal' && session.legacyVibeBus) session.frame.contentWindow.postMessage({ type: 'VIBE_BUS_SIGNAL', source: envelope.origin, signal: envelope.signal, value: envelope.value, timestamp: envelope.at, midiRoomRouted: true, id: envelope.id }, '*');
   } });

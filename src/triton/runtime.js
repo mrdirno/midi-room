@@ -37,6 +37,31 @@
     try{if(!ensure())return Promise.resolve(false);return Promise.resolve((ctx.state==='suspended'||ctx.state==='interrupted')?ctx.resume():null).then(()=>ctx.state==='running');}
     catch(error){logStatus('Audio paused: '+error.message);return Promise.resolve(false);}
   }
+  /* Channel 9 is the drum channel wherever MIDI is spoken, and dist/instrument-map.json
+     says so for this instrument. Honouring it is the whole difference between a cabled
+     band arriving as drums and arriving as several hundred notes of whichever keyboard
+     patch happens to be loaded — which is what happened, because receive() read the
+     channel and noteOn never saw it. The selected patch is NOT changed: a percussion
+     note borrows a kit for one hit and gives it straight back.
+
+     Only notes from a room cable, never from hardware. A cable arrives as a virtual
+     input whose id starts with 'wire:' (dist/bridge.js), and plenty of keyboards are set
+     to channel 10 by default while their player expects the patch they chose — so a
+     controller behaves exactly as it did before this existed.
+
+     Two note bands pick the kit, because a note number is the only thing a MIDI cable can
+     carry, and they match instrument-map.json exactly — tests/instrument-map.test.mjs
+     fails if this copy and that file ever disagree. A player who has already loaded a kit
+     keeps it; the borrow happens only when the band asks for the other family. */
+  const ROOM_PERCUSSION={channel:9,kits:[{name:'std',low:36,high:47},{name:'perc',low:48,high:59}]};
+  function roomPercussion(event){
+    if(!event.cabled||event.channel!==ROOM_PERCUSSION.channel||state.mode==='COMBI')return null;
+    const band=ROOM_PERCUSSION.kits.find(k=>event.note>=k.low&&event.note<=k.high);
+    if(!band)return null;
+    if(cur&&cur.cat==='DRUMS'&&((cur.kit||'std')==='perc')===(band.name==='perc'))return null;
+    const program=PROGRAMS.find(p=>p.cat==='DRUMS'&&(p.kit||'std')===band.name);
+    return program?{program:program,kit:band.name}:null;
+  }
   function noteOn(event){
     if(!event||!bounded(event.id)||!bounded(event.routeId)||!Number.isInteger(event.note)||event.note<0||event.note>127||
       typeof event.velocity!=='number'||!Number.isFinite(event.velocity)||event.velocity<=0||event.velocity>1||!ensure())return false;
@@ -45,16 +70,19 @@
     prune();if(owners.size>=512)return false;
     const key=event.routeId+'\n'+event.id;
     if(owners.has(key))return false; // Duplicate note IDs never retrigger another voice.
-    const profile=voiceProfile(), zone=profile.voices.find(v=>v.note%12===event.note%12);
-    const group=zone&&zone.chokeGroup;
+    const percussion=roomPercussion(event);
+    const profile=voiceProfile(), zone=percussion?null:profile.voices.find(v=>v.note%12===event.note%12);
+    // The open and closed hats cut each other off whichever way the note arrived.
+    const group=percussion?(percussion.kit==='std'&&[6,10].includes(((event.note%12)+12)%12)?'hats':null):(zone&&zone.chokeGroup);
     if(group)for(const entry of owners.values())if(entry.group===group&&entry.routeId===event.routeId)release(entry,null,true);
     const refs=[];
-    if(state.mode==='COMBI')COMBIS[state.combiIdx].timbres.forEach(tb=>{
+    if(percussion){const v=spawnVoice(percussion.program,event.note,event.velocity,when,null);if(v)refs.push(v);}
+    else if(state.mode==='COMBI')COMBIS[state.combiIdx].timbres.forEach(tb=>{
       if(event.note>=tb.lo&&event.note<=tb.hi){const v=spawnVoice(PROGRAMS[tb.p],event.note+tb.tr,event.velocity*tb.lvl,when,null);if(v)refs.push(v);}
     });
     else{const v=spawnVoice(cur,event.note,event.velocity,when,null);if(v)refs.push(v);}
     if(!refs.length)return false;
-    owners.set(key,{id:event.id,routeId:event.routeId,note:event.note,mode:profile.kind==='drums'?'oneshot':'gate',group,refs});
+    owners.set(key,{id:event.id,routeId:event.routeId,note:event.note,mode:percussion||profile.kind==='drums'?'oneshot':'gate',group,refs});
     return true;
   }
   function noteOff(event){
@@ -79,7 +107,7 @@
     const d=Array.from(bytes);if(!d.every(x=>Number.isInteger(x)&&x>=0&&x<=255))return false;
     const command=d[0]&240,ch=d[0]&15,n=d[1],v=d[2]||0;if(n>127||v>127)return false;
     const c=channel(source,ch);
-    if(command===144&&v>0){const id='midi-'+(++sequence);const ok=noteOn({id,routeId:c.route,note:n,velocity:v/127});
+    if(command===144&&v>0){const id='midi-'+(++sequence);const ok=noteOn({id,routeId:c.route,note:n,velocity:v/127,channel:ch,cabled:source==='injected'||source.slice(0,5)==='wire:'});
       if(ok){let held=c.held.get(n);if(!held){held=[];c.held.set(n,held);}held.push(id);}if(typeof ctxEnsure==='function')ctxEnsure();return ok;}
     if(command===128||(command===144&&v===0)){const held=c.held.get(n);if(!held||!held.length)return false;const id=held.shift();if(!held.length)c.held.delete(n);
       if(c.sustain)c.pending.push(id);else noteOff({id,routeId:c.route});return true;}
