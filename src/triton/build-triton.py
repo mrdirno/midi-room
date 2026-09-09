@@ -206,6 +206,18 @@ replace('<div class="sp-label">harmonic character · performance and mix stay pi
 # everyone else nothing, and the question asked was which ones are sad.
 replace("b.dataset.character=k;b.textContent=k;",
         "b.dataset.character=k;b.textContent=k+' · '+(K.MODE_DEFS[K.PRESETS[k].mode].family==='minor'?'sad':'bright');")
+# On a phone the mood row is a sideways scroller with its scrollbar hidden, and the
+# three bright chips fill the whole width: rendered at 390px on 2026-09-09, zero of the
+# five sad chips were in view, so the person who wished the room sadder would open the
+# card on their phone and read BRIGHT, BRIGHT, BRIGHT. A card is opened by a phone —
+# that is what the chip in it is for. The row now wraps, so every mood is on screen at
+# any width. The scenes row above keeps its scroller: nothing was asked of it, and its
+# first chips are the ones that matter. Measured on the built page in headless Chrome
+# (tools: measure_chips at 390 and 1280 px): sad chips in view at 390px 0 -> 5, and at
+# 1280px the eighth chip is no longer clipped (7 -> 8 in view). No behaviour changes.
+replace('.sp-scenes,.sp-characters{display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;padding:3px 1px;}',
+        '.sp-scenes{display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;padding:3px 1px;}\n'
+        '.sp-characters{display:flex;flex-wrap:wrap;gap:7px;padding:3px 1px;}')
 # dist 580-586 -> served 592-604
 replace('''      </div>
     </div>
