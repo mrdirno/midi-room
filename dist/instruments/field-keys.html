@@ -134,8 +134,15 @@
     if (typeof event.scale === 'string' && Object.hasOwn(scales,event.scale)) scale = event.scale;
     $('keyReadout').textContent = names[root]; $('scaleReadout').textContent = scaleNames[scale]; queueDraw();
   }
+  // The BPM tile is the only place in the room where a followed clock can be seen, so a
+  // number that outlives its master reads as a clock that never followed. The route that
+  // set it is remembered; its stop or its cancel (cable removed, source closed) clears it,
+  // and a stop on some other cable leaves it alone.
+  let clockRoute = null;
+  function clearClock(route) { if (route !== clockRoute) return; clockRoute = null; $('bpmReadout').textContent = '\u2014'; }
   function transport(event) {
-    if (Number.isFinite(event.bpm) && event.bpm >= 20 && event.bpm <= 300) $('bpmReadout').textContent = String(Math.round(event.bpm * 10) / 10);
+    if (Number.isFinite(event.bpm) && event.bpm >= 20 && event.bpm <= 300) { clockRoute = event.route; $('bpmReadout').textContent = String(Math.round(event.bpm * 10) / 10); }
+    if (event.action === 'stop') clearClock(event.route);
     const owner = routeOwner(event);
     if (owner && ['stop','seek'].includes(event.action)) stopOwner(owner, null, eventTime(event));
   }
@@ -147,7 +154,7 @@
   if (hostSDK) {
     sdk.declare({ name:'Field Keys', send:['signal'], receive:['midi','field','transport','signal'] });
     unsubscribers.push(sdk.on('midi', event => { const owner = routeOwner(event); if (owner) receiveMIDI(event.data,owner,eventTime(event)); }));
-    unsubscribers.push(sdk.on('cancel', event => { const owner = routeOwner(event); if (owner) stopOwner(owner); }));
+    unsubscribers.push(sdk.on('cancel', event => { const owner = routeOwner(event); if (owner) stopOwner(owner); clearClock(event.route); }));
     unsubscribers.push(sdk.on('field',field),sdk.on('transport',transport),sdk.on('signal',signal));
     $('connection').textContent = 'Room receiver · ready';
   }

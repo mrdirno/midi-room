@@ -45,6 +45,8 @@ const focusRouter = new FocusRouter((id,event)=>post(present().find(s=>s.nonce==
 let adding = false;
 let autoAttempted = false;
 const busKinds = ['midi', 'transport', 'field', 'signal'];
+const kindLabels = {midi:'Notes',field:'Field',transport:'Clock',signal:'VibeBus'};
+const labelKinds = kinds => kinds.map(kind => kindLabels[kind]).join(' + ');
 const legacySignals = ['PARAM_UPDATE', 'CELL_ISOLATED', 'THERMAL_STATE', 'CV_SOURCE', 'PHOTONIC_MOD'];
 const sessionName = session => session?.displayName || session?.name.replace(/\.html?$/i, '') || 'Instrument';
 const present = () => [...sessions, ...(staging ? [staging] : [])].filter(session => !session.retired);
@@ -552,7 +554,7 @@ function renderConnections() {
     const row = document.createElement('div'); row.className = 'wire-row';
     const label = document.createElement('span'), names = document.createElement('b'), kinds = document.createElement('small');
     names.textContent = sessionName(sessions.find(s => s.nonce === route.from)) + ' → ' + sessionName(sessions.find(s => s.nonce === route.to));
-    kinds.textContent = route.kinds.map(kind => ({midi:'Notes',field:'Field',transport:'Clock',signal:'VibeBus'}[kind])).join(' · ');
+    kinds.textContent = route.kinds.map(kind => kindLabels[kind]).join(' · ');
     label.append(names,kinds);
     const remove = document.createElement('button'); remove.type = 'button'; remove.className = 'icon-button'; remove.textContent = '×'; remove.setAttribute('aria-label','Disconnect ' + names.textContent);
     remove.onclick = () => { bus.removeRoute(route.id); logRoom('wire.removed'); sendState(); renderRack(); };
@@ -566,20 +568,33 @@ function connectWire(from = $('wireFrom').value, to = $('wireTo').value, mode = 
   const requested = ({notes:['midi'],field:['field','transport'],vibe:['signal'],follow:busKinds})[mode] || ['midi'];
   const kinds = requested.filter(kind => source.capabilities.send.includes(kind) && target.capabilities.receive.includes(kind));
   if (!kinds.length) {
-    const from = sessionName(source), to = sessionName(target);
+    const from = sessionName(source), to = sessionName(target), what = labelKinds(requested);
     const sends = requested.some(kind => source.capabilities.send.includes(kind));
     const receives = requested.some(kind => target.capabilities.receive.includes(kind));
-    const why = !sends && !receives ? from + ' does not send this, and ' + to + ' does not receive it.'
-      : !sends ? from + ' does not send this.'
-      : to + ' does not receive this.';
-    const others = sessions.filter(s => s !== target && s.capabilities.send.some(kind => target.capabilities.receive.includes(kind))).map(sessionName);
-    $('wireStatus').textContent = why + (others.length ? ' These can play into ' + to + ': ' + others.join(', ') + '.' : ' Add another instrument to wire this one to.');
+    // Name the kind, never "this". A player who asked for Clock and read "does not
+    // receive this" could not learn the one fact that answers them: the Improvisator has
+    // no clock input and keeps its own tempo, so a cable into it carries notes only.
+    const why = !sends && !receives ? from + ' does not send ' + what + ', and ' + to + ' does not take it.'
+      : !sends ? from + ' does not send ' + what + '.'
+      : to + ' does not take ' + what + (requested.includes('transport') ? '; it keeps its own tempo.' : '.');
+    // Alternatives are sources that can send what was ASKED for into this target — never
+    // the source just refused, which used to be listed as its own alternative, twice.
+    const others = [...new Set(sessions.filter(s => s !== target && s !== source && s.capabilities.send.some(kind => requested.includes(kind) && target.capabilities.receive.includes(kind))).map(sessionName))];
+    const notesInstead = !requested.includes('midi') && source.capabilities.send.includes('midi') && target.capabilities.receive.includes('midi');
+    $('wireStatus').textContent = why + (others.length ? ' These can send ' + what + ' into ' + to + ': ' + others.join(', ') + '.' : notesInstead ? ' Notes will connect.' : '');
     return false;
   }
   try {
     bus.addRoute({id:'cable-' + nonce(),from,to,kinds,signals:[...new Set([...legacySignals,...(source.signals || [])])]});
     logRoom('wire.connected',{kinds});
-    $('wireStatus').textContent = 'Connected. Enable audio in each instrument, then play.';
+    // Say what the cable actually carries. "All compatible events" into the Improvisator
+    // narrows to Notes, and this line used to read "Connected." for that and for a full
+    // cable alike — so a player who believed the clock was shared heard Lucky Dreamer at
+    // its tempo over the Improvisator's own arpeggio at 132 and reported a sync bug. The
+    // narrowing is right; the words were not. Only kinds the source really sends are
+    // named as refused, so a Notes-only target is not scolded for Field or VibeBus.
+    const refused = requested.filter(kind => source.capabilities.send.includes(kind) && !kinds.includes(kind));
+    $('wireStatus').textContent = 'Connected: ' + labelKinds(kinds) + '.' + (refused.length ? ' ' + sessionName(target) + ' does not take ' + labelKinds(refused) + (refused.includes('transport') ? '; it keeps its own tempo.' : '.') : '') + ' Enable audio in each instrument, then play.';
     sendState(); renderRack(); return true;
   } catch (error) { $('wireStatus').textContent = error.message || 'This connection would create a loop or duplicate.'; return false; }
 }

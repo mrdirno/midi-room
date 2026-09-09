@@ -279,6 +279,30 @@ test('explicit wires carry authenticated notes and survive keyboard focus change
   assert.equal(h.app.bus.snapshot().routes.length,1);
 });
 
+test('the wire status names what a cable carries, what the target refused, and never lists the refused source as its own alternative', async () => {
+  const h = harness(); const a = await h.activate(), b = await h.activate(new File(['<html>b</html>'],'b.html'),true);
+  a.port.receive({type:'instrument-ready',name:'Lucky Dreamer',send:['midi','transport'],receive:[]});
+  b.port.receive({type:'instrument-ready',name:'Improvisator',send:['midi'],receive:['midi']});
+  assert.equal(h.app.connectWire(a.nonce,b.nonce,'follow'),true);
+  const status = h.nodes.get('wireStatus').textContent;
+  assert.match(status, /^Connected: Notes\. Improvisator does not take Clock; it keeps its own tempo\. Enable audio/);
+  assert.equal(h.app.bus.snapshot().routes[0].kinds.join(), 'midi');
+  assert.equal(h.app.connectWire(a.nonce,b.nonce,'field'),false);
+  const refusal = h.nodes.get('wireStatus').textContent;
+  assert.match(refusal, /^Improvisator does not take Field \+ Clock; it keeps its own tempo\./);
+  assert.doesNotMatch(refusal, /Lucky Dreamer/);
+  // a second clock master into one follower is refused by the bus, and the dialog shows why
+  const c = await h.activate(new File(['<html>c</html>'],'c.html'),true), d = await h.activate(new File(['<html>d</html>'],'d.html'),true);
+  c.port.receive({type:'instrument-ready',name:'Field Keys',send:[],receive:['midi','field','transport','signal']});
+  d.port.receive({type:'instrument-ready',name:'Lucky Dreamer',send:['midi','transport'],receive:[]});
+  assert.equal(h.app.connectWire(a.nonce,c.nonce,'follow'),true);
+  assert.match(h.nodes.get('wireStatus').textContent, /^Connected: Notes \+ Clock\. Enable audio/);
+  assert.equal(h.app.connectWire(d.nonce,c.nonce,'follow'),false);
+  assert.match(h.nodes.get('wireStatus').textContent, /already follows another clock/);
+  assert.equal(h.app.connectWire(d.nonce,c.nonce,'notes'),true);
+  assert.equal(h.app.bus.snapshot().routes.length,3);
+});
+
 test('close removes only the selected slot and sends destination cancellation before teardown', async () => {
   const h = harness();const a = await h.activate(), b = await h.activate(new File(['<html>b</html>'],'b.html'),true);
   a.port.receive({type:'instrument-ready',send:['midi'],receive:['midi']});

@@ -155,6 +155,13 @@ export class InstrumentBus {
     if (!allowedSignals) throw new TypeError('Choose the signals this cable may carry.');
     if (this.routes.size >= BUS_LIMITS.routes) throw new RangeError('The room has reached its cable limit.');
     if ([...this.routes.values()].some(r => r.from === from && r.to === to && r.kinds.some(k => types.includes(k)))) throw new Error('This connection already exists.');
+    // One clock per follower. Note fan-in is deliberate (two keyboards into one synth is
+    // ordinary), but a transport stream is an authority: two masters into one follower
+    // would interleave two starts, two tempos and two stops with no owner, and the
+    // follower would flip to whichever spoke last — the "overlapping master/slave" a
+    // player reported on 2026-09-09. The second clock cable is refused with a sentence
+    // the wire dialog shows as-is; a Notes cable from that source still connects.
+    if (types.includes('transport') && [...this.routes.values()].some(r => r.to === to && r.from !== from && r.kinds.includes('transport'))) throw new Error('This instrument already follows another clock. Disconnect that cable first.');
     if (this._reachable(to, from)) throw new Error('This cable would create a feedback loop.');
     this.routes.set(id, { id, from, to, kinds: types, signals: allowedSignals, notes: new Map(), channels: new Set(), generation: 0 });
     return id;

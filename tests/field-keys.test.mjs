@@ -79,6 +79,16 @@ test('transport stop releases only its route; tempo and key/scale updates preser
   h.send('transport',{route:'a',action:'stop',at:100000});assert.ok(h.snapshot().voices.find(voice=>voice.owner==='wire:a').releaseAt!==null);assert.equal(h.snapshot().voices.find(voice=>voice.owner==='wire:b').releaseAt,null);
 });
 
+test('the BPM readout follows one clock and clears when that clock stops or its cable is cancelled',async t=>{
+  const h=harness();t.after(()=>h.dispose());await h.enable();
+  h.send('transport',{route:'a',action:'start',bpm:96});assert.equal(h.elements.get('bpmReadout').textContent,'96');
+  h.send('transport',{route:'b',action:'stop',at:100000});assert.equal(h.elements.get('bpmReadout').textContent,'96');   // another cable's stop is not this clock
+  h.send('transport',{route:'a',action:'stop',at:100000});assert.equal(h.elements.get('bpmReadout').textContent,'\u2014');
+  h.send('transport',{route:'a',action:'tempo',bpm:87.5});assert.equal(h.elements.get('bpmReadout').textContent,'87.5');
+  h.send('cancel',{route:'b',at:100000});assert.equal(h.elements.get('bpmReadout').textContent,'87.5');
+  h.send('cancel',{route:'a',at:100000});assert.equal(h.elements.get('bpmReadout').textContent,'\u2014');
+});
+
 test('same-pitch repeated notes, sustain and release stay owned by their route',async t=>{
   const h=harness();t.after(()=>h.dispose());await h.enable();
   for(const route of ['a','a','b'])h.send('midi',{route,at:100000,data:[0x90,60,100]});

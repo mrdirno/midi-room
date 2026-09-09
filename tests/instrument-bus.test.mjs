@@ -33,6 +33,24 @@ test('there is no implicit forwarding; duplicates, self-loops and mixed-kind cyc
   assert.equal(received.c.length, 0);
 });
 
+test('one clock per follower: a second transport master is refused while its notes still connect', () => {
+  const { bus, received } = setup();
+  bus.addRoute({ id: 'ab', from: 'a', to: 'b', kinds: ['midi', 'transport'] });
+  assert.throws(() => bus.addRoute({ id: 'cb', from: 'c', to: 'b', kinds: ['transport'] }), /already follows another clock/);
+  assert.throws(() => bus.addRoute({ id: 'cb2', from: 'c', to: 'b', kinds: ['midi', 'transport', 'field'] }), /already follows another clock/);
+  bus.addRoute({ id: 'cbn', from: 'c', to: 'b', kinds: ['midi'] });
+  bus.publish('c', { kind: 'transport', action: 'tempo', bpm: 90 });
+  assert.equal(received.b.filter(e => e.kind === 'transport').length, 0);
+  bus.publish('a', { kind: 'transport', action: 'tempo', bpm: 120 });
+  assert.equal(received.b.filter(e => e.kind === 'transport').length, 1);
+  assert.equal(received.b.at(-1).bpm, 120);
+  bus.removeRoute('ab');
+  bus.addRoute({ id: 'cbt', from: 'c', to: 'b', kinds: ['transport'] });
+  // control: a clock into a different follower is not a second master
+  bus.addRoute({ id: 'ac', from: 'a', to: 'c', kinds: ['transport'] });
+  assert.equal(bus.snapshot().routes.length, 3);
+});
+
 test('removing one cable releases its repeated notes, sustain and future queue without touching other cables', () => {
   const { bus, received } = setup();
   bus.addRoute({ id: 'ab', from: 'a', to: 'b' });
