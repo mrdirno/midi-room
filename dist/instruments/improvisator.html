@@ -567,10 +567,10 @@ body[data-instrument="improvisator"] h1{font-size:clamp(2rem,7vw,3.4rem)}
 
     <div class="sp-label">TRITON scenes</div>
     <div class="sp-scenes" id="spScenes"></div>
-    <div class="sp-label">harmonic character · performance and mix stay pinned</div>
+    <div class="sp-label">mood · sad or bright · your tempo and mix stay put</div>
     <div class="sp-characters" id="spCharacters"></div>
 
-    <div class="sp-label">colour · major, minor, or both</div>
+    <div class="sp-label">colour · minor is the sad one</div>
     <div class="sp-colours" id="spColours">
       <button class="sp-colour" data-colour="major" type="button">Major</button>
       <button class="sp-colour" data-colour="minor" type="button">Minor</button>
@@ -11303,7 +11303,7 @@ function switchMode(mode){
 }
 function populate(){
   var sc=$p('spScenes');Object.keys(SCENES).forEach(function(k){var b=document.createElement('button');b.type='button';b.className='sp-scene';b.dataset.scene=k;b.textContent=SCENES[k].label;b.onclick=function(){selectScene(k);};sc.appendChild(b);});
-  var chars=$p('spCharacters');Object.keys(K.PRESETS).forEach(function(k){var b=document.createElement('button');b.type='button';b.className='sp-character';b.dataset.character=k;b.textContent=k;b.onclick=function(){applyCharacter(k);};chars.appendChild(b);});
+  var chars=$p('spCharacters');Object.keys(K.PRESETS).forEach(function(k){var b=document.createElement('button');b.type='button';b.className='sp-character';b.dataset.character=k;b.textContent=k+' · '+(K.MODE_DEFS[K.PRESETS[k].mode].family==='minor'?'sad':'bright');b.onclick=function(){applyCharacter(k);};chars.appendChild(b);});
   NOTE_NAMES.forEach(function(n,i){var o=document.createElement('option');o.value=i;o.textContent=n;$p('spTonic').appendChild(o);});
   K.MODE_KEYS.forEach(function(k){var o=document.createElement('option');o.value=k;o.textContent=MODE_DEFS[k].label;$p('spMode').appendChild(o);});
 }

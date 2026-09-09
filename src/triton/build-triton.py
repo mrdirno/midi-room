@@ -179,13 +179,33 @@ replace('''    <div class="sp-characters" id="spCharacters"></div>
 ''',
 '''    <div class="sp-characters" id="spCharacters"></div>
 
-    <div class="sp-label">colour · major, minor, or both</div>
+    <div class="sp-label">colour · minor is the sad one</div>
     <div class="sp-colours" id="spColours">
       <button class="sp-colour" data-colour="major" type="button">Major</button>
       <button class="sp-colour" data-colour="minor" type="button">Minor</button>
       <button class="sp-colour" data-colour="both" type="button">Best of both</button>
     </div>
 ''')
+
+# A visitor wished the room was sadder. It already can be: tapping Minor takes it
+# from 38.4% to 47.5% sad-sounding chords, and the mood chip called "procession"
+# reaches 67.1% (25 seeds x 64 bars, counted off the built page). Nothing on screen
+# said so. Both patches below move WORDS ONLY — no default, no interval, no tempo
+# changes, and the same measurement must read 38.4/47.5/67.1 after the build.
+
+# The mood row's caption described what these chips leave alone and never what they
+# do. It now names the thing the visitor was looking for.
+replace('<div class="sp-label">harmonic character · performance and mix stay pinned</div>',
+        '<div class="sp-label">mood · sad or bright · your tempo and mix stay put</div>')
+
+# The chips printed their own internal key — the row read "reference still luminous
+# nocturne drift vigil ascent procession", so a stranger had to guess which of eight
+# invented words was the sad one. MODE_DEFS already carries a family for every mode,
+# so the gloss is read from the data rather than invented, and the author's names all
+# survive. Family, not the mode name: "phrygian" tells a musician something and tells
+# everyone else nothing, and the question asked was which ones are sad.
+replace("b.dataset.character=k;b.textContent=k;",
+        "b.dataset.character=k;b.textContent=k+' · '+(K.MODE_DEFS[K.PRESETS[k].mode].family==='minor'?'sad':'bright');")
 # dist 580-586 -> served 592-604
 replace('''      </div>
     </div>
