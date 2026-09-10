@@ -23995,7 +23995,14 @@ function busPublish(t){
     engine than S.world, and publishing S.world then would be a lie. */
  if(!S.playing||S.solo||!S.world)return;
  if(busWorld!==S.world){
-  busWorld=S.world;busList=busScore(S.world);busCursor=t-1e-3;busLast=-1;
+  /* Keep the cursor. It is the high-water mark of what has already gone down the
+     wire, and a new world does not un-send those notes — it only re-times the same
+     band. Rewinding it here re-published the whole 0.4 s horizon on every rebuild,
+     and a held +/- button rebuilds every 80 ms: measured 28 note-ons where 8 were
+     owed over one second, arriving 4-11 ms off a 125 ms grid, while the engine
+     itself was restruck 0 times (swapSoon debounces, by design). This is the same
+     mistake the loop-around test below was written to avoid, one branch up. */
+  busWorld=S.world;busList=busScore(S.world);busLast=-1;
   /* the dial moved, or a roll drew a new tempo */
   if(S.world.bpm&&S.world.bpm!==busBpm){busBpm=S.world.bpm;busTransport('tempo',busBpm);}
  }
