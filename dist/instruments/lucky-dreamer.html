@@ -23998,10 +23998,18 @@ function busPublish(t){
   /* Keep the cursor. It is the high-water mark of what has already gone down the
      wire, and a new world does not un-send those notes — it only re-times the same
      band. Rewinding it here re-published the whole 0.4 s horizon on every rebuild,
-     and a held +/- button rebuilds every 80 ms: measured 28 note-ons where 8 were
-     owed over one second, arriving 4-11 ms off a 125 ms grid, while the engine
-     itself was restruck 0 times (swapSoon debounces, by design). This is the same
-     mistake the loop-around test below was written to avoid, one branch up. */
+     and a held +/- button rebuilds every 80 ms. Measured over one second on real
+     worlds: 38 note-ons where 7 were owed (seed 12345; 34/8 and 38/10 on two more),
+     arriving as ~25 flams 3-90 ms apart on the same note — an audible stutter.
+     Removing only the rewind collapses 38 to 10.
+
+     THIS IS NOT A TEMPO BUG, and the first version of this note said it was. Freeze
+     the tempo and hold the same button and the pile-up is WORSE (44 v 38), because
+     the trigger is the rebuild, not the arithmetic. The engine is restruck once
+     mid-hold, at +243 ms — not zero times as first written — and the two tempo
+     readouts are byte-identical, so nothing here is two clocks disagreeing. It is
+     one cable being told the same music twice. This is the same mistake the
+     loop-around test below was written to avoid, one branch up. */
   busWorld=S.world;busList=busScore(S.world);busLast=-1;
  }
  /* Say the tempo again now and then, not only when the dial moves. A clock that

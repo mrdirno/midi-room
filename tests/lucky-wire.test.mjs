@@ -33,10 +33,11 @@ const band = (bpm, steps = 64) => ({ bpm, secPerStep: 60 / bpm / 4,
 const key = event => event.note + '@' + event.where;
 
 test('a rebuilt world does not re-send the stretch already on the wire', () => {
-  // A held +/- button rebuilds the world every 80 ms while the engine, which debounces, is
-  // restruck none of those times. The publisher used to rewind its high-water mark on every
-  // rebuild, so each one re-published the whole horizon: measured 28 note-ons over a second
-  // where 8 were owed, landing 4-11 ms off a 125 ms grid — two tempos inside one instrument.
+  // A held +/- button rebuilds the world every 80 ms, and the publisher used to rewind its
+  // high-water mark on every rebuild, so each one re-published the whole horizon: measured
+  // 38 note-ons over a second where 7 were owed, arriving as ~25 flams 3-90 ms apart on the
+  // same note. Not a tempo bug — freeze the tempo and hold the button and it is worse
+  // (44 v 38). The trigger is the rebuild; one cable is told the same music twice.
   const p = publisher();
   p.S.world = band(120);
   p.publish(0);
