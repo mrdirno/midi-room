@@ -30,6 +30,9 @@ function publisher() {
 const band = (bpm, steps = 64) => ({ bpm, secPerStep: 60 / bpm / 4,
   roster: [{ id: 'lead', engine: 'poly', muted: false }],
   events: Array.from({ length: steps }, (_, i) => ({ part: 'lead', t: i, note: 60 + (i % 4), dur: 1, vel: 0.8 })) });
+const lanes = (...ids) => ({ bpm: 120, secPerStep: 0.125,
+  roster: ids.map(id => ({ id: id.id, engine: 'poly', muted: false })),
+  events: ids.flatMap(l => Array.from({ length: 64 }, (_, i) => ({ part: l.id, t: i, note: l.note, dur: 1, vel: 0.8 }))) });
 const key = event => event.note + '@' + event.where;
 
 test('a rebuilt world does not re-send the stretch already on the wire', () => {
@@ -76,4 +79,22 @@ test('a clock that nobody touches still says its tempo, so a cable made late fil
   assert.deepEqual([...new Set(said.map(event => event.bpm))], [120], 'and always the tempo it is actually playing');
   // Once a bar, not once a publish: this rides on a cable, and 160 events would be noise.
   assert.ok(said.length <= 8, `${said.length} tempo events in eight seconds is chatter`);
+});
+
+test('a rebuild that ADDS a part sends it at once; only what was already sent is skipped', () => {
+  // The counterpart to the test above, and the reason the skip is keyed on a note's seat in
+  // the music rather than its position in time. A time cursor that is carried across the swap
+  // stops the duplicates but silently drops whatever the rebuild added inside the horizon:
+  // measured 0 of the 4 notes owed in the first 400 ms after a lane is unmuted, its entry
+  // sliding 125 ms -> 500 ms. Both properties are pinned here so neither can be traded away.
+  const p = publisher();
+  p.S.world = lanes({ id: 'lead', note: 60 });
+  p.publish(0);
+  p.S.world = lanes({ id: 'lead', note: 60 }, { id: 'bass', note: 36 });   // a lane is unmuted
+  p.publish(0.05);
+  const bass = p.onsets().filter(event => event.note === 36).map(event => event.where);
+  const lead = p.onsets().filter(event => event.note === 60).map(event => event.where);
+  assert.ok(bass.length >= 4, `the unmuted lane sent ${bass.length} notes into the first horizon`);
+  assert.ok(Math.min(...bass) <= 125, `the unmuted lane came in at ${Math.min(...bass)} ms`);
+  assert.equal(lead.length, new Set(lead).size, 'and the lane that did not change was not sent twice');
 });

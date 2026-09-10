@@ -23937,7 +23937,7 @@ ABOUT='<h2>LUCKY DREAMER</h2><p>A whole-band cloud instrument by Aldrin Payopay,
    audibly loose. Emitting 400ms early with a timestamp is the difference
    between a wire and a rumour. Nothing is sent unless a listener has drawn
    a wire; the room fans only to matching routes. */
-var busList=null,busWorld=null,busCursor=-1,busLast=-1,busBpm=0,busSaid=-1e9;
+var busList=null,busWorld=null,busCursor=-1,busLast=-1,busBpm=0,busSaid=-1e9,busSeats=Object.create(null);
 function busScore(w){
  var out=[],melCh=0,pi,i;
  for(pi=0;pi<w.roster.length;pi++){
@@ -23968,13 +23968,13 @@ function busScore(w){
       -3ms. Unclamped they sit behind the publisher's opening cursor and
       never reach the wire, so the file would have a hit the wire did not. */
    var at=Math.max(0,e.t*w.secPerStep);
-   out.push({at:at,off:at+dur,ch:ch,note:note|0,vel:Math.max(1,Math.min(127,Math.round(e.vel*126)+1))});
+   out.push({at:at,off:at+dur,ch:ch,note:note|0,vel:Math.max(1,Math.min(127,Math.round(e.vel*126)+1)),seat:r.id+':'+e.t});
   }
  }
  out.sort(function(a,b){return a.at-b.at;});
  return out;
 }
-function busReset(){busList=null;busWorld=null;busCursor=-1;busLast=-1;busBpm=0;busSaid=-1e9;}
+function busReset(){busList=null;busWorld=null;busCursor=-1;busLast=-1;busBpm=0;busSaid=-1e9;busSeats=Object.create(null);}
 /* Transport, so PLAY and STOP here mean PLAY and STOP over there. It also
    closes the one gap the note scheduler leaves open: notes are published
    400ms early, so a stop would otherwise be followed by up to 400ms of
@@ -24028,18 +24028,27 @@ function busPublish(t){
     cursor every 50ms. Measured before this line was written that way: 12 of
     12 seeds re-sent the same notes, 10,199 duplicates in one loop of the
     first. */
- if(busLast>=0&&t<busLast-1e-3)busCursor=t-1e-3;
+ if(busLast>=0&&t<busLast-1e-3){busCursor=t-1e-3;busSeats=Object.create(null);}
  busLast=t;
  var horizon=t+0.4,base=mr.now();
  for(var i=0;i<busList.length;i++){
   var n=busList[i];
-  if(n.at<=busCursor)continue;
+  /* Skip what has already gone down the wire, by its seat in the music (part + step),
+     never by its position in time. A rebuild re-times the same band, so the same note comes
+     back with a different `at`; a time cursor either re-sends it (flams, ~half the notes on
+     a held button) or, if the cursor is carried, silently drops material the rebuild ADDED
+     inside the horizon — measured at 0 of the 4 notes owed in the first 400 ms after a lane
+     is unmuted, its entry sliding 125 ms -> 500 ms. The seat is stable under re-timing, so
+     it separates the two: a re-timed note is the same seat and is skipped; an unmuted lane
+     is a new seat and goes out at once. */
+  if(busSeats[n.seat])continue;
   if(n.at>horizon)break;                      /* sorted: nothing later matters */
   var on=base+(n.at-t)*1000,off=base+(n.off-t)*1000;
   if(on<base)on=base;
   if(off<on+40)off=on+40;
   mr.emit({kind:'midi',data:[0x90|n.ch,n.note,n.vel],at:on});
   mr.emit({kind:'midi',data:[0x80|n.ch,n.note,0],at:off});
+  busSeats[n.seat]=1;
  }
  busCursor=horizon;
 }
