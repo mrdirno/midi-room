@@ -303,6 +303,31 @@ test('the wire status names what a cable carries, what the target refused, and n
   assert.equal(h.app.bus.snapshot().routes.length,3);
 });
 
+test('two of the same instrument are told apart everywhere the room names them', async () => {
+  // Measured against the served room on 2026-09-09: two Lucky Dreamers both read
+  // "Lucky Dreamer" in the From menu, the To menu, the wire list and the rack tabs, so a
+  // player aiming the SECOND one's clock cable was guessing, and picking the first one
+  // again answered "This connection already exists" — which says nothing about clocks.
+  // That is what a report of overlapping masters looks like from the player's chair.
+  const h = harness();
+  const a = await h.activate(), b = await h.activate(new File(['<html>b</html>'],'b.html'),true), c = await h.activate(new File(['<html>c</html>'],'c.html'),true);
+  a.port.receive({type:'instrument-ready',name:'Lucky Dreamer',send:['midi','transport'],receive:[]});
+  b.port.receive({type:'instrument-ready',name:'Lucky Dreamer',send:['midi','transport'],receive:[]});
+  c.port.receive({type:'instrument-ready',name:'Field Keys',send:[],receive:['midi','field','transport','signal']});
+  assert.equal(h.app.connectWire(a.nonce,c.nonce,'field'),true);
+  const menu = h.nodes.get('wireFrom').options.map(option => option.text);
+  assert.equal(new Set(menu).size, menu.length, 'every source in the From menu reads differently');
+  assert.deepEqual(menu.filter(text => text.startsWith('Lucky')), ['Lucky Dreamer 1','Lucky Dreamer 2']);
+  assert.deepEqual(h.nodes.get('rackTabs').children.map(tab => tab.textContent), ['Lucky Dreamer 1','Lucky Dreamer 2','Field Keys']);
+  assert.equal(h.nodes.get('wireList').children[0].children[0].children[0].textContent, 'Lucky Dreamer 1 → Field Keys');
+  // The refusal a second clock earns now says which twin is already in the seat.
+  assert.equal(h.app.connectWire(b.nonce,c.nonce,'field'),false);
+  assert.match(h.nodes.get('wireStatus').textContent, /already follows another clock/);
+  // One of a kind is still one plain name: close a twin and the survivor stops counting.
+  h.app.focusSession(a); h.app.closeInstrument();
+  assert.deepEqual(h.nodes.get('rackTabs').children.map(tab => tab.textContent), ['Lucky Dreamer','Field Keys']);
+});
+
 test('close removes only the selected slot and sends destination cancellation before teardown', async () => {
   const h = harness();const a = await h.activate(), b = await h.activate(new File(['<html>b</html>'],'b.html'),true);
   a.port.receive({type:'instrument-ready',send:['midi'],receive:['midi']});

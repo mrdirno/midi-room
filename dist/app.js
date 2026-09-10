@@ -48,8 +48,21 @@ const busKinds = ['midi', 'transport', 'field', 'signal'];
 const kindLabels = {midi:'Notes',field:'Field',transport:'Clock',signal:'VibeBus'};
 const labelKinds = kinds => kinds.map(kind => kindLabels[kind]).join(' + ');
 const legacySignals = ['PARAM_UPDATE', 'CELL_ISOLATED', 'THERMAL_STATE', 'CV_SOURCE', 'PHOTONIC_MOD'];
-const sessionName = session => session?.displayName || session?.name.replace(/\.html?$/i, '') || 'Instrument';
+const instrumentName = session => session?.displayName || session?.name.replace(/\.html?$/i, '') || 'Instrument';
 const present = () => [...sessions, ...(staging ? [staging] : [])].filter(session => !session.retired);
+// Two of the same instrument used to be two identical words in every list the room shows —
+// the From and To menus, the wire list, the rack tabs, the sentence a refused cable prints.
+// A player wiring the SECOND Lucky Dreamer's clock could not see which one they had picked,
+// and picking the first one again answered "This connection already exists", which says
+// nothing about clocks. That is how two masters look to the person reporting them.
+// Number a name only when it collides, so the ordinary room — one of each — still reads
+// plainly, and a name goes back to being plain when the twin is closed.
+const sessionName = session => {
+  const base = instrumentName(session);
+  if (!session) return base;
+  const twins = present().filter(other => instrumentName(other) === base);
+  return twins.length > 1 ? base + ' ' + (twins.indexOf(session) + 1) : base;
+};
 const builtinPlugin=(id,name,role='instrument')=>validatePlugin({format:'midi-room.plugin/1',id,version:'1.0.0',name,role,engine:{type:'html-sandbox/1'},midi:{mode:'web-midi',channel:null}});
 
 function notify(message, duration = 4800) {
@@ -316,7 +329,7 @@ function handlePortMessage(session, data) {
   }
   if (data.type === 'instrument-ready') {
     const meta = data.manifest || data;
-    session.displayName = typeof meta.name === 'string' && meta.name !== 'HTML instrument' ? meta.name.trim().slice(0, 64) : sessionName(session);
+    session.displayName = typeof meta.name === 'string' && meta.name !== 'HTML instrument' ? meta.name.trim().slice(0, 64) : instrumentName(session);
     session.legacyVibeBus = meta.legacyVibeBus === true;
     session.capabilities = { send: Array.isArray(meta.send) ? [...new Set(meta.send)].filter(kind => busKinds.includes(kind)) : [], receive: Array.isArray(meta.receive) ? [...new Set(meta.receive)].filter(kind => busKinds.includes(kind)) : ['midi', 'signal'] };
     bus.setCapabilities(session.nonce, session.capabilities);
