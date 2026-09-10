@@ -111,6 +111,20 @@ await test('Live source release and cancellation retain their original AudioCont
 await test('Tempo controls cannot mutate an active offline render',()=>{
   const e=env(candidate);e.run('exporting=true');assert.equal(e.world.TritonEngine.setTempo(90),false);assert.equal(e.world.TritonEngine.transportState().bpm,132);
 });
+await test('A tempo control refused mid-render is put back, so no slider states a tempo the clock is not at',async()=>{
+  // The clock refusing is only half the job. The Soul slider kept the value the clock had
+  // rejected, and kept it after the render ended, so the panel showed a thumb at 200 above a
+  // readout at 132 and the next one-step nudge promoted 201 into the clock — a 69 BPM jump.
+  const e=env(candidate);e.boot();const slider=e.el('spTempo');
+  assert.equal((slider.listeners.input||[]).length,1,'the Soul tempo handler is attached');
+  e.run('exporting=true');slider.value='200';slider.fire('input');
+  assert.equal(e.world.TritonEngine.transportState().bpm,132);
+  assert.equal(Number(slider.value),132,'the refused thumb is put back, not left where it was dragged');
+  e.run('exporting=false');
+  assert.equal(Number(slider.value),132,'and it does not outlive the render');
+  slider.value='96';slider.fire('input');           // control: an ordinary move still works
+  assert.equal(e.world.TritonEngine.transportState().bpm,96);assert.equal(Number(slider.value),96);
+});
 await test('Actual renderNote restores live graph, pitch settings and voice ledger on success and failure',async()=>{
   const e=env(candidate);e.boot();
   const io=[...candidate.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)].find(m=>m[2].includes('function renderNote('))[2];

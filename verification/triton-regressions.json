@@ -1,6 +1,6 @@
 {
-  "testedAt": "2026-09-10T03:07:06.111Z",
-  "artifactSha256": "312a87f99ea476fe692735eb5be3e6105aa423c88b522a68a0a96a2aa15134e3",
+  "testedAt": "2026-09-10T03:12:52.362Z",
+  "artifactSha256": "2fee03b131ed7c00a37802d17ddfe74a2c17dd33174bd711bb8d6d0f6d2916d0",
   "method": "Node VM execution of original and candidate implementation with explicit DOM, AudioContext and timer doubles",
   "tests": [
     {
@@ -53,6 +53,10 @@
     },
     {
       "name": "Tempo controls cannot mutate an active offline render",
+      "pass": true
+    },
+    {
+      "name": "A tempo control refused mid-render is put back, so no slider states a tempo the clock is not at",
       "pass": true
     },
     {

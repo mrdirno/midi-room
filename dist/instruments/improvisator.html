@@ -11254,7 +11254,7 @@ function syncControls(){
   Object.keys(vals).forEach(function(id){var e=$p(id);if(e)e.value=Math.round(vals[id]);var o=$p(id+'Out');if(o)o.textContent=Math.round(vals[id])+(id==='spTempo'?'':'%');});
   $p('spTonic').value=settings.tonic;$p('spMode').value=settings.mode;$p('spKey').textContent=keyText();$p('spTempoRead').textContent=Math.round(settings.bpm)+' bpm';
 }
-function changeSetting(id,key,isBpm){var e=$p(id);if(!e)return;e.addEventListener('input',function(){var v=Number(e.value);if(isBpm){TritonTransport.set(v,{reason:"Soul tempo control"});return;}settings[key]=v/100;
+function changeSetting(id,key,isBpm){var e=$p(id);if(!e)return;e.addEventListener('input',function(){var v=Number(e.value);if(isBpm){if(!TritonTransport.set(v,{reason:"Soul tempo control"}))e.value=state.tempo;return;}settings[key]=v/100;
   var o=$p(id+'Out');if(o)o.textContent=Math.round(v)+(isBpm?'':'%');if(SP.composer){SP.composer.updateSettings(settings);if(SP.composer.pending)SP.composer.pending.length=0;}
   if(key==='reverb'){SP.pendingFx=SP.on;if(!SP.on)applySoulFX();}if(key==='bpm')$p('spTempoRead').textContent=Math.round(v)+' bpm';});}
 function outputName(ext){return 'triton-soul-'+String(SP.seed||'take').replace(/[^a-z0-9._-]+/gi,'-')+ext;}

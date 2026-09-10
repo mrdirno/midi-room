@@ -49,7 +49,13 @@ replace('var settings=Object.assign({},K.PRESETS.reference,K.LOCKED_PERFORMANCE|
 replace('id="spTempo" type="range" min="34" max="132" value="132"', 'id="spTempo" type="range" min="40" max="240" value="132"')
 replace('state.tempo=+bar.bpm.toFixed(2);', '/* A planned bar cannot write shared tempo. */')
 replace('settings.mode=p.mode;Object.assign(settings,K.LOCKED_PERFORMANCE||K.PRESETS.reference);', 'settings.mode=p.mode; /* Harmonic character retains tempo and performance controls. */')
-replace('settings[key]=isBpm?v:v/100;', 'if(isBpm){TritonTransport.set(v,{reason:"Soul tempo control"});return;}settings[key]=v/100;')
+# A refused tempo write must put the control back, or the thumb states a tempo the clock is
+# not at and keeps stating it after the refusal is over. During a mix render the transport
+# refuses every write; the Soul slider still moved, and nothing reset it when the render
+# ended, so the next one-step nudge promoted the stale value (200 -> 201) and jumped the
+# clock 69 BPM in one step. runtime.js:159 already does exactly this for the rack tempo box;
+# the Soul slider was the one control that did not.
+replace('settings[key]=isBpm?v:v/100;', 'if(isBpm){if(!TritonTransport.set(v,{reason:"Soul tempo control"}))e.value=state.tempo;return;}settings[key]=v/100;')
 replace('function soulStart(fresh){\n', 'function soulStart(fresh){\n  if(SP.on)return true; /* Proven donor fix: one scheduler per conductor. */\n  SP.startRequest=(SP.startRequest||0)+1;SP.startPending=false;\n')
 replace('function soulStop(silent){\n', 'function soulStop(silent){\n  SP.startRequest=(SP.startRequest||0)+1;SP.startPending=false;\n')
 replace("if(SP.on){soulStop(false);return;}\n  if(ctx&&ctx.state==='suspended'&&ctx.resume){ctx.resume().then(function(){soulStart(false);});return;}", "if(SP.on||SP.startPending){soulStop(false);return;}\n  if(ctx&&ctx.state==='suspended'&&ctx.resume){var request=(SP.startRequest||0)+1;SP.startRequest=request;SP.startPending=true;ctx.resume().then(function(){if(SP.startRequest===request&&SP.startPending)soulStart(false);},function(ex){if(SP.startRequest===request){SP.startPending=false;setStatus('Audio paused: '+ex.message);}});return;}")
