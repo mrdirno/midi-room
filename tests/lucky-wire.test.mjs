@@ -61,3 +61,18 @@ test('a run of rebuilds sends each note once, and the loop coming round still re
   p.publish(0);                                  // the playhead goes backwards: the music genuinely repeats
   assert.ok(p.onsets().length > before, 'the loop coming round sends its notes again');
 });
+
+test('a clock that nobody touches still says its tempo, so a cable made late fills in', () => {
+  // A follower learns the tempo only from a transport event. On the shipped file a steady
+  // performance sent exactly one, at t=0: eight seconds of play, one event. So a cable made
+  // a minute in carried notes while the follower's BPM tile stayed a dash — the wire list
+  // said "Clock" and the instrument said "no clock", and nothing could settle it.
+  const p = publisher();
+  p.S.world = band(120, 256);
+  for (let t = 0; t < 8; t = Number((t + 0.05).toFixed(2))) p.publish(t);
+  const said = p.sent.filter(event => event.kind === 'transport');
+  assert.ok(said.length >= 4, `eight seconds of steady play said the tempo ${said.length} time(s)`);
+  assert.deepEqual([...new Set(said.map(event => event.bpm))], [120], 'and always the tempo it is actually playing');
+  // Once a bar, not once a publish: this rides on a cable, and 160 events would be noise.
+  assert.ok(said.length <= 8, `${said.length} tempo events in eight seconds is chatter`);
+});

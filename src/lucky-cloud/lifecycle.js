@@ -199,7 +199,7 @@ ABOUT='<h2>LUCKY DREAMER</h2><p>A whole-band cloud instrument by Aldrin Payopay,
    audibly loose. Emitting 400ms early with a timestamp is the difference
    between a wire and a rumour. Nothing is sent unless a listener has drawn
    a wire; the room fans only to matching routes. */
-var busList=null,busWorld=null,busCursor=-1,busLast=-1,busBpm=0;
+var busList=null,busWorld=null,busCursor=-1,busLast=-1,busBpm=0,busSaid=-1e9;
 function busScore(w){
  var out=[],melCh=0,pi,i;
  for(pi=0;pi<w.roster.length;pi++){
@@ -236,7 +236,7 @@ function busScore(w){
  out.sort(function(a,b){return a.at-b.at;});
  return out;
 }
-function busReset(){busList=null;busWorld=null;busCursor=-1;busLast=-1;busBpm=0;}
+function busReset(){busList=null;busWorld=null;busCursor=-1;busLast=-1;busBpm=0;busSaid=-1e9;}
 /* Transport, so PLAY and STOP here mean PLAY and STOP over there. It also
    closes the one gap the note scheduler leaves open: notes are published
    400ms early, so a stop would otherwise be followed by up to 400ms of
@@ -265,8 +265,16 @@ function busPublish(t){
      itself was restruck 0 times (swapSoon debounces, by design). This is the same
      mistake the loop-around test below was written to avoid, one branch up. */
   busWorld=S.world;busList=busScore(S.world);busLast=-1;
-  /* the dial moved, or a roll drew a new tempo */
-  if(S.world.bpm&&S.world.bpm!==busBpm){busBpm=S.world.bpm;busTransport('tempo',busBpm);}
+ }
+ /* Say the tempo again now and then, not only when the dial moves. A clock that
+    states itself once cannot be joined late: a cable made a minute into the song
+    carried notes while the follower's BPM tile stayed a dash forever, so the wire
+    list said "Clock" and the instrument said "no clock" and nothing could settle
+    it. Measured on the shipped file: eight seconds of steady play sent exactly one
+    transport event, at t=0. Once a bar fills the tile within a bar of any connect,
+    and `t<busSaid` catches the loop coming round. */
+ if(S.world.bpm&&(S.world.bpm!==busBpm||t-busSaid>=S.world.secPerStep*16||t<busSaid)){
+  busBpm=S.world.bpm;busSaid=t;busTransport('tempo',busBpm);
  }
  /* The loop came round. Test it against the PREVIOUS playhead, never against
     the cursor: the cursor sits a whole horizon ahead of the playhead by
