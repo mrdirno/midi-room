@@ -829,6 +829,127 @@ replace(' filter:{type:"lp24",cutoff:120,reso:3.2,env:2600,key:.5,vel:1},', ' fi
 replace(' fEG:{a:.002,d:.34,s:.1,r:.14},', ' fEG:{a:.002,d:.2,s:.2,r:.14},')
 replace(' fx:{drive:.28,chorus:0,delay:{send:0,time:"16",fb:0},reverb:.08}, audition:riffBass},', ' fx:{drive:.1,chorus:0,delay:{send:0,time:"16",fb:0},reverb:.08}, audition:riffBass},')
 # ---- end wish 2a299366 ---------------------------------------------------------
+# ---- wishes 64b9ef57 + 3a79c120: a dice for patches, a size button for the keys ----
+# 64b9ef57: "Add a dice to the patch selection so I don't have to keep scrolling down and
+# then scrolling back up." Measured on the built page in headless Chrome at 390 px
+# (2026-09-14, at 32cfbc2): the keys start 520 px down the page, the selected patch chip
+# sits 460 px BELOW the top of the keys and the patch list runs 3,737 px (155 chips in 15
+# category rows: 139 programs + 16 combis) — choosing a sound is a thumb trip of up to
+# ~4,100 px each way. The LCD name is 11 px type drawn at 0.385x on a phone (about 4 px),
+# so the chip list was also the only legible readout of what is loaded. Two "Random"
+# buttons share one handler: one in the keyboard header beside the OCT buttons (no trip at
+# all), one at the head of the list. A press picks uniformly among the programs that are
+# NOT the current one (COMBI mode rolls among the combis) and loads it through exactly the
+# path a chip click takes (quickBoot if unpowered, mode, setProgram/setCombi — looked up by
+# name at press time, so it is the runtime.js-wrapped setProgram that also publishes to the
+# room). Only the list's own dice scrolls the selected chip into view: a first draft
+# scrolled whenever the list intersected the viewport, and because the list starts right
+# under the drawer that fired from the keys too and moved the page 644 px per 100 presses —
+# the very trip the wish is about. The R key rolls as well: it is not a KMAP note key, the
+# handler already ignores text fields, and it is skipped whenever the drawer is not on
+# screen (the Improvisator hides .keys-shell, so there all three controls are inert).
+replace('''      <button class="oct-btn" id="octUp">+ OCT</button>
+    </span>
+  </div>''',
+'''      <button class="oct-btn" id="octUp">+ OCT</button>
+    </span>
+    <span class="kb-tools">
+      <button class="oct-btn kb-tool kbDice" id="kbDice" type="button" title="Random patch (R)">🎲 Random</button>
+      <span id="kbDiceLbl"></span>
+      <button class="oct-btn kb-tool" id="kbSize" type="button" title="Key size: S, M or L">keys S</button>
+    </span>
+  </div>''')
+replace('''◀▶ jumps by category.</p>
+  <div id="patchList"></div>''',
+'''◀▶ jumps by category.</p>
+  <button class="oct-btn kb-tool kbDice" type="button" data-scroll="1" title="Random patch (R)">🎲 Random patch</button>
+  <div id="patchList"></div>''')
+replace('.hint{color:var(--text-dim);font-size:11px;margin-top:8px;text-align:center;}',
+'''.hint{color:var(--text-dim);font-size:11px;margin-top:8px;text-align:center;}
+.kb-tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.kb-tool{min-height:44px;padding:0 14px;font-size:12px;letter-spacing:.04em;text-transform:none;}
+#kbDiceLbl{color:#d8cba6;font-size:12px;letter-spacing:.04em;text-transform:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:52vw;}
+.pane>.kb-tool{margin:0 4px 10px;}
+body:not(.phone) #kbDiceLbl{display:none;}''')
+replace('''function updatePatchChips(){
+  document.querySelectorAll(".pchip").forEach(b=>{''',
+'''function updatePatchChips(){
+  /* the readable name of what is loaded, next to the dice: at phone scale the LCD is drawn at
+     0.385x and its 11 px type is 4 px tall, so the chip list was the only legible readout */
+  const dl=document.getElementById("kbDiceLbl");
+  if(dl){ const u=state.userSlot!=null&&USER_BANK[state.userSlot];
+    dl.textContent = state.mode==="COMBI" ? COMBIS[state.combiIdx].id+" "+COMBIS[state.combiIdx].name
+      : u ? "B"+String(state.userSlot).padStart(3,"0")+" "+u.name : PROGRAMS[state.progIdx].id+" "+PROGRAMS[state.progIdx].name; }
+  document.querySelectorAll(".pchip").forEach(b=>{''')
+replace('''buildPatchPane(); updatePatchChips();
+/* Bank B file I/O''',
+'''buildPatchPane(); updatePatchChips();
+function rollPatch(e){
+  if(state.test) return;
+  if(!state.powered) quickBoot();
+  if(state.mode==="COMBI"){
+    const N=COMBIS.length; if(N<2) return;
+    let r=Math.floor(Math.random()*(N-1)); if(r>=state.combiIdx) r++; /* uniform over the other N-1 */
+    setCombi(r);
+  } else {
+    const N=PROGRAMS.length; if(N<2) return;
+    let r;
+    if(state.userSlot==null){ r=Math.floor(Math.random()*(N-1)); if(r>=state.progIdx) r++; }
+    else r=Math.floor(Math.random()*N); /* a Bank B slot is loaded: every factory program is a change */
+    state.mode="PROG"; state.page=0; setProgram(r);
+  }
+  /* only the dice that sits at the head of the list keeps the selection in view: the list
+     starts right under the drawer, so "list on screen" is true from the keys too, and a
+     scroll from there is the very trip the wish is about */
+  const b=e&&e.currentTarget, on=b&&b.dataset&&b.dataset.scroll&&document.querySelector("#patchList .pchip.on");
+  if(on) on.scrollIntoView({block:"nearest"});
+}
+document.querySelectorAll(".kbDice").forEach(b=>b.addEventListener("click",rollPatch));
+/* Bank B file I/O''')
+replace('if(k==="z"){ shiftOct(-1); return; } if(k==="x"){ shiftOct(1); return; }',
+        'if(k==="z"){ shiftOct(-1); return; } if(k==="x"){ shiftOct(1); return; }\n  if(k==="r"){ if(kb.offsetParent!==null&&typeof rollPatch==="function") rollPatch(); return; }')
+# 3a79c120: "adjust the size of the keys by pressing a button and then expanding the
+# space." Measured before the change (same rig, 390 px): white keys 29 x 132 px, black
+# 19 x 82, eleven whites in the 344 px drawer, and no size control anywhere on the page.
+# The pitch (30), the widths (29 / 19) and the black-key offset (10) were literals inside
+# buildKB. They now come from one table, and S IS the old table (P=30 gives width P-1=29,
+# black width round(30*19/30)=19 and offset round(30/3)=10), so nothing moves until the
+# button is pressed. A size must keep a whole octave (seven whites) inside the drawer at
+# phone width: #kb and the keys are touch-action:none, so a phone cannot swipe the drawer
+# sideways and OCT is the only way across — a key outside the window would be unreachable.
+# M is a fixed 45 px pitch (44 px whites, the tap minimum); L fits exactly seven whites to
+# the drawer (49 px at 390, capped at 80 on wide screens) and is re-laid out when the width
+# changes. The choice is kept in localStorage where there is one (the standalone page);
+# inside the room the instrument iframe is sandboxed without allow-same-origin and the read
+# throws, which is caught, so there it lasts for the life of the frame. The cost is the
+# header: two 44 px buttons grow .keys-head 64 -> 114 px at 390 (27 -> 44 at 1280) even at
+# size S; the patch-name label is hidden off-phone, which is what keeps 1280 to one row.
+replace('''const kb=$("#kb"); const ptrMap=new Map(); const keyEls=new Map();
+function buildKB(){''',
+'''const kb=$("#kb"); const ptrMap=new Map(); const keyEls=new Map();
+const KB_SIZES={S:{p:30,h:132},M:{p:45,h:176},L:{fit:7,min:45,max:80,h:220}};
+let kbSize="S";
+try{ const s=localStorage.getItem("triton.keySize"); if(KB_SIZES[s]) kbSize=s; }catch(_){ }
+function kbPitch(){ const z=KB_SIZES[kbSize]; if(z.p) return z.p;
+  const w=(kb.parentElement&&kb.parentElement.clientWidth)||640; return Math.max(z.min,Math.min(z.max,Math.floor(w/z.fit))); }
+function buildKB(){
+  const P=kbPitch(); kb.dataset.pitch=P; kb.style.height=KB_SIZES[kbSize].h+"px";
+  const sb=document.getElementById("kbSize"); if(sb) sb.textContent="keys "+kbSize;''')
+replace('el.style.left=(wi*30)+"px"; el.style.width="29px"; el.dataset.note=n;',
+        'el.style.left=(wi*P)+"px"; el.style.width=(P-1)+"px"; el.dataset.note=n;')
+replace('kb.style.minWidth=(wi*30+2)+"px";', 'kb.style.minWidth=(wi*P+2)+"px";')
+replace('el.style.left=(wj*30-10)+"px"; el.style.width="19px"; el.dataset.note=n;',
+        'el.style.left=(wj*P-Math.round(P/3))+"px"; el.style.width=Math.round(P*19/30)+"px"; el.dataset.note=n;')
+replace('$("#octUp").addEventListener("click",()=>shiftOct(1));',
+'''$("#octUp").addEventListener("click",()=>shiftOct(1));
+function setKeySize(s){ if(!KB_SIZES[s]) return; kbSize=s; try{ localStorage.setItem("triton.keySize",s); }catch(_){ } allNotesOff(true); buildKB(); }
+$("#kbSize").addEventListener("click",()=>{ const o=Object.keys(KB_SIZES); setKeySize(o[(o.indexOf(kbSize)+1)%o.length]); });''')
+replace('''window.addEventListener("resize",fit);
+buildKB(); fit(); render();''',
+'''window.addEventListener("resize",fit);
+window.addEventListener("resize",()=>{ if(+kb.dataset.pitch!==kbPitch()) buildKB(); }); /* only L depends on the width */
+buildKB(); fit(); render();''')
+# ---- end wishes 64b9ef57 + 3a79c120 ---------------------------------------------
 html=html.replace('</head>','<style>'+(root/'views.css').read_text()+'</style></head>')
 html=re.sub(r'<title>.*?</title>', '<title>TRITON Rack · MIDI Room</title>', html,count=1)
 replace('<head>', '<head>\n<link rel="canonical" href="https://persona500.com/midi-room/instruments/triton-rack.html">')

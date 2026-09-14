@@ -133,6 +133,11 @@ h1,h2,h3{font-weight:600;letter-spacing:.02em;}
 .bk.dn{background:linear-gradient(180deg,#6a5c3a,#211c12);}
 .wk,.bk{touch-action:none;user-select:none;-webkit-user-select:none;}
 .hint{color:var(--text-dim);font-size:11px;margin-top:8px;text-align:center;}
+.kb-tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.kb-tool{min-height:44px;padding:0 14px;font-size:12px;letter-spacing:.04em;text-transform:none;}
+#kbDiceLbl{color:#d8cba6;font-size:12px;letter-spacing:.04em;text-transform:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:52vw;}
+.pane>.kb-tool{margin:0 4px 10px;}
+body:not(.phone) #kbDiceLbl{display:none;}
 
 /* ============ TABS ============ */
 .tabs{display:flex;gap:2px;max-width:1000px;margin:26px auto 0;padding:0 10px;}
@@ -736,6 +741,11 @@ body[data-instrument="improvisator"] h1{font-size:clamp(2rem,7vw,3.4rem)}
       <span id="octLbl" style="margin:0 8px;color:#d8cba6;">C3–C6</span>
       <button class="oct-btn" id="octUp">+ OCT</button>
     </span>
+    <span class="kb-tools">
+      <button class="oct-btn kb-tool kbDice" id="kbDice" type="button" title="Random patch (R)">🎲 Random</button>
+      <span id="kbDiceLbl"></span>
+      <button class="oct-btn kb-tool" id="kbSize" type="button" title="Key size: S, M or L">keys S</button>
+    </span>
   </div>
   <div class="kb-scroll"><div id="kb"></div></div>
   <div class="hint">Tap to play — the first tap powers the unit on. Computer keys A W S E D F T G Y H U J K O L P work too; Z / X shift octaves.</div>
@@ -751,6 +761,7 @@ body[data-instrument="improvisator"] h1{font-size:clamp(2rem,7vw,3.4rem)}
 </div>
 <div class="pane on" id="pane-patches">
   <p class="circ-note">All 128 programs and 16 combis live in this one file — nothing to download, nothing fetched. Tap a name to load it, then play the keys (the first tap powers the unit on). On the unit itself: the dial steps sounds one by one, ◀▶ jumps by category.</p>
+  <button class="oct-btn kb-tool kbDice" type="button" data-scroll="1" title="Random patch (R)">🎲 Random patch</button>
   <div id="patchList"></div>
 </div>
 
@@ -2720,21 +2731,28 @@ function volApply(){
 })();
 /* ================= keyboard ================= */
 const kb=$("#kb"); const ptrMap=new Map(); const keyEls=new Map();
+const KB_SIZES={S:{p:30,h:132},M:{p:45,h:176},L:{fit:7,min:45,max:80,h:220}};
+let kbSize="S";
+try{ const s=localStorage.getItem("triton.keySize"); if(KB_SIZES[s]) kbSize=s; }catch(_){ }
+function kbPitch(){ const z=KB_SIZES[kbSize]; if(z.p) return z.p;
+  const w=(kb.parentElement&&kb.parentElement.clientWidth)||640; return Math.max(z.min,Math.min(z.max,Math.floor(w/z.fit))); }
 function buildKB(){
+  const P=kbPitch(); kb.dataset.pitch=P; kb.style.height=KB_SIZES[kbSize].h+"px";
+  const sb=document.getElementById("kbSize"); if(sb) sb.textContent="keys "+kbSize;
   kb.innerHTML=""; keyEls.clear();
   const whites=[]; let wi=0;
   for(let i=0;i<37;i++){ const n=state.kbBase+i, s=n%12;
     const black=[1,3,6,8,10].includes(s);
     if(!black){ const el=document.createElement("div"); el.className="wk";
-      el.style.left=(wi*30)+"px"; el.style.width="29px"; el.dataset.note=n;
+      el.style.left=(wi*P)+"px"; el.style.width=(P-1)+"px"; el.dataset.note=n;
       kb.appendChild(el); keyEls.set(n,el); wi++; }
   }
-  kb.style.minWidth=(wi*30+2)+"px";
+  kb.style.minWidth=(wi*P+2)+"px";
   let wj=0;
   for(let i=0;i<37;i++){ const n=state.kbBase+i, s=n%12;
     const black=[1,3,6,8,10].includes(s);
     if(black){ const el=document.createElement("div"); el.className="bk";
-      el.style.left=(wj*30-10)+"px"; el.style.width="19px"; el.dataset.note=n;
+      el.style.left=(wj*P-Math.round(P/3))+"px"; el.style.width=Math.round(P*19/30)+"px"; el.dataset.note=n;
       kb.appendChild(el); keyEls.set(n,el); }
     else wj++;
   }
@@ -2761,6 +2779,7 @@ window.addEventListener("keydown",e=>{
   if(e.repeat||e.metaKey||e.ctrlKey||e.altKey||e.target.closest?.("input,textarea,select,[contenteditable=true],dialog[open]")) return;
   const k=e.key.toLowerCase();
   if(k==="z"){ shiftOct(-1); return; } if(k==="x"){ shiftOct(1); return; }
+  if(k==="r"){ if(kb.offsetParent!==null&&typeof rollPatch==="function") rollPatch(); return; }
   if(k in KMAP && !cDown.has(k)){ cDown.add(k); noteOn(state.kbBase+12+KMAP[k],.8); }
 });
 window.addEventListener("keyup",e=>{ const k=e.key.toLowerCase();
@@ -2768,6 +2787,8 @@ window.addEventListener("keyup",e=>{ const k=e.key.toLowerCase();
 function shiftOct(d){ allNotesOff(true); state.kbBase=Math.min(72,Math.max(24,state.kbBase+12*d)); buildKB(); }
 $("#octDn").addEventListener("click",()=>shiftOct(-1));
 $("#octUp").addEventListener("click",()=>shiftOct(1));
+function setKeySize(s){ if(!KB_SIZES[s]) return; kbSize=s; try{ localStorage.setItem("triton.keySize",s); }catch(_){ } allNotesOff(true); buildKB(); }
+$("#kbSize").addEventListener("click",()=>{ const o=Object.keys(KB_SIZES); setKeySize(o[(o.indexOf(kbSize)+1)%o.length]); });
 /* ================= tabs + circuit + inspector ================= */
 $$(".tab").forEach(t=>t.addEventListener("click",()=>{
   $$(".tab").forEach(x=>x.classList.toggle("on",x===t));
@@ -2932,6 +2953,7 @@ function fit(){ const w=Math.min(document.documentElement.clientWidth,1000)-20;
   if(RK&&RS){ RK.style.transform="scale("+s+")"; RS.style.width=(960*s)+"px";
     RS.style.height=(RK.offsetHeight*s)+"px"; } }
 window.addEventListener("resize",fit);
+window.addEventListener("resize",()=>{ if(+kb.dataset.pitch!==kbPitch()) buildKB(); }); /* only L depends on the width */
 buildKB(); fit(); render();
 </script>
 <script>
@@ -3195,6 +3217,12 @@ function buildPatchPane(){
   });
 }
 function updatePatchChips(){
+  /* the readable name of what is loaded, next to the dice: at phone scale the LCD is drawn at
+     0.385x and its 11 px type is 4 px tall, so the chip list was the only legible readout */
+  const dl=document.getElementById("kbDiceLbl");
+  if(dl){ const u=state.userSlot!=null&&USER_BANK[state.userSlot];
+    dl.textContent = state.mode==="COMBI" ? COMBIS[state.combiIdx].id+" "+COMBIS[state.combiIdx].name
+      : u ? "B"+String(state.userSlot).padStart(3,"0")+" "+u.name : PROGRAMS[state.progIdx].id+" "+PROGRAMS[state.progIdx].name; }
   document.querySelectorAll(".pchip").forEach(b=>{
     let on=false;
     if(b.dataset.u!=null) on = state.mode==="PROG" && state.userSlot===+b.dataset.u;
@@ -3204,6 +3232,27 @@ function updatePatchChips(){
   });
 }
 buildPatchPane(); updatePatchChips();
+function rollPatch(e){
+  if(state.test) return;
+  if(!state.powered) quickBoot();
+  if(state.mode==="COMBI"){
+    const N=COMBIS.length; if(N<2) return;
+    let r=Math.floor(Math.random()*(N-1)); if(r>=state.combiIdx) r++; /* uniform over the other N-1 */
+    setCombi(r);
+  } else {
+    const N=PROGRAMS.length; if(N<2) return;
+    let r;
+    if(state.userSlot==null){ r=Math.floor(Math.random()*(N-1)); if(r>=state.progIdx) r++; }
+    else r=Math.floor(Math.random()*N); /* a Bank B slot is loaded: every factory program is a change */
+    state.mode="PROG"; state.page=0; setProgram(r);
+  }
+  /* only the dice that sits at the head of the list keeps the selection in view: the list
+     starts right under the drawer, so "list on screen" is true from the keys too, and a
+     scroll from there is the very trip the wish is about */
+  const b=e&&e.currentTarget, on=b&&b.dataset&&b.dataset.scroll&&document.querySelector("#patchList .pchip.on");
+  if(on) on.scrollIntoView({block:"nearest"});
+}
+document.querySelectorAll(".kbDice").forEach(b=>b.addEventListener("click",rollPatch));
 /* Bank B file I/O — the export pane's markup precedes the scripts, safe to bind now */
 (function(){
   const exp=document.getElementById("bankExp"), imp=document.getElementById("bankImp"),

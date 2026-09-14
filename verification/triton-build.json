@@ -3,8 +3,8 @@
   "source": "inherited-runtime.html",
   "sourceSha256": "4eced0d8da0d9623c11014a29ba57ecb9751ff735ea1c5bd647478177a219404",
   "artifact": "dist/instruments/triton-rack.html",
-  "artifactSha256": "930a0e200aad4eddaaed4411a7afa4d3bcd90ac76baa96866a3cd26a66982cbb",
-  "bytes": 803804,
+  "artifactSha256": "85dd575313ad3e07aca262124679eb06195ee3b1415c737f9a78c295968755f6",
+  "bytes": 807321,
   "countedPatches": [
     {
       "anchor": "<h1>KORG TRITON-Rack</h1>",
@@ -392,6 +392,54 @@
     },
     {
       "anchor": " fx:{drive:.28,chorus:0,delay:{send:0,time:\"16\",fb:0},reverb:.08}, audition:riffBass},",
+      "count": 1
+    },
+    {
+      "anchor": "      <button class=\"oct-btn\" id=\"octUp\">+ OCT</button>\n    </span>\n  </div>",
+      "count": 1
+    },
+    {
+      "anchor": "\u25c0\u25b6 jumps by category.</p>\n  <div id=\"patchList\"></div>",
+      "count": 1
+    },
+    {
+      "anchor": ".hint{color:var(--text-dim);font-size:11px;margin-top:8px;text-align:center;}",
+      "count": 1
+    },
+    {
+      "anchor": "function updatePatchChips(){\n  document.querySelectorAll(\".pchip\").forEach(b=>{",
+      "count": 1
+    },
+    {
+      "anchor": "buildPatchPane(); updatePatchChips();\n/* Bank B file I/O",
+      "count": 1
+    },
+    {
+      "anchor": "if(k===\"z\"){ shiftOct(-1); return; } if(k===\"x\"){ shiftOct(1); return; }",
+      "count": 1
+    },
+    {
+      "anchor": "const kb=$(\"#kb\"); const ptrMap=new Map(); const keyEls=new Map();\nfunction buildKB(){",
+      "count": 1
+    },
+    {
+      "anchor": "el.style.left=(wi*30)+\"px\"; el.style.width=\"29px\"; el.dataset.note=n;",
+      "count": 1
+    },
+    {
+      "anchor": "kb.style.minWidth=(wi*30+2)+\"px\";",
+      "count": 1
+    },
+    {
+      "anchor": "el.style.left=(wj*30-10)+\"px\"; el.style.width=\"19px\"; el.dataset.note=n;",
+      "count": 1
+    },
+    {
+      "anchor": "$(\"#octUp\").addEventListener(\"click\",()=>shiftOct(1));",
+      "count": 1
+    },
+    {
+      "anchor": "window.addEventListener(\"resize\",fit);\nbuildKB(); fit(); render();",
       "count": 1
     },
     {
