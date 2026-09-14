@@ -805,6 +805,30 @@ replace('const cat=PROGRAMS.map((p,i)=>({p,i})).filter(x=>x.p.cat==="DRUMS").map
 replace('if(p.mono!=null&&typeof p.mono!=="boolean") return false;',
 'if(p.mono!=null&&typeof p.mono!=="boolean") return false;\n  if(p.kit!=null&&["std","ana","perc"].indexOf(p.kit)<0) return false; /* wish df6454ef: the kit fields are ranged like every other imported field */\n  if(p.dkit!=null&&!(typeof p.dkit==="string"&&typeof DD_KIT_NAMES!=="undefined"&&DD_KIT_NAMES.indexOf(p.dkit)>=0)) return false;')
 # ---- end wish df6454ef ---------------------------------------------------------
+# ---- wish 2a299366: the first bass patch no longer honks -----------------------
+# "Your base sounds like a fart noise." The first BASS chip in the rack's patch pane is
+# A007 Phatt Saw Bass, and at the register the screen keys play (C3, velocity .67: kbBase
+# 48, a tap two-thirds up the key) it measured as exactly that through the page's own
+# renderPass: 69% of its energy between 250 and 2000 Hz, a resonant filter envelope
+# (reso 3.2, env 2600) falling 1.29 octaves in 300 ms so the loudest bin left the 132 Hz
+# fundamental for a 390 Hz honk at 270 ms, 7.8x more buzz than low in the sustain, and a
+# level 3.8 dB under the bank median. The square sub an octave down did not carry the
+# note: only 8% of the rack-path energy sat below 80 Hz. A sine sub kept an octave down
+# (the rig's v6) still leaves 28% in the mids, 36% at the onset and the level 2.7 dB under
+# the bank, so the third oscillator becomes a sine on the fundamental instead.
+# Measured (keys C3 E3 G3 C3 vel .67, rack path): mid share .69->.15, onset mid .62->.22,
+# sweep 1.29->.94 oct, buzz/low 7.84->.12, centroid 675->318 Hz, level -21.7->-17.8 dBFS
+# (bank median -17.9); the peak bin stays on the fundamental through 330 ms; the audition
+# riff 740->329 Hz. Id, name, category, tempo and riff stay; every other program moves
+# under 1.4 Hz, inside the rig's run-to-run floor. A049 Acid Squelch keeps the squelch its
+# name promises, and A099 Upright Jazz Bs is a different finding (it vanishes on a phone
+# speaker, it does not rasp): neither is touched here.
+replace('{id:"A007",name:"Phatt Saw Bass",cat:"BASS",tempo:100, osc:[{w:"saw",lvl:.6,det:-7},{w:"saw",lvl:.6,det:7},{w:"sq",lvl:.35,det:0,oct:-1}],',
+ '{id:"A007",name:"Phatt Saw Bass",cat:"BASS",tempo:100, osc:[{w:"saw",lvl:.6,det:-7},{w:"saw",lvl:.6,det:7},{w:"sine",lvl:.3,det:0,oct:0}],')
+replace(' filter:{type:"lp24",cutoff:120,reso:3.2,env:2600,key:.5,vel:1},', ' filter:{type:"lp24",cutoff:240,reso:1,env:900,key:.5,vel:1},')
+replace(' fEG:{a:.002,d:.34,s:.1,r:.14},', ' fEG:{a:.002,d:.2,s:.2,r:.14},')
+replace(' fx:{drive:.28,chorus:0,delay:{send:0,time:"16",fb:0},reverb:.08}, audition:riffBass},', ' fx:{drive:.1,chorus:0,delay:{send:0,time:"16",fb:0},reverb:.08}, audition:riffBass},')
+# ---- end wish 2a299366 ---------------------------------------------------------
 html=html.replace('</head>','<style>'+(root/'views.css').read_text()+'</style></head>')
 html=re.sub(r'<title>.*?</title>', '<title>TRITON Rack · MIDI Room</title>', html,count=1)
 replace('<head>', '<head>\n<link rel="canonical" href="https://persona500.com/midi-room/instruments/triton-rack.html">')

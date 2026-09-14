@@ -3,8 +3,8 @@
   "source": "inherited-runtime.html",
   "sourceSha256": "4eced0d8da0d9623c11014a29ba57ecb9751ff735ea1c5bd647478177a219404",
   "artifact": "dist/instruments/triton-rack.html",
-  "artifactSha256": "544a3345be2855f1daa4a7666903fc075e30cf33bcbd8fc903e0b5b28fcaec67",
-  "bytes": 803809,
+  "artifactSha256": "930a0e200aad4eddaaed4411a7afa4d3bcd90ac76baa96866a3cd26a66982cbb",
+  "bytes": 803804,
   "countedPatches": [
     {
       "anchor": "<h1>KORG TRITON-Rack</h1>",
@@ -376,6 +376,22 @@
     },
     {
       "anchor": "if(p.mono!=null&&typeof p.mono!==\"boolean\") return false;",
+      "count": 1
+    },
+    {
+      "anchor": "{id:\"A007\",name:\"Phatt Saw Bass\",cat:\"BASS\",tempo:100, osc:[{w:\"saw\",lvl:.6,det:-7},{w:\"saw\",lvl:.6,det:7},{w:",
+      "count": 1
+    },
+    {
+      "anchor": " filter:{type:\"lp24\",cutoff:120,reso:3.2,env:2600,key:.5,vel:1},",
+      "count": 1
+    },
+    {
+      "anchor": " fEG:{a:.002,d:.34,s:.1,r:.14},",
+      "count": 1
+    },
+    {
+      "anchor": " fx:{drive:.28,chorus:0,delay:{send:0,time:\"16\",fb:0},reverb:.08}, audition:riffBass},",
       "count": 1
     },
     {
