@@ -1575,7 +1575,52 @@ PROGRAMS.push(
 {id:"A127",name:"Grand Finale St",cat:"STRINGS",tempo:70, osc:[{w:"saw",lvl:.5,det:-6},{w:"saw",lvl:.5,det:6},{w:"saw",lvl:.4,det:0,oct:1},{w:"tri",lvl:.4,det:0,oct:-1}],
  filter:{type:"lp24",cutoff:600,reso:1,env:1800,key:.5,vel:.5}, fEG:{a:.8,d:1.6,s:.65,r:1.4},
  aEG:{a:.7,d:1.4,s:.88,r:1.6}, lfo:{rate:5.2,pitch:5,filter:40,amp:0,delay:.7},
- fx:{drive:0,chorus:.45,delay:{send:.08,time:"4d",fb:.22},reverb:.6}, audition:riffHymn}
+ fx:{drive:0,chorus:.45,delay:{send:.08,time:"4d",fb:.22},reverb:.6}, audition:riffHymn},
+/* wish df6454ef: the eleven produced kits as DRUMS programs — appended, never inserted (LDR_KITS, COMBI timbres and the take codec index PROGRAMS by position) */
+{id:"A128",name:"Tight Click Kit",cat:"DRUMS",tempo:96, kit:"std", dkit:"neptune", osc:[],
+ filter:{type:"lp12",cutoff:16000,reso:.5,env:0,key:0,vel:0}, fEG:{a:0,d:0,s:1,r:.1},
+ aEG:{a:0,d:0,s:1,r:.1}, lfo:{rate:1,pitch:0,filter:0,amp:0,delay:0},
+ fx:{drive:0,chorus:0,delay:{send:.04,time:"16",fb:.2},reverb:.1}, audition:riffKit},
+{id:"A129",name:"Deep Sub Kit",cat:"DRUMS",tempo:92, kit:"std", dkit:"timb", osc:[],
+ filter:{type:"lp12",cutoff:16000,reso:.5,env:0,key:0,vel:0}, fEG:{a:0,d:0,s:1,r:.1},
+ aEG:{a:0,d:0,s:1,r:.1}, lfo:{rate:1,pitch:0,filter:0,amp:0,delay:0},
+ fx:{drive:0,chorus:0,delay:{send:.04,time:"16",fb:.2},reverb:.12}, audition:riffKit},
+{id:"A130",name:"Live Funk Kit",cat:"DRUMS",tempo:104, kit:"std", dkit:"ewf", osc:[],
+ filter:{type:"lp12",cutoff:16000,reso:.5,env:0,key:0,vel:0}, fEG:{a:0,d:0,s:1,r:.1},
+ aEG:{a:0,d:0,s:1,r:.1}, lfo:{rate:1,pitch:0,filter:0,amp:0,delay:0},
+ fx:{drive:0,chorus:0,delay:{send:.04,time:"16",fb:.2},reverb:.22}, audition:riffKit},
+{id:"A131",name:"Trap 808 Kit",cat:"DRUMS",tempo:140, kit:"std", dkit:"trapK", osc:[],
+ filter:{type:"lp12",cutoff:16000,reso:.5,env:0,key:0,vel:0}, fEG:{a:0,d:0,s:1,r:.1},
+ aEG:{a:0,d:0,s:1,r:.1}, lfo:{rate:1,pitch:0,filter:0,amp:0,delay:0},
+ fx:{drive:0,chorus:0,delay:{send:.04,time:"16",fb:.2},reverb:.1}, audition:riffKit},
+{id:"A132",name:"Hyphy Slap Kit",cat:"DRUMS",tempo:100, kit:"std", dkit:"hyphyK", osc:[],
+ filter:{type:"lp12",cutoff:16000,reso:.5,env:0,key:0,vel:0}, fEG:{a:0,d:0,s:1,r:.1},
+ aEG:{a:0,d:0,s:1,r:.1}, lfo:{rate:1,pitch:0,filter:0,amp:0,delay:0},
+ fx:{drive:0,chorus:0,delay:{send:.04,time:"16",fb:.2},reverb:.12}, audition:riffKit},
+{id:"A133",name:"Boom Bap Kit",cat:"DRUMS",tempo:90, kit:"std", dkit:"boombap", osc:[],
+ filter:{type:"lp12",cutoff:16000,reso:.5,env:0,key:0,vel:0}, fEG:{a:0,d:0,s:1,r:.1},
+ aEG:{a:0,d:0,s:1,r:.1}, lfo:{rate:1,pitch:0,filter:0,amp:0,delay:0},
+ fx:{drive:0,chorus:0,delay:{send:.04,time:"16",fb:.2},reverb:.16}, audition:riffKit},
+{id:"A134",name:"Afro Live Kit",cat:"DRUMS",tempo:110, kit:"std", dkit:"afroK", osc:[],
+ filter:{type:"lp12",cutoff:16000,reso:.5,env:0,key:0,vel:0}, fEG:{a:0,d:0,s:1,r:.1},
+ aEG:{a:0,d:0,s:1,r:.1}, lfo:{rate:1,pitch:0,filter:0,amp:0,delay:0},
+ fx:{drive:0,chorus:0,delay:{send:.04,time:"16",fb:.2},reverb:.24}, audition:riffKit},
+{id:"A135",name:"Latin Snap Kit",cat:"DRUMS",tempo:105, kit:"std", dkit:"latinK", osc:[],
+ filter:{type:"lp12",cutoff:16000,reso:.5,env:0,key:0,vel:0}, fEG:{a:0,d:0,s:1,r:.1},
+ aEG:{a:0,d:0,s:1,r:.1}, lfo:{rate:1,pitch:0,filter:0,amp:0,delay:0},
+ fx:{drive:0,chorus:0,delay:{send:.04,time:"16",fb:.2},reverb:.14}, audition:riffKit},
+{id:"A136",name:"House Four Kit",cat:"DRUMS",tempo:124, kit:"std", dkit:"houseK", osc:[],
+ filter:{type:"lp12",cutoff:16000,reso:.5,env:0,key:0,vel:0}, fEG:{a:0,d:0,s:1,r:.1},
+ aEG:{a:0,d:0,s:1,r:.1}, lfo:{rate:1,pitch:0,filter:0,amp:0,delay:0},
+ fx:{drive:0,chorus:0,delay:{send:.04,time:"16",fb:.2},reverb:.12}, audition:riffKit},
+{id:"A137",name:"Brushed Soft Kit",cat:"DRUMS",tempo:72, kit:"std", dkit:"softK", osc:[],
+ filter:{type:"lp12",cutoff:16000,reso:.5,env:0,key:0,vel:0}, fEG:{a:0,d:0,s:1,r:.1},
+ aEG:{a:0,d:0,s:1,r:.1}, lfo:{rate:1,pitch:0,filter:0,amp:0,delay:0},
+ fx:{drive:0,chorus:0,delay:{send:.04,time:"16",fb:.2},reverb:.3}, audition:riffKit},
+{id:"A138",name:"Cinema Kit",cat:"DRUMS",tempo:80, kit:"std", dkit:"cine", osc:[],
+ filter:{type:"lp12",cutoff:16000,reso:.5,env:0,key:0,vel:0}, fEG:{a:0,d:0,s:1,r:.1},
+ aEG:{a:0,d:0,s:1,r:.1}, lfo:{rate:1,pitch:0,filter:0,amp:0,delay:0},
+ fx:{drive:0,chorus:0,delay:{send:.04,time:"16",fb:.2},reverb:.4}, audition:riffKit}
 );
 
 COMBIS.push(
@@ -1897,7 +1942,16 @@ const BELL_DEFAULT=[[1,1,.9],[2.76,.6,.55],[5.40,.34,.32],[8.93,.18,.18]]; /* ra
 function spawnVoice(prog,note,vel,when,dur,dest){
   const _tk=(typeof TAKE!=="undefined"&&TAKE.on&&typeof takeLog==="function")? takeLog(prog,note,vel,when,dur,dest) : null;
   if(typeof DRY!=="undefined"&&DRY) return null; /* composed, not played (round 10) */
-  if(prog.cat==="DRUMS"){return drumHit(note,vel,when,prog.kit||"std");}
+  if(prog.cat==="DRUMS"){
+    /* wish df6454ef: a DRUMS program wearing a produced kit (dkit) plays it from the keys, a cable,
+       the Soul Pilot and the bounce through this one seam; the TRITON kit is the per-hit fallback
+       until the bake lands. C#/D swapped: the keys put the snare on D, DD_ZONE2SLOT keeps it on 1. */
+    if(prog.dkit&&typeof ddHit==="function"&&typeof DD_KIT_NAMES!=="undefined"&&DD_KIT_NAMES.indexOf(prog.dkit)>=0){
+      const z=((note%12)+12)%12, zone=z===1?2:z===2?1:z;
+      if(typeof ddWarm==="function"&&!(typeof exporting!=="undefined"&&exporting)) ddWarm(prog.dkit);
+      const dv=ddHit(prog.dkit,zone,vel,when,{_q:1});
+      if(dv){ if(typeof pulseAt==="function") pulseAt(when); return dv; } }
+    return drumHit(note,vel,when,prog.kit||"std");}
   const voiceCtx=ctx,t=Math.max(when,ctx.currentTime),out=ctx.createGain();out.gain.value=0;
   const isBP=prog.filter.type==="bp";
   const f1=ctx.createBiquadFilter(); f1.type=isBP?"bandpass":"lowpass";
@@ -2431,6 +2485,7 @@ function clone(o){ return JSON.parse(JSON.stringify(o)); }
 function setProgram(i){
   state.progIdx=(i+PROGRAMS.length)%PROGRAMS.length; state.userSlot=null;
   cur=clone(PROGRAMS[state.progIdx]); pristine=clone(PROGRAMS[state.progIdx]);
+  if(cur.dkit&&typeof ddWarm==="function") ddWarm(cur.dkit); /* wish df6454ef: bake the produced kit off the hit path as soon as it is browsed */
   state.compare=false; $("#cmpBtn").classList.remove("lit-a");
   /* browsing sounds must not arm the arp under the conductor — the DREAM
      watchdog stops on state.arp.on, so an arpDefault would silence the band.
@@ -2511,6 +2566,8 @@ function progValidate(p){
   if(!opt(p.strike,0,1.2)||!opt(p.click,0,1.2)||!opt(p.porta,0,5)) return false;
   if(p.vox!=null&&p.vox!==true&&!(typeof p.vox==="object"&&p.vox&&inR(p.vox.f1,50,8000)&&inR(p.vox.f2,50,8000)&&opt(p.vox.wob,0,4000))) return false;
   if(p.mono!=null&&typeof p.mono!=="boolean") return false;
+  if(p.kit!=null&&["std","ana","perc"].indexOf(p.kit)<0) return false; /* wish df6454ef: the kit fields are ranged like every other imported field */
+  if(p.dkit!=null&&!(typeof p.dkit==="string"&&typeof DD_KIT_NAMES!=="undefined"&&DD_KIT_NAMES.indexOf(p.dkit)>=0)) return false;
   if(p.arpDefault!=null){ const d=p.arpDefault;
     if(!d||typeof d!=="object"||typeof d.on!=="boolean"||typeof d.latch!=="boolean") return false;
     if(["UP","DOWN","ALT","RANDOM","CHORD","STRUM"].indexOf(d.patt)<0||["8","16","32"].indexOf(d.reso)<0) return false;
@@ -3062,6 +3119,8 @@ async function exportCurrent(){
   const steps=roots.length*vels.length+2; let done=0;
   const tick=()=>{ done++; bar.style.width=Math.min(100,Math.round(done/steps*100))+"%"; };
   try{
+    if(prog.dkit&&typeof ddBake==="function"&&typeof DD_LAYERS!=="undefined"){ /* wish df6454ef: the pack renders at 48 kHz and DD_BUFS is keyed by sample rate — bake there first or the pack silently carries the TRITON fallback */
+      for(let s=0;s<12;s++){ DD_LAYERS.forEach(l=>ddBake(prog.dkit,s,l,48000)); await new Promise(r=>setTimeout(r,0)); } }
     log.textContent="Measuring level…";
     const cal=await renderNote(prog,prog.cat==="DRUMS"?48:60,vels[vels.length-1].v,plan);
     const g=Math.min(8,0.891/Math.max(1e-4,peakOf(cal))); tick();
@@ -6284,7 +6343,7 @@ function ddHit(kitName,zone,vel,when,o){
      the whole offline ledger is discarded on restore anyway (round 8) */
   if(!(typeof exporting!=="undefined"&&exporting))
     setTimeout(v.kill,Math.max(400,pair.buf.duration*1000)+((t-ctx.currentTime)*1000)+120);
-  return true;
+  return v; /* wish df6454ef: the room's noteOn keeps this handle, exactly as it keeps drumHit's */
 }
 /* every scheduled kit-lane hit passes here: a card wearing a DD22 kit plays
    the DreamDrummer sound, anything else (or a not-yet-baked slot) plays the
@@ -6495,7 +6554,7 @@ function candDrums(rng){
     const gi=phrasePick("dr",rng,null), g=PHRASES[gi];
     const fam=(g.s||"").split("/")[0];
     const fi=phrasePick("fill",rng,p=>(p.s||"").split("/")[0]===fam);
-    const cat=PROGRAMS.map((p,i)=>({p,i})).filter(x=>x.p.cat==="DRUMS").map(x=>x.i);
+    const cat=PROGRAMS.map((p,i)=>({p,i})).filter(x=>x.p.cat==="DRUMS"&&!x.p.dkit).map(x=>x.i); /* wish df6454ef: the fallback kit draw stays on the six TRITON kits so a seed deals the card it always did */
     const fig16=Object.keys(LDR_FIG).find(k=>LDR_FIG[k].grid===16);
     /* the kit draw is UNCONDITIONAL so the stream position never depends on
        the shelf; 55/11 divides evenly, so each DD22 kit is equally likely */
@@ -6512,7 +6571,7 @@ function candDrums(rng){
   const sv=rng();
   if(typeof DD22!=="undefined"&&DD22.KSTYLE_KEYS&&sv<.5){
     const ks=DD22.KSTYLE_KEYS, sk=ks[Math.floor(rng()*ks.length)], st=DD22.KSTYLES[sk];
-    const cat=PROGRAMS.map((p,i)=>({p,i})).filter(x=>x.p.cat==="DRUMS").map(x=>x.i);
+    const cat=PROGRAMS.map((p,i)=>({p,i})).filter(x=>x.p.cat==="DRUMS"&&!x.p.dkit).map(x=>x.i); /* wish df6454ef: the fallback kit draw stays on the six TRITON kits so a seed deals the card it always did */
     const fig16=Object.keys(LDR_FIG).find(k=>LDR_FIG[k].grid===16);
     const dk=DD22.STYLE2KIT[sk];
     return {kind:"drums",name:st.label+" · "+st.place,
@@ -7340,7 +7399,7 @@ function keptFromP(p,seed){
 function rackVoiceField(k){ return k==="drums"?"kit":k==="bass"?"bass":k==="chords"?"chord":k==="lead"?"lead":null; }
 function rackCatFor(kind){
   const cat=cs=>PROGRAMS.map((p,i)=>({p,i})).filter(x=>cs.includes(x.p.cat)).map(x=>x.i);
-  if(kind==="drums") return cat(["DRUMS"]);
+  if(kind==="drums") return cat(["DRUMS"]).filter(i=>!PROGRAMS[i].dkit); /* wish df6454ef: the produced kits already ride this ring as dkit */
   if(kind==="bass") return cat(["BASS"]);
   if(kind==="chords") return cat(["PAD","VOX","ORGAN","KEYBOARD"]);
   return cat(["LEAD","BELL","PLUCK"]);
@@ -8027,6 +8086,8 @@ async function exportTake(kind,src){
   if(song&&song.evs.length){ evs=song.evs; flashRow("SONG — "+song.bars+" BARS · "+song.format.toUpperCase()+" · FINAL SELECTIONS");
     await ddWarmDone(DREAM.p&&DREAM.p.dkit); }
   else { src="take"; evs=TAKE.ev.map(e=>Object.assign({},e)); evs.forEach(e=>{ if(e.dur==null) e.dur=0.3; }); }
+  /* wish df6454ef: a take that played a produced-kit program replays it through spawnVoice — bake its kit before the offline pass, as the song's dkit is */
+  if(typeof ddWarmDone==="function") for(const k of new Set(evs.filter(e=>e.role==="kit"&&e.prog&&e.prog.dkit).map(e=>e.prog.dkit))) await ddWarmDone(k);
   window._lastBounce={src,kind,n:evs.length,bars:song?song.bars:null,seconds:song?song.seconds:null,
     roles:[...new Set(evs.map(e=>e.role))],youN:evs.filter(e=>e.role==="you").length}; /* measurement, not audio */
   const name="triton-dream-"+(DREAM.seed||"take")+(src==="take"?"-jam":"");
@@ -11411,11 +11472,19 @@ window._soulPilotReady=true;console.info('Soul Pilot ready',SP.selfTest());
     const p=cur||PROGRAMS[state.progIdx], drum=state.mode!=='COMBI'&&p.cat==='DRUMS', kit=p.kit||'std';
     const labels=kit==='perc'?['Low hand drum','Hand slap','Hand slap','Claves','Cowbell','Mid hand drum','Shaker','High hand drum','Shaker','Bongo','Tambourine','Cowbell']:
       ['Kick','Snare','Snare','Clap','Crash','Low tom','Closed hat','Mid tom','Closed hat','High tom','Open hat','Crash'];
+    /* wish df6454ef: a DRUMS program wearing a produced kit (dkit) publishes all twelve zones, each named
+       for what ddHit plays there — DD_ZONE2SLOT with the C#/D swap spawnVoice's drum branch applies — so a
+       bound Drum Pad shows Side stick, Crash, Pedal hat and Ride pads the nine-voice TRITON profile has no
+       slot for. Gated on dkit: the nine verified standard-kit roles above stay exactly as pinned. */
+    const dd=drum&&p.dkit&&typeof DD_ZONE2SLOT!=='undefined'&&typeof DD22!=='undefined'&&Array.isArray(DD22.KIT_SLOTS);
+    const ddWords={kick:'Kick',snare:'Snare',rim:'Side stick',clap:'Hand clap',hatC:'Closed hat',hatO:'Open hat',tomL:'Low tom',tomM:'Mid tom',tomH:'High tom',ride:'Ride',crash:'Crash',shake:'Shaker'};
+    const ddVoices=()=>Array.from({length:12},(_,k)=>{const slot=DD22.KIT_SLOTS[DD_ZONE2SLOT[k===1?2:k===2?1:k]];
+      return {id:'dd:'+p.dkit+':'+k,label:k===8?'Pedal hat':(ddWords[slot]||String(slot)),note:36+k,channel:9,mode:'oneshot',...([6,8,10].includes(k)?{chokeGroup:'hats'}:{})};});
     return {version:1,definitionId:'local.triton-rack',definitionVersion:'1',
       profileId:'triton:'+ (state.mode==='COMBI'?'combi:'+state.combiIdx:(p.id||'user'))+':1',
       kind:drum?'drums':'pitched',name:state.mode==='COMBI'?COMBIS[state.combiIdx].name:p.name,
       noteRange:[0,127],recommendedRoot:drum?36:48,preferredTempo:p.tempo,
-      voices:drum?(kit==='perc'?[0,2,3,4,5,6,7,9,10]:[0,2,3,5,6,7,9,10,11]).map(k=>({id:kit+':'+k,label:labels[k],note:36+k,channel:9,mode:'oneshot',...((kit!=='perc'&&[6,8,10].includes(k))?{chokeGroup:'hats'}:{})})):[],
+      voices:drum?(dd?ddVoices():(kit==='perc'?[0,2,3,4,5,6,7,9,10]:[0,2,3,5,6,7,9,10,11]).map(k=>({id:kit+':'+k,label:labels[k],note:36+k,channel:9,mode:'oneshot',...((kit!=='perc'&&[6,8,10].includes(k))?{chokeGroup:'hats'}:{})}))):[],
       velocity:{min:1,max:127,response:'continuous amplitude'},timing:{unit:'audio-context-seconds',maximumLookahead:10},
       provenance:'TRITON16 supplied oscillator models; twelve pitch-class zones, not General MIDI'};
   }

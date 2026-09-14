@@ -12,11 +12,19 @@
     const p=cur||PROGRAMS[state.progIdx], drum=state.mode!=='COMBI'&&p.cat==='DRUMS', kit=p.kit||'std';
     const labels=kit==='perc'?['Low hand drum','Hand slap','Hand slap','Claves','Cowbell','Mid hand drum','Shaker','High hand drum','Shaker','Bongo','Tambourine','Cowbell']:
       ['Kick','Snare','Snare','Clap','Crash','Low tom','Closed hat','Mid tom','Closed hat','High tom','Open hat','Crash'];
+    /* wish df6454ef: a DRUMS program wearing a produced kit (dkit) publishes all twelve zones, each named
+       for what ddHit plays there — DD_ZONE2SLOT with the C#/D swap spawnVoice's drum branch applies — so a
+       bound Drum Pad shows Side stick, Crash, Pedal hat and Ride pads the nine-voice TRITON profile has no
+       slot for. Gated on dkit: the nine verified standard-kit roles above stay exactly as pinned. */
+    const dd=drum&&p.dkit&&typeof DD_ZONE2SLOT!=='undefined'&&typeof DD22!=='undefined'&&Array.isArray(DD22.KIT_SLOTS);
+    const ddWords={kick:'Kick',snare:'Snare',rim:'Side stick',clap:'Hand clap',hatC:'Closed hat',hatO:'Open hat',tomL:'Low tom',tomM:'Mid tom',tomH:'High tom',ride:'Ride',crash:'Crash',shake:'Shaker'};
+    const ddVoices=()=>Array.from({length:12},(_,k)=>{const slot=DD22.KIT_SLOTS[DD_ZONE2SLOT[k===1?2:k===2?1:k]];
+      return {id:'dd:'+p.dkit+':'+k,label:k===8?'Pedal hat':(ddWords[slot]||String(slot)),note:36+k,channel:9,mode:'oneshot',...([6,8,10].includes(k)?{chokeGroup:'hats'}:{})};});
     return {version:1,definitionId:'local.triton-rack',definitionVersion:'1',
       profileId:'triton:'+ (state.mode==='COMBI'?'combi:'+state.combiIdx:(p.id||'user'))+':1',
       kind:drum?'drums':'pitched',name:state.mode==='COMBI'?COMBIS[state.combiIdx].name:p.name,
       noteRange:[0,127],recommendedRoot:drum?36:48,preferredTempo:p.tempo,
-      voices:drum?(kit==='perc'?[0,2,3,4,5,6,7,9,10]:[0,2,3,5,6,7,9,10,11]).map(k=>({id:kit+':'+k,label:labels[k],note:36+k,channel:9,mode:'oneshot',...((kit!=='perc'&&[6,8,10].includes(k))?{chokeGroup:'hats'}:{})})):[],
+      voices:drum?(dd?ddVoices():(kit==='perc'?[0,2,3,4,5,6,7,9,10]:[0,2,3,5,6,7,9,10,11]).map(k=>({id:kit+':'+k,label:labels[k],note:36+k,channel:9,mode:'oneshot',...((kit!=='perc'&&[6,8,10].includes(k))?{chokeGroup:'hats'}:{})}))):[],
       velocity:{min:1,max:127,response:'continuous amplitude'},timing:{unit:'audio-context-seconds',maximumLookahead:10},
       provenance:'TRITON16 supplied oscillator models; twelve pitch-class zones, not General MIDI'};
   }

@@ -731,6 +731,80 @@ replace('''  if(stage===2) return candChords(rng,kept&&kept[1]);''',
 replace('''  const bp=pick(PROG_BANK.filter(b=>b.scale===scale));''',
 '''  const bp=pick(progPool(scale,f.grid));''')
 # ---- end wish e4c6e175 --------------------------------------------------------
+# ---- wish df6454ef: DreamDrummer kits as rack patches -------------------------
+# "Add more banging ass kits … show me production grade grown folks production."
+# The page already carried eleven produced kits (DD_KITBANK: neptune, timb, ewf, trapK,
+# hyphyK, boombap, afroK, latinK, houseK, softK, cine) and the engine that plays them, and
+# no player could reach any of it: the only selector was the DREAM ring inside #rackScale,
+# which views.css hides on both public faces. Measured before this block, on both built
+# pages: cat:"DRUMS" 6, distinct kits 3 (std/ana/perc), roleList('drums') 6.
+# Each kit becomes a DRUMS program (A128-A138) that wears the kit as `dkit` and keeps
+# kit:"std" as its per-hit fallback, so every seam that already plays a drum program —
+# the keys, a room cable, the Soul Pilot, the take bounce, the DecentSampler pack — reaches
+# it through spawnVoice's one drum branch. APPENDED after A127, never inserted: LDR_KITS,
+# COMBI timbres, SP.base and the take codec's e.pi all index PROGRAMS by position.
+DD_PROGRAMS=[('neptune','Tight Click Kit',96,'.1'),('timb','Deep Sub Kit',92,'.12'),('ewf','Live Funk Kit',104,'.22'),
+ ('trapK','Trap 808 Kit',140,'.1'),('hyphyK','Hyphy Slap Kit',100,'.12'),('boombap','Boom Bap Kit',90,'.16'),
+ ('afroK','Afro Live Kit',110,'.24'),('latinK','Latin Snap Kit',105,'.14'),('houseK','House Four Kit',124,'.12'),
+ ('softK','Brushed Soft Kit',72,'.3'),('cine','Cinema Kit',80,'.4')]
+# A116's field shape; fx.drive 0 because the DD kit bus already saturates its hits.
+_dd_entries=',\n'.join(
+ '{id:"A%03d",name:"%s",cat:"DRUMS",tempo:%d, kit:"std", dkit:"%s", osc:[],\n'
+ ' filter:{type:"lp12",cutoff:16000,reso:.5,env:0,key:0,vel:0}, fEG:{a:0,d:0,s:1,r:.1},\n'
+ ' aEG:{a:0,d:0,s:1,r:.1}, lfo:{rate:1,pitch:0,filter:0,amp:0,delay:0},\n'
+ ' fx:{drive:0,chorus:0,delay:{send:.04,time:"16",fb:.2},reverb:%s}, audition:riffKit}'
+ % (128+n,name,tempo,kit,reverb) for n,(kit,name,tempo,reverb) in enumerate(DD_PROGRAMS))
+_a127=' fx:{drive:0,chorus:.45,delay:{send:.08,time:"4d",fb:.22},reverb:.6}, audition:riffHymn}\n);'
+replace(_a127, _a127[:-3]+',\n/* wish df6454ef: the eleven produced kits as DRUMS programs — appended, never inserted (LDR_KITS, COMBI timbres and the take codec index PROGRAMS by position) */\n'+_dd_entries+'\n);')
+# The one drum seam. This anchor is the text the :83 hunk above wrote, so this block must
+# stay after it. C# and D are swapped on the way in: the keyboard, GM 38, riffKit and the
+# Soul Pilot KIT put the snare on D (zone 2) while DD_ZONE2SLOT — the conductor's contract —
+# keeps the snare on 1 and the rim on 2. ddHit returns false until the kit has baked, and
+# the TRITON std kit covers that hit (kitZone's law: the fallback is per hit, never per
+# song). _q:1 because takeLog at the top of spawnVoice already wrote the hit as role "kit".
+# Every DD name is typeof-guarded: the node VM harness never runs the DD22 script.
+replace('if(prog.cat==="DRUMS"){return drumHit(note,vel,when,prog.kit||"std");}',
+'''if(prog.cat==="DRUMS"){
+    /* wish df6454ef: a DRUMS program wearing a produced kit (dkit) plays it from the keys, a cable,
+       the Soul Pilot and the bounce through this one seam; the TRITON kit is the per-hit fallback
+       until the bake lands. C#/D swapped: the keys put the snare on D, DD_ZONE2SLOT keeps it on 1. */
+    if(prog.dkit&&typeof ddHit==="function"&&typeof DD_KIT_NAMES!=="undefined"&&DD_KIT_NAMES.indexOf(prog.dkit)>=0){
+      const z=((note%12)+12)%12, zone=z===1?2:z===2?1:z;
+      if(typeof ddWarm==="function"&&!(typeof exporting!=="undefined"&&exporting)) ddWarm(prog.dkit);
+      const dv=ddHit(prog.dkit,zone,vel,when,{_q:1});
+      if(dv){ if(typeof pulseAt==="function") pulseAt(when); return dv; } }
+    return drumHit(note,vel,when,prog.kit||"std");}''')
+# The room's noteOn keeps the voice handle it is given (refs, prune, cancelRoute) and refuses
+# the note when it gets none; drumHit hands one back since the drum-voice repairs above,
+# ddHit still said `true`. Its v already carries the real gain-zeroing kill from the count=3
+# hunk above. kitZone reads truthiness and playEv ignores the value, so neither moves.
+replace('setTimeout(v.kill,Math.max(400,pair.buf.duration*1000)+((t-ctx.currentTime)*1000)+120);\n  return true;\n}',
+'setTimeout(v.kill,Math.max(400,pair.buf.duration*1000)+((t-ctx.currentTime)*1000)+120);\n  return v; /* wish df6454ef: the room\'s noteOn keeps this handle, exactly as it keeps drumHit\'s */\n}')
+# Bake the kit the moment it is browsed (quickBoot lands here too); ddWarm is idempotent,
+# worker-backed and returns before a context exists, when the lazy warm in the branch covers it.
+replace('cur=clone(PROGRAMS[state.progIdx]); pristine=clone(PROGRAMS[state.progIdx]);',
+'cur=clone(PROGRAMS[state.progIdx]); pristine=clone(PROGRAMS[state.progIdx]);\n  if(cur.dkit&&typeof ddWarm==="function") ddWarm(cur.dkit); /* wish df6454ef: bake the produced kit off the hit path as soon as it is browsed */')
+# The bounce renders at the live sample rate, the key DD_BUFS and DD_WARM use, and it used to
+# await only the DREAM song's kit; a take that played one of these programs replays role
+# "kit" hits through spawnVoice and would have found nothing baked in a fresh page.
+replace('window._lastBounce={src,kind,n:evs.length',
+'/* wish df6454ef: a take that played a produced-kit program replays it through spawnVoice — bake its kit before the offline pass, as the song\'s dkit is */\n  if(typeof ddWarmDone==="function") for(const k of new Set(evs.filter(e=>e.role==="kit"&&e.prog&&e.prog.dkit).map(e=>e.prog.dkit))) await ddWarmDone(k);\n  window._lastBounce={src,kind,n:evs.length')
+# The DecentSampler pack renders at 48 kHz through renderNote; DD_BUFS is keyed by sample
+# rate, so without a bake there the pack silently carried the TRITON fallback.
+replace('log.textContent="Measuring level…";',
+'if(prog.dkit&&typeof ddBake==="function"&&typeof DD_LAYERS!=="undefined"){ /* wish df6454ef: the pack renders at 48 kHz and DD_BUFS is keyed by sample rate — bake there first or the pack silently carries the TRITON fallback */\n      for(let s=0;s<12;s++){ DD_LAYERS.forEach(l=>ddBake(prog.dkit,s,l,48000)); await new Promise(r=>setTimeout(r,0)); } }\n    log.textContent="Measuring level…";')
+# The DREAM's own kit lists stay on the six TRITON kits: its ring already walks the produced
+# kits as dkit (a program wearing one would list each kit twice), and the seeded deal's
+# modulus was 6 — at 17 every KEEP'd seed would deal a different card.
+replace('if(kind==="drums") return cat(["DRUMS"]);',
+'if(kind==="drums") return cat(["DRUMS"]).filter(i=>!PROGRAMS[i].dkit); /* wish df6454ef: the produced kits already ride this ring as dkit */')
+replace('const cat=PROGRAMS.map((p,i)=>({p,i})).filter(x=>x.p.cat==="DRUMS").map(x=>x.i);',
+'const cat=PROGRAMS.map((p,i)=>({p,i})).filter(x=>x.p.cat==="DRUMS"&&!x.p.dkit).map(x=>x.i); /* wish df6454ef: the fallback kit draw stays on the six TRITON kits so a seed deals the card it always did */', 2)
+# Range law for the two kit fields, so a foreign bank fails loudly instead of quietly falling
+# back to TRITON. The branch's DD_KIT_NAMES guard is the load-bearing check; this is depth.
+replace('if(p.mono!=null&&typeof p.mono!=="boolean") return false;',
+'if(p.mono!=null&&typeof p.mono!=="boolean") return false;\n  if(p.kit!=null&&["std","ana","perc"].indexOf(p.kit)<0) return false; /* wish df6454ef: the kit fields are ranged like every other imported field */\n  if(p.dkit!=null&&!(typeof p.dkit==="string"&&typeof DD_KIT_NAMES!=="undefined"&&DD_KIT_NAMES.indexOf(p.dkit)>=0)) return false;')
+# ---- end wish df6454ef ---------------------------------------------------------
 html=html.replace('</head>','<style>'+(root/'views.css').read_text()+'</style></head>')
 html=re.sub(r'<title>.*?</title>', '<title>TRITON Rack · MIDI Room</title>', html,count=1)
 replace('<head>', '<head>\n<link rel="canonical" href="https://persona500.com/midi-room/instruments/triton-rack.html">')

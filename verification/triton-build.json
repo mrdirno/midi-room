@@ -3,8 +3,8 @@
   "source": "inherited-runtime.html",
   "sourceSha256": "4eced0d8da0d9623c11014a29ba57ecb9751ff735ea1c5bd647478177a219404",
   "artifact": "dist/instruments/triton-rack.html",
-  "artifactSha256": "2fee03b131ed7c00a37802d17ddfe74a2c17dd33174bd711bb8d6d0f6d2916d0",
-  "bytes": 796710,
+  "artifactSha256": "544a3345be2855f1daa4a7666903fc075e30cf33bcbd8fc903e0b5b28fcaec67",
+  "bytes": 803809,
   "countedPatches": [
     {
       "anchor": "<h1>KORG TRITON-Rack</h1>",
@@ -340,6 +340,42 @@
     },
     {
       "anchor": "  const bp=pick(PROG_BANK.filter(b=>b.scale===scale));",
+      "count": 1
+    },
+    {
+      "anchor": " fx:{drive:0,chorus:.45,delay:{send:.08,time:\"4d\",fb:.22},reverb:.6}, audition:riffHymn}\n);",
+      "count": 1
+    },
+    {
+      "anchor": "if(prog.cat===\"DRUMS\"){return drumHit(note,vel,when,prog.kit||\"std\");}",
+      "count": 1
+    },
+    {
+      "anchor": "setTimeout(v.kill,Math.max(400,pair.buf.duration*1000)+((t-ctx.currentTime)*1000)+120);\n  return true;\n}",
+      "count": 1
+    },
+    {
+      "anchor": "cur=clone(PROGRAMS[state.progIdx]); pristine=clone(PROGRAMS[state.progIdx]);",
+      "count": 1
+    },
+    {
+      "anchor": "window._lastBounce={src,kind,n:evs.length",
+      "count": 1
+    },
+    {
+      "anchor": "log.textContent=\"Measuring level\u2026\";",
+      "count": 1
+    },
+    {
+      "anchor": "if(kind===\"drums\") return cat([\"DRUMS\"]);",
+      "count": 1
+    },
+    {
+      "anchor": "const cat=PROGRAMS.map((p,i)=>({p,i})).filter(x=>x.p.cat===\"DRUMS\").map(x=>x.i);",
+      "count": 2
+    },
+    {
+      "anchor": "if(p.mono!=null&&typeof p.mono!==\"boolean\") return false;",
       "count": 1
     },
     {
