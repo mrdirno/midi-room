@@ -176,7 +176,7 @@ function retire(session) {
   bus.removeSession(session.nonce); surfaceRouter.remove(session.nonce); focusRouter.release(session.nonce); logRoom('instrument.closed');
   post(session, { type: 'dispose' });
   session.retired = true;
-  const index = sessions.indexOf(session); if (index >= 0) sessions.splice(index, 1);
+  const index = sessions.indexOf(session); if (index >= 0) sessions.splice(index, 1); syncWakeLock();
   session.port?.close();
   session.frame.remove();
   session.reject?.(new DOMException('A newer instrument was selected.', 'AbortError'));
@@ -360,7 +360,7 @@ function handlePortMessage(session, data) {
     }
   } else if (data.type === 'audio-state') {
     session.audio = data.state;
-    renderRackActivity();
+    renderRackActivity(); syncWakeLock();
     if (session !== active) return;
     const running = data.state === 'running';
     $('audioLight').classList.toggle('running', running);
@@ -625,8 +625,26 @@ async function openFieldKeys() {
   finally { if (current()) $('loading').hidden = true; }
 }
 
+// Wish 6531b50a: keep the screen on only while an instrument is sounding. Taken when a
+// session first reports 'running', dropped when none does, never on load; the platform
+// drops it itself when the page hides and syncWakeLock() takes it back on the next
+// visibility or audio-state change. A refusal stays silent: sound is never gated on light.
+// navigator.wakeLock is read at call time, never cached, so a browser without it pays a
+// typeof and nothing else, and the test harness can hand the room a counting double.
+let wakeSentinel = null, wakeRequest = null;
+const anySounding = () => present().some(session => session.audio === 'running');
+function releaseWakeLock() { const held = wakeSentinel; wakeSentinel = null; if (held) { try { Promise.resolve(held.release()).catch(() => {}); } catch { /* already gone */ } } }
+function syncWakeLock() {
+  if (document.hidden || !anySounding()) { releaseWakeLock(); return; }
+  if (wakeSentinel || wakeRequest || typeof navigator.wakeLock?.request !== 'function') return;
+  wakeRequest = Promise.resolve().then(() => navigator.wakeLock.request('screen')).then(sentinel => {
+    wakeSentinel = sentinel; sentinel.addEventListener?.('release', () => { if (wakeSentinel === sentinel) wakeSentinel = null; });
+    if (document.hidden || !anySounding()) releaseWakeLock();
+  }, () => logRoom('wake.refused')).finally(() => { wakeRequest = null; });
+}
+
 function stopSound(announce = false) {
-  broker.panic(); bus.panic(); for (const session of present()) surfaceRouter.cancel(session.nonce,'room-stopped'); logRoom('room.stopped');
+  broker.panic(); bus.panic(); for (const session of present()) surfaceRouter.cancel(session.nonce,'room-stopped'); logRoom('room.stopped'); releaseWakeLock();
   for (const session of present()) post(session, { type: 'panic' });
   if (announce && active) notify('Stopped. Tap an instrument to play again.');
 }
@@ -743,7 +761,7 @@ window.addEventListener('drop', event => {
 let stoppedWhileHidden = false;
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) { stoppedWhileHidden = present().some(session => session.audio === 'running'); stopSound(); }
-  else { broker.discover(); if (stoppedWhileHidden) { stoppedWhileHidden = false; notify('Sound stopped while this tab was in the background. Tap an instrument to play again.'); } }
+  else { broker.discover(); syncWakeLock(); if (stoppedWhileHidden) { stoppedWhileHidden = false; notify('Sound stopped while this tab was in the background. Tap an instrument to play again.'); } }
 });
 window.addEventListener('pagehide', () => { stopSound(); });
 
@@ -751,6 +769,8 @@ window.addEventListener('pagehide', () => { stopSound(); });
 
 window.addEventListener('pageshow', () => broker.discover());
 broker.discover(); renderRack();
+// The Player options line about the screen is shown only where the browser can keep it on. Nothing is requested here.
+if (typeof navigator.wakeLock?.request === 'function') $('wakeStatus').hidden = false;
 
 // The rack is independent; cards select input without changing the sound target.
 // Launch is resolved after all catalog actions are bound below.

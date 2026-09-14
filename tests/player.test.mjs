@@ -48,7 +48,7 @@ class Sequence {
   cancel() { this.generation++; }
 }
 
-function harness({ supported = true, share, canShare, embedded } = {}) {
+function harness({ supported = true, share, canShare, embedded, wakeLock } = {}) {
   const nodes = new Map();
   const document = new Target();
   document.body = new Element('body'); document.hidden = false; document.baseURI='https://example.test/midi-room/';
@@ -64,7 +64,7 @@ function harness({ supported = true, share, canShare, embedded } = {}) {
   const channels = [];
   const downloads = [];
   let nativeCalls = 0, fetchCalls = 0;
-  const nav = { userActivation: { isActive: false }, share, canShare };
+  const nav = { userActivation: { isActive: false }, share, canShare, wakeLock };
   if (supported) nav.requestMIDIAccess = () => { nativeCalls++; return Promise.resolve(); };
   class Broker {
     constructor(options) { this.options = options; this.state = { status: supported ? 'idle' : 'unavailable', access: false, inputs: [], devices: [], selection: 'auto', error: null }; }
@@ -379,4 +379,73 @@ test('room log excludes instrument names and note content and has a manual copy 
   const box = h.nodes.get('roomLogText'); box.select=()=>{box.selected=true};
   await h.nodes.get('copyRoomLog').click();
   assert.equal(box.selected,true); assert.match(h.nodes.get('roomLogStatus').textContent,/Text selected/);
+});
+
+// Wish 6531b50a: the screen stays awake only while an instrument is sounding. The stub
+// counts what the room asks of navigator.wakeLock. The room reads that object at call
+// time, so a harness built without one is the browser that has no such API.
+function wakeLockStub({ refuse = false } = {}) {
+  const stub = { requests: 0, releases: 0, types: [] };
+  stub.request = async type => {
+    stub.requests++; stub.types.push(type);
+    if (refuse) throw new DOMException('Wake lock request denied', 'NotAllowedError');
+    return { type, released: false, addEventListener() {}, release: async () => { stub.releases++; } };
+  };
+  return stub;
+}
+
+test('the screen wake lock follows sound: taken once when an instrument reports running, dropped on Stop, hide and close, taken back on return', async () => {
+  const wakeLock = wakeLockStub();
+  const h = harness({ wakeLock }); const session = await h.activate();
+  assert.equal(wakeLock.requests, 0, 'opening a silent instrument asks for nothing');
+  session.port.receive({ type: 'audio-state', state: 'running', contexts: 1 }); await h.tick(); await h.tick();
+  assert.equal(wakeLock.requests, 1); assert.deepEqual(wakeLock.types, ['screen']);
+  session.port.receive({ type: 'audio-state', state: 'running', contexts: 1 }); await h.tick(); await h.tick();
+  assert.equal(wakeLock.requests, 1, 'a second running report does not ask again');
+  h.nodes.get('stopButton').click(); await h.tick();
+  assert.equal(wakeLock.releases, 1);
+  session.port.receive({ type: 'audio-state', state: 'suspended', contexts: 1 }); await h.tick(); await h.tick();
+  assert.equal(wakeLock.requests, 1); assert.equal(wakeLock.releases, 1);
+  session.port.receive({ type: 'audio-state', state: 'running', contexts: 1 }); await h.tick(); await h.tick();
+  assert.equal(wakeLock.requests, 2);
+  session.port.messages = [];
+  h.document.hidden = true; h.document.emit('visibilitychange'); await h.tick();
+  assert.equal(wakeLock.releases, 2);
+  assert.ok(session.port.messages.some(message => message.type === 'panic' && message.suspend !== false), 'hiding still silences the instrument');
+  h.document.hidden = false; h.document.emit('visibilitychange'); await h.tick(); await h.tick();
+  assert.equal(wakeLock.requests, 3, 'a session still marked running takes the lock back on return');
+  h.app.closeInstrument(); await h.tick();
+  assert.equal(wakeLock.releases, 3); assert.equal(wakeLock.requests, 3);
+  assert.equal(h.nodes.get('wakeStatus').hidden, false, 'the Player options line is shown where the API exists');
+});
+
+test('a refused wake lock changes nothing the player can see: Audio on stays, Stop still silences, the refusal is only journaled', async () => {
+  const wakeLock = wakeLockStub({ refuse: true });
+  const h = harness({ wakeLock }); const session = await h.activate();
+  session.port.receive({ type: 'audio-state', state: 'running', contexts: 1 }); await h.tick(); await h.tick();
+  assert.equal(wakeLock.requests, 1);
+  assert.equal(h.nodes.get('audioLabel').textContent, 'Audio on');
+  assert.equal(h.nodes.get('toast')?.textContent ?? '', '', 'no message is shown for a refusal');
+  session.port.messages = [];
+  h.nodes.get('stopButton').click(); await h.tick();
+  assert.ok(session.port.messages.some(message => message.type === 'panic' && message.suspend !== false));
+  assert.equal(wakeLock.releases, 0, 'nothing was held, so nothing is released');
+  h.nodes.get('roomCheck').click();
+  const journal = JSON.parse(h.nodes.get('roomLogText').value).journal.map(entry => entry.event);
+  assert.equal(journal.filter(event => event === 'wake.refused').length, 1);
+});
+
+test('without a wake lock API the room behaves as before: nothing is asked, nothing throws, the options line is never touched', async () => {
+  const h = harness(); const session = await h.activate();
+  assert.equal(h.nav.wakeLock, undefined);
+  session.port.receive({ type: 'audio-state', state: 'running', contexts: 1 }); await h.tick(); await h.tick();
+  assert.equal(h.nodes.get('audioLabel').textContent, 'Audio on');
+  session.port.messages = [];
+  h.nodes.get('stopButton').click();
+  assert.ok(session.port.messages.some(message => message.type === 'panic' && message.suspend !== false));
+  h.document.hidden = true; h.document.emit('visibilitychange');
+  h.document.hidden = false; h.document.emit('visibilitychange'); await h.tick();
+  h.app.closeInstrument();
+  assert.equal(h.app.active, null);
+  assert.equal(h.nodes.has('wakeStatus'), false, 'the room never touched the line, so the page keeps its hidden attribute');
 });
