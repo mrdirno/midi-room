@@ -3,6 +3,9 @@ export function childBootstrap(options) {
   'use strict';
   const nonce = String(options.nonce), MAX_SAVE_BYTES = 256 * 1024 * 1024;
   let channel = null, disposed = false, serial = 0, granted = false, lastNotice = -Infinity, notices = 0;
+  // The room's 'background-policy' (Player options: keep playing when the screen locks). Off
+  // until the room says otherwise, so a frame that never hears of it behaves as before.
+  let keepPlaying = false;
   let bridgeTimer = null;
   const pendingMIDI = new Map(), pendingSaves = new Map(), blobs = new Map(), contexts = new Set();
   const inputStore = new Map(), inputCache = new Map(), queuedNotices = [];
@@ -51,6 +54,8 @@ export function childBootstrap(options) {
   }
   const midiRoom = Object.freeze({
     version: 1, declare, emit, on, now,
+    // Read by an instrument's own hidden-stop; absent (undefined) when the page runs standalone.
+    get keepPlaying() { return keepPlaying; },
     controlVersion: 1,
     describe(profile) {
       try { if (!profile || profile.version !== 1 || JSON.stringify(profile).length > 16384) return false; } catch { return false; }
@@ -371,7 +376,7 @@ export function childBootstrap(options) {
     audioState();
   }
   function resumeContexts() {
-    if (document.hidden || disposed) return;
+    if ((document.hidden && !keepPlaying) || disposed) return;
     for (const context of contexts) if (context.state === 'suspended' || context.state === 'interrupted') {
       try { Promise.resolve(context.resume()).then(audioState, () => {}); } catch { /* A closed context cannot resume. */ }
     }
@@ -384,7 +389,7 @@ export function childBootstrap(options) {
   listen(document, 'pointerup', resumeFromGesture, true);
   listen(document, 'touchend', resumeFromGesture, true);
   listen(document, 'keydown', resumeFromGesture, true);
-  listen(document, 'visibilitychange', () => { if (document.hidden) panic(); });
+  listen(document, 'visibilitychange', () => { if (document.hidden && !keepPlaying) panic(); });
 
   function fileName(value) {
     const name = String(value || 'instrument-export').split(/[\\/]/).pop().replace(/[\u0000-\u001f\u007f]/g, '').slice(0, 160);
@@ -506,6 +511,7 @@ export function childBootstrap(options) {
     } else if (message.type === 'panic') panic(message.suspend !== false);
     else if (message.type === 'hardware-panic') releaseInputs(true);
     else if (message.type === 'resume') resumeContexts();
+    else if (message.type === 'background-policy') keepPlaying = message.keepPlaying === true;
     else if (message.type === 'dispose') dispose();
   }
   function boot(event) {

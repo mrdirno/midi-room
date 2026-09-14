@@ -176,7 +176,7 @@ function retire(session) {
   bus.removeSession(session.nonce); surfaceRouter.remove(session.nonce); focusRouter.release(session.nonce); logRoom('instrument.closed');
   post(session, { type: 'dispose' });
   session.retired = true;
-  const index = sessions.indexOf(session); if (index >= 0) sessions.splice(index, 1); syncWakeLock();
+  const index = sessions.indexOf(session); if (index >= 0) sessions.splice(index, 1); syncWakeLock(); syncKeepAlive();
   session.port?.close();
   session.frame.remove();
   session.reject?.(new DOMException('A newer instrument was selected.', 'AbortError'));
@@ -360,7 +360,7 @@ function handlePortMessage(session, data) {
     }
   } else if (data.type === 'audio-state') {
     session.audio = data.state;
-    renderRackActivity(); syncWakeLock();
+    renderRackActivity(); syncWakeLock(); syncKeepAlive();
     if (session !== active) return;
     const running = data.state === 'running';
     $('audioLight').classList.toggle('running', running);
@@ -392,6 +392,7 @@ window.addEventListener('message', event => {
   session.frame.contentWindow.postMessage({ type: 'midiroom:boot', nonce: session.nonce }, '*', [channel.port2]);
   session.ready = true;
   post(session, { type: 'midi-state', state: { ...latestState, inputs: session === active ? latestState.inputs : [] } });
+  post(session, { type: 'background-policy', keepPlaying });
   activate(session);
 });
 
@@ -642,9 +643,94 @@ function syncWakeLock() {
     if (document.hidden || !anySounding()) releaseWakeLock();
   }, () => logRoom('wake.refused')).finally(() => { wakeRequest = null; });
 }
+// Wish d7d9b4eb: keep playing when the screen locks. OFF unless the person turns it on in
+// Player options, and while it is off every line below is inert: the room stops itself
+// when the page hides exactly as before, no element is made, no media session is touched.
+// With it on, the room (1) skips its own hidden-stop and tells every instrument frame to
+// skip theirs (bridge.js 'background-policy'), (2) loops a silent <audio> element in this
+// document while an instrument is sounding, because phones keep an audio session open for
+// a media element and not for a Web Audio graph, and (3) names the sounding instrument to
+// navigator.mediaSession so a lock screen has something to show and its Pause reaches
+// stopSound(). The element carries silent samples at volume 0.01 and is NOT muted: a muted
+// element holds no audio session. Whether the phone then keeps the sound going with the
+// screen off is the phone's decision, which is why the switch is worded as an experiment.
+// Verified headlessly only; no phone was used.
+const BACKGROUND_KEY = 'midi-room.background-audio.v1';
+let keepPlaying = false; try { keepPlaying = localStorage.getItem(BACKGROUND_KEY) === 'on'; } catch { /* no storage: the switch stays off */ }
+let keepAlive = null, mediaActionsBound = false;
+// 0.25 s of 8 kHz 8-bit mono silence as a WAV data: URL, built here rather than pasted so
+// the bytes can be read. 8-bit PCM rests at 0x80; a run of 0x00 would be full negative swing.
+function silentWav() {
+  const samples = 2000, bytes = new Uint8Array(44 + samples), view = new DataView(bytes.buffer);
+  const tag = (offset, text) => { for (let i = 0; i < text.length; i++) bytes[offset + i] = text.charCodeAt(i); };
+  tag(0, 'RIFF'); view.setUint32(4, 36 + samples, true); tag(8, 'WAVE'); tag(12, 'fmt '); view.setUint32(16, 16, true);
+  view.setUint16(20, 1, true); view.setUint16(22, 1, true); view.setUint32(24, 8000, true); view.setUint32(28, 8000, true);
+  view.setUint16(32, 1, true); view.setUint16(34, 8, true); tag(36, 'data'); view.setUint32(40, samples, true); bytes.fill(0x80, 44);
+  let binary = ''; for (const byte of bytes) binary += String.fromCharCode(byte);
+  return 'data:audio/wav;base64,' + btoa(binary);
+}
+function keepAliveElement() {
+  if (keepAlive) return keepAlive;
+  try {
+    const element = new Audio(silentWav());
+    element.id = 'keepAlive'; element.loop = true; element.volume = 0.01; element.setAttribute('playsinline', ''); element.hidden = true;
+    document.body.append(element); keepAlive = element;
+  } catch { keepAlive = null; }
+  return keepAlive;
+}
+function setPlaybackState(state) { try { if (navigator.mediaSession) navigator.mediaSession.playbackState = state; } catch { /* not offered here */ } }
+function bindMediaActions() {
+  if (mediaActionsBound || typeof navigator.mediaSession?.setActionHandler !== 'function') return;
+  mediaActionsBound = true;
+  const actions = [['pause', () => stopSound(true)], ['stop', () => stopSound(true)], ['play', () => { for (const session of present()) post(session, { type: 'resume' }); }]];
+  for (const [action, handler] of actions) { try { navigator.mediaSession.setActionHandler(action, handler); } catch { /* an action this platform does not offer */ } }
+}
+function playKeepAlive() {
+  const element = keepAliveElement();
+  if (!element || element.paused === false) return;
+  try { Promise.resolve(element.play()).catch(() => logRoom('keepalive.refused')); } catch { logRoom('keepalive.refused'); }
+}
+function pauseKeepAlive() {
+  if (!keepAlive) return;                              // never switched on: nothing to keep in step
+  try { if (keepAlive.paused === false) keepAlive.pause(); } catch { /* already stopped */ }
+  setPlaybackState('paused');
+}
+function syncKeepAlive() {
+  if (!keepPlaying || !anySounding()) { pauseKeepAlive(); return; }
+  const sounding = present().find(session => session.audio === 'running');
+  try { if (navigator.mediaSession && typeof MediaMetadata === 'function') navigator.mediaSession.metadata = new MediaMetadata({ title: sessionName(sounding), artist: 'MIDI Room' }); } catch { /* not offered here */ }
+  bindMediaActions(); playKeepAlive(); setPlaybackState('playing');
+}
+function renderBackgroundSwitch() {
+  $('backgroundAudio').setAttribute('aria-pressed', String(keepPlaying));
+  $('backgroundAudioState').textContent = keepPlaying ? 'On' : 'Off';
+}
+function applyBackgroundPolicy() {
+  // WebKit's audio session category: 'playback' is the one for media meant to continue in
+  // the background (it also plays through the silent switch); 'auto' hands the choice back.
+  try { if (navigator.audioSession) navigator.audioSession.type = keepPlaying ? 'playback' : 'auto'; } catch { /* not offered here */ }
+  for (const session of present()) post(session, { type: 'background-policy', keepPlaying });
+  if (keepPlaying) bindMediaActions();
+  syncKeepAlive();
+}
+// Phones let a media element start only inside a trusted gesture, and the switch's tap is
+// one: when nothing is sounding yet the element is started here and paused as soon as it
+// is playing, so a later play() outside any gesture is allowed on the unlocked element.
+function primeKeepAlive() {
+  const element = keepAliveElement();
+  if (!element || element.paused === false) return;
+  try { Promise.resolve(element.play()).then(() => { if (!keepPlaying || !anySounding()) element.pause(); }, () => logRoom('keepalive.refused')); } catch { logRoom('keepalive.refused'); }
+}
+function setKeepPlaying(on, fromGesture = false) {
+  keepPlaying = on === true;
+  try { localStorage.setItem(BACKGROUND_KEY, keepPlaying ? 'on' : 'off'); } catch { /* private mode: the switch lasts this visit */ }
+  renderBackgroundSwitch(); logRoom(keepPlaying ? 'background.on' : 'background.off');
+  applyBackgroundPolicy();
+  if (keepPlaying && fromGesture) primeKeepAlive();
+}
 
 function stopSound(announce = false) {
-  broker.panic(); bus.panic(); for (const session of present()) surfaceRouter.cancel(session.nonce,'room-stopped'); logRoom('room.stopped'); releaseWakeLock();
+  broker.panic(); bus.panic(); for (const session of present()) surfaceRouter.cancel(session.nonce,'room-stopped'); logRoom('room.stopped'); releaseWakeLock(); pauseKeepAlive();
   for (const session of present()) post(session, { type: 'panic' });
   if (announce && active) notify('Stopped. Tap an instrument to play again.');
 }
@@ -760,7 +846,12 @@ window.addEventListener('drop', event => {
 });
 let stoppedWhileHidden = false;
 document.addEventListener('visibilitychange', () => {
-  if (document.hidden) { stoppedWhileHidden = present().some(session => session.audio === 'running'); stopSound(); }
+  if (document.hidden) {
+    // With the Player-options switch on, the room keeps its hands off the sound while the
+    // screen is off; the phone decides whether it keeps going. pagehide below is unchanged.
+    if (keepPlaying && anySounding()) { logRoom('room.kept-playing-hidden'); return; }
+    stoppedWhileHidden = present().some(session => session.audio === 'running'); stopSound();
+  }
   else { broker.discover(); syncWakeLock(); if (stoppedWhileHidden) { stoppedWhileHidden = false; notify('Sound stopped while this tab was in the background. Tap an instrument to play again.'); } }
 });
 window.addEventListener('pagehide', () => { stopSound(); });
@@ -771,6 +862,9 @@ window.addEventListener('pageshow', () => broker.discover());
 broker.discover(); renderRack();
 // The Player options line about the screen is shown only where the browser can keep it on. Nothing is requested here.
 if (typeof navigator.wakeLock?.request === 'function') $('wakeStatus').hidden = false;
+$('backgroundAudio').onclick = () => setKeepPlaying(!keepPlaying, true);
+// A remembered switch is shown and applied at load; the default off touches nothing else.
+renderBackgroundSwitch(); if (keepPlaying) applyBackgroundPolicy();
 
 // The rack is independent; cards select input without changing the sound target.
 // Launch is resolved after all catalog actions are bound below.

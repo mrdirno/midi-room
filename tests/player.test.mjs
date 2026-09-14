@@ -48,7 +48,7 @@ class Sequence {
   cancel() { this.generation++; }
 }
 
-function harness({ supported = true, share, canShare, embedded, wakeLock } = {}) {
+function harness({ supported = true, share, canShare, embedded, wakeLock, storage, mediaSession, audioSession, playRefused = false } = {}) {
   const nodes = new Map();
   const document = new Target();
   document.body = new Element('body'); document.hidden = false; document.baseURI='https://example.test/midi-room/';
@@ -64,7 +64,16 @@ function harness({ supported = true, share, canShare, embedded, wakeLock } = {})
   const channels = [];
   const downloads = [];
   let nativeCalls = 0, fetchCalls = 0;
-  const nav = { userActivation: { isActive: false }, share, canShare, wakeLock };
+  const nav = { userActivation: { isActive: false }, share, canShare, wakeLock, mediaSession, audioSession };
+  // The keep-alive element of wish d7d9b4eb: every one the room makes is kept here so a
+  // test can count them (the default-off path must make none) and read their state.
+  const audios = [];
+  class AudioDouble {
+    constructor(src) { this.src = src; this.paused = true; this.plays = 0; this.pauses = 0; this.attributes = {}; this.muted = false; this.volume = 1; this.loop = false; this.currentTime = 0; audios.push(this); }
+    setAttribute(name, value) { this.attributes[name] = value; }
+    play() { this.plays++; if (playRefused) return Promise.reject(new DOMException('play() failed because the user didn\'t interact with the document first.', 'NotAllowedError')); this.paused = false; return Promise.resolve(); }
+    pause() { this.pauses++; this.paused = true; }
+  }
   if (supported) nav.requestMIDIAccess = () => { nativeCalls++; return Promise.resolve(); };
   class Broker {
     constructor(options) { this.options = options; this.state = { status: supported ? 'idle' : 'unavailable', access: false, inputs: [], devices: [], selection: 'auto', error: null }; }
@@ -81,6 +90,7 @@ function harness({ supported = true, share, canShare, embedded, wakeLock } = {})
     safeFilename: name => String(name || 'instrument.html').split(/[\\/]/).pop(),
     validateInstrument(file) { if (!/\.html?$/i.test(file.name)) throw new Error('Choose HTML'); },
     crypto: webcrypto, Blob, File, DOMException, console, Option: class { constructor(text, value) { this.text = text; this.value = value; } },
+    Audio: AudioDouble, MediaMetadata: class { constructor(init) { Object.assign(this, init); } }, btoa, ...(storage ? { localStorage: storage } : {}),
     MessageChannel: class { constructor() { this.port1 = new Port(); this.port2 = new Port(); channels.push(this); } },
     URL: class extends URL { static createObjectURL(blob) { downloads.push(blob); return `blob:download-${downloads.length}`; } static revokeObjectURL() {} }, URLSearchParams, location: {href:'https://example.test/midi-room/',protocol:'https:',hash:''}, history:{replaceState(){}},
     setTimeout(fn, delay) { const id = ++clockId; timers.set(id, { fn, delay }); return id; },
@@ -100,7 +110,7 @@ function harness({ supported = true, share, canShare, embedded, wakeLock } = {})
     await pending;
     return session;
   }
-  return { context, app: context.appTest, nodes, document, window, timers, prepared, channels, downloads, nav, tick, activate, get nativeCalls() { return nativeCalls; }, get fetchCalls() { return fetchCalls; } };
+  return { context, app: context.appTest, nodes, document, window, timers, prepared, channels, downloads, nav, audios, tick, activate, get nativeCalls() { return nativeCalls; }, get fetchCalls() { return fetchCalls; } };
 }
 
 test('portable player opens its embedded instrument through the normal isolated handshake without a fetch', async () => {
@@ -448,4 +458,123 @@ test('without a wake lock API the room behaves as before: nothing is asked, noth
   h.app.closeInstrument();
   assert.equal(h.app.active, null);
   assert.equal(h.nodes.has('wakeStatus'), false, 'the room never touched the line, so the page keeps its hidden attribute');
+});
+
+// Wish d7d9b4eb: keep playing when the screen locks. The switch is off unless the person
+// turns it on, and the phone decides what happens after that; these tests cover only the
+// room's side — that it stops stopping itself, tells the frames, and holds a media session
+// while an instrument sounds. Nothing here says a phone keeps the sound going.
+function storageDouble(entries = {}) { const map = new Map(Object.entries(entries)); return { map, getItem: key => map.has(key) ? map.get(key) : null, setItem: (key, value) => map.set(key, String(value)) }; }
+function mediaSessionDouble() { return { handlers: {}, metadata: null, playbackState: 'none', setActionHandler(name, handler) { this.handlers[name] = handler; } }; }
+const BACKGROUND_KEY = 'midi-room.background-audio.v1';
+
+test('Keep playing when the screen locks is off by default: nothing is made, stored or told, and hiding still silences', async () => {
+  const storage = storageDouble(), media = mediaSessionDouble(), audioSession = { type: 'auto' };
+  const h = harness({ storage, mediaSession: media, audioSession }); const session = await h.activate();
+  assert.equal(h.nodes.get('backgroundAudio').attributes['aria-pressed'], 'false');
+  assert.equal(h.nodes.get('backgroundAudioState').textContent, 'Off');
+  assert.equal(storage.map.size, 0, 'the default is not written down');
+  assert.equal(audioSession.type, 'auto');
+  const types = session.port.messages.map(message => message.type);
+  assert.equal(types.indexOf('background-policy'), types.indexOf('midi-state') + 1, 'the policy follows the MIDI state in the handshake');
+  assert.equal(session.port.messages.find(message => message.type === 'background-policy').keepPlaying, false);
+  session.port.receive({ type: 'audio-state', state: 'running', contexts: 1 }); await h.tick();
+  assert.equal(h.audios.length, 0, 'no keep-alive element while the switch is off');
+  assert.equal(media.metadata, null); assert.equal(media.playbackState, 'none'); assert.deepEqual(Object.keys(media.handlers), []);
+  session.port.messages = [];
+  h.document.hidden = true; h.document.emit('visibilitychange');
+  assert.equal(session.port.messages.filter(message => message.type === 'panic' && message.suspend !== false).length, 1, 'hiding silences as before');
+  h.document.hidden = false; h.document.emit('visibilitychange');
+  assert.match(h.nodes.get('toast').textContent, /^Sound stopped while this tab was in the background/);
+});
+
+test('with the switch on, hiding posts no panic and is journaled; a silent element and the media session follow the sound; off restores the old behaviour', async () => {
+  const storage = storageDouble(), media = mediaSessionDouble(), audioSession = { type: 'auto' };
+  const h = harness({ storage, mediaSession: media, audioSession }); const session = await h.activate();
+  session.port.receive({ type: 'instrument-ready', name: 'Improvisator', send: ['midi'], receive: ['midi'] });
+  h.nodes.get('backgroundAudio').click(); await h.tick();
+  assert.equal(storage.map.get(BACKGROUND_KEY), 'on');
+  assert.equal(h.nodes.get('backgroundAudio').attributes['aria-pressed'], 'true');
+  assert.equal(h.nodes.get('backgroundAudioState').textContent, 'On');
+  assert.equal(audioSession.type, 'playback');
+  assert.deepEqual(session.port.messages.filter(message => message.type === 'background-policy').map(message => message.keepPlaying), [false, true]);
+  // The tap primed the element: started inside the gesture, paused because nothing sounds yet.
+  assert.equal(h.audios.length, 1); const element = h.audios[0];
+  assert.equal(element.plays, 1); assert.equal(element.paused, true);
+  assert.equal(element.loop, true); assert.equal(element.muted, false); assert.equal(element.volume, 0.01); assert.equal(element.attributes.playsinline, '');
+  assert.match(element.src, /^data:audio\/wav;base64,/); assert.ok(h.document.body.children.includes(element));
+  assert.deepEqual(Object.keys(media.handlers).sort(), ['pause', 'play', 'stop']);
+  session.port.receive({ type: 'audio-state', state: 'running', contexts: 1 }); await h.tick();
+  assert.equal(element.paused, false); assert.equal(element.plays, 2);
+  assert.equal(media.metadata.title, 'Improvisator'); assert.equal(media.metadata.artist, 'MIDI Room'); assert.equal(media.playbackState, 'playing');
+  session.port.messages = [];
+  h.document.hidden = true; h.document.emit('visibilitychange'); await h.tick();
+  assert.equal(session.port.messages.filter(message => message.type === 'panic').length, 0, 'hiding posts no panic while the switch is on');
+  assert.equal(element.paused, false);
+  h.document.hidden = false; h.document.emit('visibilitychange'); await h.tick();
+  assert.equal(h.nodes.get('toast')?.textContent ?? '', '', 'no background-stop message: nothing was stopped');
+  h.nodes.get('roomCheck').click();
+  const journal = JSON.parse(h.nodes.get('roomLogText').value).journal.map(entry => entry.event);
+  assert.equal(journal.filter(event => event === 'room.kept-playing-hidden').length, 1);
+  assert.equal(journal.filter(event => event === 'keepalive.refused').length, 0);
+  // A lock-screen Pause is the Stop button; Play asks the frames to resume.
+  media.handlers.pause();
+  assert.equal(session.port.messages.filter(message => message.type === 'panic').length, 1); assert.equal(element.paused, true); assert.equal(media.playbackState, 'paused');
+  session.port.receive({ type: 'audio-state', state: 'suspended', contexts: 1 });
+  media.handlers.play();
+  assert.equal(session.port.messages.filter(message => message.type === 'resume').length, 1);
+  session.port.receive({ type: 'audio-state', state: 'running', contexts: 1 }); await h.tick();
+  assert.equal(element.paused, false); assert.equal(media.playbackState, 'playing');
+  // A frame that opens later is told the policy right after its MIDI state.
+  const second = await h.activate(new File(['<html>b</html>'], 'b.html'), true);
+  const types = second.port.messages.map(message => message.type);
+  assert.equal(types.indexOf('background-policy'), types.indexOf('midi-state') + 1);
+  assert.equal(second.port.messages.find(message => message.type === 'background-policy').keepPlaying, true);
+  // Stop pauses the element; the switch off tells every frame and restores the old behaviour.
+  h.nodes.get('stopButton').click(); assert.equal(element.paused, true); assert.equal(media.playbackState, 'paused');
+  h.nodes.get('backgroundAudio').click(); await h.tick();
+  assert.equal(storage.map.get(BACKGROUND_KEY), 'off'); assert.equal(audioSession.type, 'auto');
+  assert.equal(h.nodes.get('backgroundAudio').attributes['aria-pressed'], 'false'); assert.equal(h.nodes.get('backgroundAudioState').textContent, 'Off');
+  for (const item of [session, second]) assert.equal(item.port.messages.filter(message => message.type === 'background-policy').at(-1).keepPlaying, false);
+  session.port.receive({ type: 'audio-state', state: 'running', contexts: 1 }); await h.tick();
+  assert.equal(element.paused, true, 'off: the element stays paused even while sound runs');
+  session.port.messages = [];
+  h.document.hidden = true; h.document.emit('visibilitychange');
+  assert.equal(session.port.messages.filter(message => message.type === 'panic' && message.suspend !== false).length, 1, 'off: hiding silences as before');
+  assert.equal(h.audios.length, 1, 'one element for the life of the page');
+});
+
+test('a remembered switch comes back on at the next visit; closing the last sounding instrument pauses the element', async () => {
+  const storage = storageDouble({ [BACKGROUND_KEY]: 'on' }), media = mediaSessionDouble(), audioSession = { type: 'auto' };
+  const h = harness({ storage, mediaSession: media, audioSession });
+  assert.equal(h.nodes.get('backgroundAudio').attributes['aria-pressed'], 'true'); assert.equal(h.nodes.get('backgroundAudioState').textContent, 'On');
+  assert.equal(audioSession.type, 'playback');
+  assert.equal(h.audios.length, 0, 'no element until something sounds');
+  const session = await h.activate();
+  assert.equal(session.port.messages.find(message => message.type === 'background-policy').keepPlaying, true);
+  session.port.receive({ type: 'audio-state', state: 'running', contexts: 1 }); await h.tick();
+  assert.equal(h.audios.length, 1); assert.equal(h.audios[0].paused, false); assert.equal(media.playbackState, 'playing');
+  session.port.messages = [];
+  h.document.hidden = true; h.document.emit('visibilitychange');
+  assert.equal(session.port.messages.filter(message => message.type === 'panic').length, 0);
+  h.document.hidden = false;
+  h.app.closeInstrument(); await h.tick();
+  assert.equal(h.app.active, null);
+  assert.equal(h.audios[0].paused, true, 'nothing sounds, so the element rests'); assert.equal(media.playbackState, 'paused');
+});
+
+test('a refused keep-alive element changes nothing the player can see: the switch still holds, the refusal is only journaled', async () => {
+  const storage = storageDouble(), media = mediaSessionDouble();
+  const h = harness({ storage, mediaSession: media, playRefused: true }); const session = await h.activate();
+  h.nodes.get('backgroundAudio').click(); await h.tick();
+  session.port.receive({ type: 'audio-state', state: 'running', contexts: 1 }); await h.tick();
+  assert.equal(h.nodes.get('audioLabel').textContent, 'Audio on');
+  assert.equal(h.nodes.get('toast')?.textContent ?? '', '', 'no message is shown for a refusal');
+  assert.equal(h.audios[0].paused, true);
+  session.port.messages = [];
+  h.document.hidden = true; h.document.emit('visibilitychange');
+  assert.equal(session.port.messages.filter(message => message.type === 'panic').length, 0, 'the policy holds without the element');
+  h.nodes.get('roomCheck').click();
+  const journal = JSON.parse(h.nodes.get('roomLogText').value).journal.map(entry => entry.event);
+  assert.ok(journal.includes('keepalive.refused')); assert.ok(journal.includes('room.kept-playing-hidden'));
 });

@@ -24119,7 +24119,9 @@ function cloudInstall(){
  cloudOn($('dice'),'click',function(){if(!C.destroyed)ensureAudio().catch(function(){});},true);
  cloudOn($('bRoll'),'click',function(){if(!C.destroyed)ensureAudio().catch(function(){});},true);
  cloudOn($('bSounds'),'click',openSounds);cloudOn($('cancelExport'),'click',cancelExport);
- cloudOn(document,'visibilitychange',function(){if(document.hidden)cloudStop();});cloudOn(window,'blur',function(){cloudStop();});
+ /* The room's 'Keep playing when the screen locks' switch (MidiRoom.keepPlaying) turns both
+    stops off; standalone there is no MidiRoom and the page stops on hide and blur as before. */
+ cloudOn(document,'visibilitychange',function(){if(document.hidden&&!(window.MidiRoom&&MidiRoom.keepPlaying))cloudStop();});cloudOn(window,'blur',function(){if(!(window.MidiRoom&&MidiRoom.keepPlaying))cloudStop();});
  cloudOn(window,'pagehide',cloudDestroy);cloudOn(window,'midiroom:panic',cloudStop);cloudOn(window,'midiroom:dispose',cloudDestroy);
  if(window.MidiRoom&&MidiRoom.declare)MidiRoom.declare({name:'Lucky Dreamer',send:['midi','transport'],receive:[]});  /* send: it plays a whole band and, until now, was the only instrument in the room that could not be     wired to anything — the wire dialog offered it and then refused with "no compatible output".     receive stays empty: there is no note-in path here, and claiming one would put Lucky Dreamer in the     TO menu only to swallow whatever arrived. */
  var sheet=$('sheet'),wasOpen=false;

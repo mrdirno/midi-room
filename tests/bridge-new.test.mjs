@@ -174,3 +174,33 @@ test('legacy mode does not duplicate a signal through SDK and window handlers', 
   r.sandbox.dispatchEvent(message);
   assert.equal(sdk, 0); assert.equal(legacy, 1);
 });
+
+// Wish d7d9b4eb: the room's 'background-policy' (Player options: keep playing when the
+// screen locks). Off until the room says otherwise, so the frame stops itself on hide as
+// it always has; on, the frame keeps its hands off its own sound and lets a resume through
+// while hidden, which is how a lock-screen Play reaches it. The room's Stop still silences.
+test('the background policy decides whether a hidden frame stops itself; Stop still silences and resume reaches a hidden frame only while it is on', async t => {
+  const r = rig(); t.after(() => r.dispose());
+  const audio = vm.runInContext('new AudioContext()', r.context);
+  let panics = 0; r.sandbox.addEventListener('midiroom:panic', () => panics++);
+  assert.equal(r.sandbox.MidiRoom.keepPlaying, false, 'off until the room says otherwise');
+  assert.throws(() => { r.sandbox.MidiRoom.keepPlaying = true; }, TypeError, 'an instrument cannot flip the policy itself');
+  // Control, the old behaviour: hiding suspends every context and tells the instrument.
+  r.document.hidden = true; r.document.dispatchEvent(new Event('visibilitychange')); await tick();
+  assert.equal(audio.suspends, 1); assert.equal(panics, 1);
+  r.send({ type: 'resume' }); await tick(); assert.equal(audio.resumes, 0, 'a hidden frame ignores resume while the policy is off');
+  r.document.hidden = false; await audio.resume();
+  r.send({ type: 'background-policy', keepPlaying: true });
+  assert.equal(r.sandbox.MidiRoom.keepPlaying, true);
+  r.document.hidden = true; r.document.dispatchEvent(new Event('visibilitychange')); await tick();
+  assert.equal(audio.suspends, 1, 'on: hiding suspends nothing'); assert.equal(panics, 1, 'on: no panic reaches the instrument'); assert.equal(audio.state, 'running');
+  r.send({ type: 'panic' }); await tick();
+  assert.equal(audio.suspends, 2, 'the room\'s Stop still silences'); assert.equal(panics, 2);
+  r.send({ type: 'resume' }); await tick(); assert.equal(audio.resumes, 2, 'a lock-screen Play reaches a hidden frame while the policy is on');
+  r.send({ type: 'background-policy', keepPlaying: 'yes' }); assert.equal(r.sandbox.MidiRoom.keepPlaying, false, 'only a real true turns it on');
+  r.send({ type: 'background-policy', keepPlaying: true });
+  r.send({ type: 'background-policy', keepPlaying: false });
+  r.document.dispatchEvent(new Event('visibilitychange')); await tick();
+  assert.equal(audio.suspends, 3, 'off again: hiding suspends as before'); assert.equal(panics, 3);
+  assert.equal(r.outgoing.filter(e => e.type === 'audio-state').at(-1).state, 'suspended');
+});

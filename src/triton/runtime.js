@@ -191,7 +191,9 @@
   window.addEventListener('midiroom:panic',stopPerformance);
   window.addEventListener('midiroom:dispose',dispose);
   window.addEventListener('pagehide',dispose);
-  document.addEventListener('visibilitychange',()=>{if(document.hidden)stopPerformance();});
+  // The room's 'Keep playing when the screen locks' switch (MidiRoom.keepPlaying) turns this
+  // stop off; standalone there is no MidiRoom and the page stops on hide as before.
+  document.addEventListener('visibilitychange',()=>{if(document.hidden&&!window.MidiRoom?.keepPlaying)stopPerformance();});
   // Safari can interrupt an existing context. Resume synchronously in the next real gesture.
   function resumeGesture(event){if(event.isTrusted&&ctx&&(ctx.state==='suspended'||ctx.state==='interrupted')){try{ctx.resume().catch(()=>{});}catch{}}}
   window.addEventListener('pointerdown',resumeGesture,true);window.addEventListener('keydown',resumeGesture,true);
