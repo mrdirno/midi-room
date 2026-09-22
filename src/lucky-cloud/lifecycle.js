@@ -291,13 +291,6 @@ function busPublish(t){
     12 seeds re-sent the same notes, 10,199 duplicates in one loop of the
     first. */
  if(busLast>=0&&t<busLast-1e-3){busCursor=t-1e-3;busSeats=Object.create(null);}
- /* A playhead that did not get here by playing owes the wire nothing behind it: the first report
-    after PLAY (busReset leaves busCursor at -1 until then; a rebuild does not), or a jump past the
-    last horizon (a resume or a skipped lead-in lands mid-song; a swap lands on a new position).
-    Unguarded, every earlier note went out at once: measured 45 note-ons in one report starting at
-    bar 2, 237 resuming at bar 10. Not busLast<0: a rebuild sets that too, and an unmuted lane must
-    still go out at once (tests/lucky-wire.test.mjs). */
- if(busCursor<0||(busLast>=0&&t>busLast+0.4))for(var j=0;j<busList.length&&busList[j].at<t-1e-3;j++)busSeats[busList[j].seat]=1;
  busLast=t;
  var horizon=t+0.4,base=mr.now();
  for(var i=0;i<busList.length;i++){
@@ -380,12 +373,7 @@ rollPart=function(lane,kind,btn){
 var originalPause=pause;
 pause=function(){auditionStop();busReset();busTransport('stop');return originalPause();};
 var originalPlay=play;
-/* Wish 44813890: the room's Player-options switch "Skip the lead-in on new songs" (MidiRoom.skipLeadIn).
-   A start from the top of a song (the gate dice, ROLL, the continue gate, PLAY at bar 0) begins at the
-   first bar after the intro instead of on it. A resume keeps its bar. Standalone there is no MidiRoom,
-   so every song opens on its intro as before. The loop still comes round through the intro. */
-function leadInEnd(){var w=S.world;if(!w||!w.sections)return 0;for(var i=0;i<w.sections.length;i++){var n=w.sections[i].name;if(n!=='in'&&n!=='intro')return Math.max(0,w.sections[i].startBar|0);}return 0;}
-play=function(fromBar){auditionStop();busReset();if((fromBar===undefined?S.bar:fromBar)===0&&window.MidiRoom&&MidiRoom.skipLeadIn===true&&S.world){fromBar=leadInEnd();S.bar=fromBar;}var r=originalPlay(fromBar);busTransport('start',S.world&&S.world.bpm);return r;};
+play=function(fromBar){auditionStop();busReset();var r=originalPlay(fromBar);busTransport('start',S.world&&S.world.bpm);return r;};
 function cloudState(){return {historyMode:C.historyMode,historyCount:C.history.length,seed:S.seed,style:S.style,playing:S.playing,solo:S.solo,bar:S.bar,time:S.playhead,mode:S.mode,audioState:S.ctx?S.ctx.state:(C.destroyed?'closed':'off'),destroyed:C.destroyed,soundBank:JSON.parse(JSON.stringify(S.soundBank)),stats:C.health||null,lateRecoveries:C.lateRecoveries,resources:{urls:C.urls.size,workers:C.exportJob&&C.exportJob.worker?1:0,timers:C.timers.size,exporting:!!C.exportJob},roll:JSON.parse(JSON.stringify(S.roll)),locks:Object.keys(S.locks)};}
 async function cloudDestroy(){if(C.destroyed)return;saveSession();C.destroyed=true;C.history=[];++C.intent;S.playing=false;S.solo=null;cancelExport();[toastT,saveT,swapT].forEach(clearTimeout);C.timers.forEach(clearTimeout);C.timers.clear();C.listeners.splice(0).forEach(function(off){off();});if(C.observer)C.observer.disconnect();C.urls.forEach(revoke);if(S.send)try{S.send({type:'stop'});}catch(_){}document.body.inert=true;await resetAudio();}
 function cloudInstall(){

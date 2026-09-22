@@ -204,15 +204,3 @@ test('the background policy decides whether a hidden frame stops itself; Stop st
   assert.equal(audio.suspends, 3, 'off again: hiding suspends as before'); assert.equal(panics, 3);
   assert.equal(r.outgoing.filter(e => e.type === 'audio-state').at(-1).state, 'suspended');
 });
-
-// Wish 44813890: the room's 'lead-in-policy' is a read-only flag an instrument reads when a song starts.
-test('the lead-in policy is false until the room says otherwise, read-only to the instrument, and only a real true turns it on', async t => {
-  const r = rig(); t.after(() => r.dispose());
-  assert.equal(r.sandbox.MidiRoom.skipLeadIn, false);
-  assert.throws(() => { r.sandbox.MidiRoom.skipLeadIn = true; }, TypeError, 'an instrument cannot flip the policy itself');
-  r.send({ type: 'lead-in-policy', skipLeadIn: true }); assert.equal(r.sandbox.MidiRoom.skipLeadIn, true);
-  r.send({ type: 'lead-in-policy', skipLeadIn: 'yes' }); assert.equal(r.sandbox.MidiRoom.skipLeadIn, false);
-  r.send({ type: 'lead-in-policy', skipLeadIn: true }); r.send({ type: 'lead-in-policy', skipLeadIn: false });
-  assert.equal(r.sandbox.MidiRoom.skipLeadIn, false);
-  assert.equal(r.sandbox.MidiRoom.keepPlaying, false, 'the background policy is a separate switch');
-});

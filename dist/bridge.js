@@ -6,9 +6,6 @@ export function childBootstrap(options) {
   // The room's 'background-policy' (Player options: keep playing when the screen locks). Off
   // until the room says otherwise, so a frame that never hears of it behaves as before.
   let keepPlaying = false;
-  // The room's 'lead-in-policy' (Player options: skip the lead-in on new songs). Off until the
-  // room says otherwise, so a frame that never hears of it opens every song as before.
-  let skipLeadIn = false;
   let bridgeTimer = null;
   const pendingMIDI = new Map(), pendingSaves = new Map(), blobs = new Map(), contexts = new Set();
   const inputStore = new Map(), inputCache = new Map(), queuedNotices = [];
@@ -59,7 +56,6 @@ export function childBootstrap(options) {
     version: 1, declare, emit, on, now,
     // Read by an instrument's own hidden-stop; absent (undefined) when the page runs standalone.
     get keepPlaying() { return keepPlaying; },
-    get skipLeadIn() { return skipLeadIn; },
     controlVersion: 1,
     describe(profile) {
       try { if (!profile || profile.version !== 1 || JSON.stringify(profile).length > 16384) return false; } catch { return false; }
@@ -516,7 +512,6 @@ export function childBootstrap(options) {
     else if (message.type === 'hardware-panic') releaseInputs(true);
     else if (message.type === 'resume') resumeContexts();
     else if (message.type === 'background-policy') keepPlaying = message.keepPlaying === true;
-    else if (message.type === 'lead-in-policy') skipLeadIn = message.skipLeadIn === true;
     else if (message.type === 'dispose') dispose();
   }
   function boot(event) {
