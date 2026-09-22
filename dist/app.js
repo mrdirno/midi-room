@@ -393,6 +393,7 @@ window.addEventListener('message', event => {
   session.ready = true;
   post(session, { type: 'midi-state', state: { ...latestState, inputs: session === active ? latestState.inputs : [] } });
   post(session, { type: 'background-policy', keepPlaying });
+  post(session, { type: 'lead-in-policy', skipLeadIn });
   activate(session);
 });
 
@@ -728,6 +729,22 @@ function setKeepPlaying(on, fromGesture = false) {
   applyBackgroundPolicy();
   if (keepPlaying && fromGesture) primeKeepAlive();
 }
+// Wish 44813890: "enable a toggle for lead in countdown". Lucky Dreamer opens every new song with
+// a two-bar intro (its progress bar reads IN) before the full beat. OFF unless the person turns it
+// on in Player options; while it is off nothing is stored and every frame is told false, so every
+// song opens as before. Only an instrument that reads MidiRoom.skipLeadIn acts on it.
+const LEAD_IN_KEY = 'midi-room.skip-lead-in.v1';
+let skipLeadIn = false; try { skipLeadIn = localStorage.getItem(LEAD_IN_KEY) === 'on'; } catch { /* no storage: the switch stays off */ }
+function renderLeadInSwitch() {
+  $('skipLeadIn').setAttribute('aria-pressed', String(skipLeadIn));
+  $('skipLeadInState').textContent = skipLeadIn ? 'On' : 'Off';
+}
+function setSkipLeadIn(on) {
+  skipLeadIn = on === true;
+  try { localStorage.setItem(LEAD_IN_KEY, skipLeadIn ? 'on' : 'off'); } catch { /* private mode: the switch lasts this visit */ }
+  renderLeadInSwitch(); logRoom(skipLeadIn ? 'lead-in.skip' : 'lead-in.play');
+  for (const session of present()) post(session, { type: 'lead-in-policy', skipLeadIn });
+}
 
 function stopSound(announce = false) {
   broker.panic(); bus.panic(); for (const session of present()) surfaceRouter.cancel(session.nonce,'room-stopped'); logRoom('room.stopped'); releaseWakeLock(); pauseKeepAlive();
@@ -865,6 +882,8 @@ if (typeof navigator.wakeLock?.request === 'function') $('wakeStatus').hidden = 
 $('backgroundAudio').onclick = () => setKeepPlaying(!keepPlaying, true);
 // A remembered switch is shown and applied at load; the default off touches nothing else.
 renderBackgroundSwitch(); if (keepPlaying) applyBackgroundPolicy();
+$('skipLeadIn').onclick = () => setSkipLeadIn(!skipLeadIn);
+renderLeadInSwitch();
 
 // The rack is independent; cards select input without changing the sound target.
 // Launch is resolved after all catalog actions are bound below.

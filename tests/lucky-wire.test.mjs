@@ -98,3 +98,18 @@ test('a rebuild that ADDS a part sends it at once; only what was already sent is
   assert.ok(Math.min(...bass) <= 125, `the unmuted lane came in at ${Math.min(...bass)} ms`);
   assert.equal(lead.length, new Set(lead).size, 'and the lane that did not change was not sent twice');
 });
+
+// Wish 44813890: with the lead-in skipped a song starts at bar 2, and a resume starts wherever it
+// stopped. Before the guard the first report after either sent every earlier note at once: a note
+// already behind the playhead is clamped to "now", so it lands AT the playhead, not before it.
+test('a start that lands mid-song sends only what lies ahead of the playhead, and so does a jump past the horizon', () => {
+  const p = publisher();
+  p.S.world = band(120, 256);                        // one note every 125 ms
+  p.publish(2.0);                                    // first report after PLAY, at bar 2
+  assert.equal(p.onsets().length, 4, `the first report sent ${p.onsets().length} notes; 4 lie in the 400 ms ahead`);
+  p.publish(2.05);
+  const before = p.onsets().length;
+  p.publish(5.0);                                    // a swap lands 3 s further on
+  const after = p.onsets().length - before;
+  assert.equal(after, 4, `the jump sent ${after} notes; 4 lie in the 400 ms ahead of the new playhead`);
+});
