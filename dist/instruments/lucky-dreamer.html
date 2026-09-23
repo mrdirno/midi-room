@@ -24052,12 +24052,25 @@ function busPublish(t){
     up to 15 ms ahead of its bar line, where the engine re-strikes the pitched ones on landing. */
  if(busFrom>=0){
   if(t<busFrom-1e-3||t>busFrom+0.25){if(++busWait<6)return;busFrom=t;}
-  busSeats=Object.create(null);
+  /* Forget what already went out only when the engine will play it again (a seek back), or when
+     there is no last place to compare with: PLAY resets busLast, and so does every new world, which
+     is how a song opened from an address or a session arrives. A seek FORWARD in the same song plays
+     each note once, and the notes already sent inside the 400 ms horizon are among them. Forgetting
+     those sent the next bar's downbeat twice whenever the progress bar was clicked just before its
+     line: 5-7 notes on six real seeds, where a7b9370 sent each once. */
+  if(!(busLast>=0&&busFrom>=busLast-1e-3))busSeats=Object.create(null);
   for(var j=0,grace=Math.max(1e-3,S.world.secPerStep*0.1);j<busList.length&&busList[j].at<busFrom-grace;j++)busSeats[busList[j].seat]=1;
-  busFrom=-1;busWait=0;busLast=t;
+  /* The last place a landing leaves is its bar line, not this report, because this report can be
+     the OLD place. Click the bar that is playing in its first quarter second and the report already
+     in flight falls inside the window, where nothing tells it from the real one. Kept as the last
+     place, the engine's real first report came earlier, read as the loop coming round, and every
+     note from bar 0 went out at once, 6-12 of them twice. Every real report after a landing is at or
+     past the line, and the loop coming round is still earlier than it. */
+  busLast=busFrom;busFrom=-1;busWait=0;
+ }else{
+  if(busLast>=0&&t<busLast-1e-3){busCursor=t-1e-3;busSeats=Object.create(null);}
+  busLast=t;
  }
- if(busLast>=0&&t<busLast-1e-3){busCursor=t-1e-3;busSeats=Object.create(null);}
- busLast=t;
  var horizon=t+0.4,base=mr.now();
  for(var i=0;i<busList.length;i++){
   var n=busList[i];

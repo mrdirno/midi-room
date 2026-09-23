@@ -255,3 +255,90 @@ test('with the switch off, a song from the top goes down the cable exactly as or
     assert.deepEqual(after, before, `seed ${seed}: the cable differs from origin/main`);
   }
 });
+
+// Two ways a landing sent the same seat twice, found by the refute pass on 086d9f9. Both come from
+// what a landing did to the publisher's memory: it forgot every seat already sent, and it took the
+// accepted report's time as the last place the song had been.
+const a7b9370 = fs.readFileSync(new URL('./fixtures/lucky-wire-a7b9370.js', import.meta.url), 'utf8');
+const each = list => list.every((note, i) => i === 0 || note !== list[i - 1]);
+
+test('a jump to the next bar, clicked inside the 400 ms already sent, sends that bar once', () => {
+  // The progress bar clicked 0.2 s before the next bar line. The publisher is 400 ms ahead, so that
+  // bar's downbeat is already on the wire, stamped for the moment it plays, and a forward seek plays
+  // it exactly once. The landing forgot it had been sent and sent it again: 7, 5, 5, 5, 7 and 7 notes
+  // twice on six real seeds. a7b9370 knew nothing of landings and sent each once; it is the control.
+  const run = (block, world, bar, every = 0.05) => {
+    const p = publisher(block), line = bar * world.steps * world.secPerStep;
+    p.S.world = world;
+    p.reset(); p.land(0);
+    let k = 0;
+    for (; 0.013 + k * every < line - 0.2; k++) p.publish(0.013 + k * every);   // from the top to 0.2 s before the line
+    p.land(bar);                                               // click the next bar
+    p.publish(0.013 + k * every);                              // a report of the old place was already in flight
+    let last = 0;
+    for (let u = line + 0.021; u < line + 1; u += every) { p.publish(u); last = u; }   // the engine, from the line
+    return { p, last };
+  };
+  for (const block of [a7b9370, current]) {
+    const { p, last } = run(block, bars(120), 2);
+    const heard = notesSince(p);
+    assert.ok(each(heard), `${block === current ? 'now' : 'a7b9370'}: a note went out twice`);
+    assert.deepEqual(heard, owed(p.S.world, 0, last), `${block === current ? 'now' : 'a7b9370'}: every note from the top once`);
+  }
+  // The same on real songs: with nothing to skip, the cable must be note for note what a7b9370 sent.
+  const { load } = createRequire(import.meta.url)('../src/lucky-cloud/tests/engine-loader.cjs');
+  const { x } = load();
+  for (const seed of [12345, 7919, 424242, 90210, 31337, 2718281]) {
+    const world = x.buildBand(seed), block = 2304 / 44100;   // the worklet's report period
+    const before = run(a7b9370, world, 6, block).p.onsets().map(key), after = run(current, world, 6, block).p.onsets().map(key);
+    assert.deepEqual(after, before, `seed ${seed}: the next bar clicked 0.2 s before its line`);
+  }
+  // A seek the engine never carried out is the same case: the song goes on forward from where it was.
+  // After six reports from there the wire goes on, and what it had already sent stays sent.
+  for (const block of [a7b9370, current]) {
+    const p = publisher(block);
+    p.S.world = bars(120);
+    p.reset(); p.land(0);
+    for (let k = 0; k <= 100; k++) p.publish(0.005 + k * 0.05);   // to 5.005 s: sent to 5.405, step 43 is 5.375
+    p.land(12);                                                   // superseded in the engine's queue
+    for (let k = 101; k <= 120; k++) p.publish(0.005 + k * 0.05); // the sixth report is 5.305 s
+    const heard = notesSince(p);
+    assert.ok(each(heard), `${block === current ? 'now' : 'a7b9370'}: a seek that never happened sent a note twice`);
+    assert.deepEqual(heard, owed(p.S.world, 0, 0.005 + 120 * 0.05), 'and nothing is lost');
+  }
+});
+
+test('a report of the old place inside the new bar\'s first quarter second starts no burst', () => {
+  // Click the bar that is playing, 120 ms into it: the song seeks back to its line. The report the
+  // engine had already posted says 170 ms, inside the window a landing is accepted in, and nothing
+  // can tell it from the real first report. The landing then remembered 170 ms as the last place,
+  // the engine's real first report said 21 ms, and the loop test read that as the song coming round:
+  // every note from bar 0 went out at once, as a7b9370 also did, and 6-12 of them twice. The last
+  // place a landing leaves is its bar line, which every real report after it reaches.
+  const p = publisher();
+  p.S.world = bars(120);
+  p.reset(); p.land(0);
+  for (let k = 0; k <= 42; k++) p.publish(0.02 + k * 0.05);      // 120 ms into bar 1
+  const mark = p.onsets().length;
+  p.land(1);                                                     // click bar 1
+  p.publish(0.02 + 43 * 0.05);                                   // the old place, 170 ms in: in the window
+  let last = 0;
+  for (let u = 2.021; u < 3; u += 0.05) { p.publish(u); last = u; }
+  assert.deepEqual(notesSince(p, mark), owed(p.S.world, 16, last), 'bar 1 from its line, each note once, nothing from bar 0');
+  // ROLL twice inside a quarter second is the same thing at the top of a song: the first song's
+  // report is queued behind the second song's start and lands in its window.
+  const q = publisher();
+  q.S.world = bars(120);
+  q.reset(); q.land(0);
+  for (let k = 0; k < 3; k++) q.publish(0.013 + k * 0.05);
+  q.reset(); q.S.world = bars(120); q.land(0);                   // ROLL again
+  const roll = q.onsets().length;
+  q.publish(0.163);                                              // the first song's report
+  let end = 0;
+  for (let u = 0.009; u < 1; u += 0.05) { q.publish(u); end = u; }
+  assert.deepEqual(notesSince(q, roll), owed(q.S.world, 0, end), 'the second song from its top, each note once');
+  // and the loop coming round after such a landing is still the loop coming round
+  const wrap = q.onsets().length;
+  q.publish(0.012);
+  assert.ok(q.onsets().length > wrap, 'the top of the song goes out again when the playhead goes back');
+});
