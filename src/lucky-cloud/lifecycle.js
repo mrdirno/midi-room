@@ -199,7 +199,7 @@ ABOUT='<h2>LUCKY DREAMER</h2><p>A whole-band cloud instrument by Aldrin Payopay,
    audibly loose. Emitting 400ms early with a timestamp is the difference
    between a wire and a rumour. Nothing is sent unless a listener has drawn
    a wire; the room fans only to matching routes. */
-var busList=null,busWorld=null,busCursor=-1,busLast=-1,busBpm=0,busSaid=-1e9,busSeats=Object.create(null);
+var busList=null,busWorld=null,busCursor=-1,busLast=-1,busBpm=0,busSaid=-1e9,busSeats=Object.create(null),busFrom=-1,busWait=0;
 function busScore(w){
  var out=[],melCh=0,pi,i;
  for(pi=0;pi<w.roster.length;pi++){
@@ -236,7 +236,12 @@ function busScore(w){
  out.sort(function(a,b){return a.at-b.at;});
  return out;
 }
-function busReset(){busList=null;busWorld=null;busCursor=-1;busLast=-1;busBpm=0;busSaid=-1e9;busSeats=Object.create(null);}
+function busReset(){busList=null;busWorld=null;busCursor=-1;busLast=-1;busBpm=0;busSaid=-1e9;busSeats=Object.create(null);busFrom=-1;busWait=0;}
+/* Where the song is about to come down, in seconds: the start of `bar`, clamped exactly as the engine's
+   handover clamps it before seekBar. Called by the sendSwap wrapper below for every swap that SEEKS —
+   PLAY, a resume, the lead-in switch, the progress bar, an address or session opened while playing.
+   A follow swap (a rebuild) aligns to the running clock and moves nothing, so it never lands here. */
+function busLand(bar){var w=S.world;busFrom=-1;busWait=0;if(!w||!(w.secPerStep>0)||!(w.steps>0))return;busFrom=Math.max(0,Math.min(Math.floor(bar)||0,(w.bars|0)-1))*w.steps*w.secPerStep;}
 /* Transport, so PLAY and STOP here mean PLAY and STOP over there. It also
    closes the one gap the note scheduler leaves open: notes are published
    400ms early, so a stop would otherwise be followed by up to 400ms of
@@ -290,6 +295,29 @@ function busPublish(t){
     cursor every 50ms. Measured before this line was written that way: 12 of
     12 seeds re-sent the same notes, 10,199 duplicates in one loop of the
     first. */
+ /* Where the song came down, not where it was first reported. Every seek lands on the START of a bar
+    (busLand), and everything from that bar line on is owed to the wire once; nothing before it is.
+    Unguarded, a start anywhere but the top sent every earlier note at once: 36 note-ons for the 4
+    owed starting at bar 2, 164 resuming at bar 10 (tests/lucky-wire.test.mjs). The first guard
+    keyed this on the first position REPORT instead, and the engine never reports on the bar line:
+    its report counter runs on across a load, so the first report comes one audio block to 50 ms
+    after it (3-51 ms in Chromium, ~93 ms on the ScriptProcessor path). The downbeat lay before that
+    report, so every song's first kick and bass note never reached a room cable (seed 12345: 14
+    note-ons -> 12), and it was reverted. A report more than a quarter second past the bar line, or
+    before it, was already in flight when the swap went out: it says where the song WAS, and
+    publishing the new song from there sends a stretch of it at once, so it is dropped. The bound
+    covers the slowest real landing (a ScriptProcessor block plus a queued crossfade, ~190 ms). Six
+    such reports in a row mean the seek was superseded in the engine's queue; then nothing behind the
+    report is owed. A tenth of a step of grace before the line keeps the downbeat whole: the humanizer
+    plays hits a little early (12,960 of 13,555 early offsets over 30 seeds are under a tenth of a
+    step; the next cluster starts at 0.15), and 54 of 60 seeds put part of section A's first downbeat
+    up to 15 ms ahead of its bar line, where the engine re-strikes the pitched ones on landing. */
+ if(busFrom>=0){
+  if(t<busFrom-1e-3||t>busFrom+0.25){if(++busWait<6)return;busFrom=t;}
+  busSeats=Object.create(null);
+  for(var j=0,grace=Math.max(1e-3,S.world.secPerStep*0.1);j<busList.length&&busList[j].at<busFrom-grace;j++)busSeats[busList[j].seat]=1;
+  busFrom=-1;busWait=0;busLast=t;
+ }
  if(busLast>=0&&t<busLast-1e-3){busCursor=t-1e-3;busSeats=Object.create(null);}
  busLast=t;
  var horizon=t+0.4,base=mr.now();
@@ -319,6 +347,11 @@ onEngineMsg=function(m){
  originalOnEngineMsg(m);
  if(m&&m.type==='pos')busPublish(m.t);
 };
+/* Every seek the page asks for goes through sendSwap, so this is where the publisher learns where the
+   song will come down. follow===true is the rebuild path (it aligns to the running clock); anything
+   else seeks, and the engine reads a missing bar as S.bar exactly as sendSwap does. */
+var originalSendSwap=sendSwap;
+sendSwap=function(bar,follow){if(follow!==true&&S.send)busLand(bar===undefined?S.bar:bar);return originalSendSwap(bar,follow);};
 /* ── TAP A LANE ──────────────────────────────────────────────────────────
    Two things made "tap a lane to hear it alone" read as a dead button.
    First, this file declares toggleSolo twice, and the later copy — the live
@@ -373,7 +406,12 @@ rollPart=function(lane,kind,btn){
 var originalPause=pause;
 pause=function(){auditionStop();busReset();busTransport('stop');return originalPause();};
 var originalPlay=play;
-play=function(fromBar){auditionStop();busReset();var r=originalPlay(fromBar);busTransport('start',S.world&&S.world.bpm);return r;};
+/* Wish 44813890: the room's Player-options switch "Skip the lead-in on new songs" (MidiRoom.skipLeadIn).
+   A start from the top of a song (the gate dice, ROLL, the continue gate, PLAY at bar 0) begins at the
+   first bar after the intro instead of on it. A resume keeps its bar. Standalone there is no MidiRoom,
+   so every song opens on its intro as before. The loop still comes round through the intro. */
+function leadInEnd(){var w=S.world;if(!w||!w.sections)return 0;for(var i=0;i<w.sections.length;i++){var n=w.sections[i].name;if(n!=='in'&&n!=='intro')return Math.max(0,w.sections[i].startBar|0);}return 0;}
+play=function(fromBar){auditionStop();busReset();if((fromBar===undefined?S.bar:fromBar)===0&&window.MidiRoom&&MidiRoom.skipLeadIn===true&&S.world){fromBar=leadInEnd();S.bar=fromBar;}var r=originalPlay(fromBar);busTransport('start',S.world&&S.world.bpm);return r;};
 function cloudState(){return {historyMode:C.historyMode,historyCount:C.history.length,seed:S.seed,style:S.style,playing:S.playing,solo:S.solo,bar:S.bar,time:S.playhead,mode:S.mode,audioState:S.ctx?S.ctx.state:(C.destroyed?'closed':'off'),destroyed:C.destroyed,soundBank:JSON.parse(JSON.stringify(S.soundBank)),stats:C.health||null,lateRecoveries:C.lateRecoveries,resources:{urls:C.urls.size,workers:C.exportJob&&C.exportJob.worker?1:0,timers:C.timers.size,exporting:!!C.exportJob},roll:JSON.parse(JSON.stringify(S.roll)),locks:Object.keys(S.locks)};}
 async function cloudDestroy(){if(C.destroyed)return;saveSession();C.destroyed=true;C.history=[];++C.intent;S.playing=false;S.solo=null;cancelExport();[toastT,saveT,swapT].forEach(clearTimeout);C.timers.forEach(clearTimeout);C.timers.clear();C.listeners.splice(0).forEach(function(off){off();});if(C.observer)C.observer.disconnect();C.urls.forEach(revoke);if(S.send)try{S.send({type:'stop'});}catch(_){}document.body.inert=true;await resetAudio();}
 function cloudInstall(){
