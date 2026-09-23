@@ -542,7 +542,16 @@ function renderRack() {
     tab.setAttribute('aria-label', sessionName(session) + (session === active ? ' · keyboard focus' : ' · select for keyboard'));
     tab.classList.toggle('selected', session === active);
     tab.onclick = () => { focusSession(session); post(session, {type: 'resume'}); };
-    session.tab = tab; $('rackTabs').append(tab);
+    // The only way to close an instrument used to be Player options, which closes the
+    // selected one — so closing the second of three meant selecting it first. The × is a
+    // sibling of the tab, never inside it: a button inside a button is invalid HTML and its
+    // click would also select the tab it was trying to close. Same close as the menu row.
+    const close = document.createElement('button');
+    close.type = 'button'; close.className = 'rack-close'; close.textContent = '×';
+    close.setAttribute('aria-label', 'Close ' + sessionName(session));
+    close.onclick = () => { closeInstrument(session); if (active?.tab) active.tab.focus(); };
+    const item = document.createElement('span'); item.className = 'rack-item'; item.append(tab, close);
+    session.tab = tab; $('rackTabs').append(item);
   }
   $('addButton').disabled = sessions.length >= MAX_INSTRUMENTS;
   $('patchButton').textContent = 'Wires' + (bus.snapshot().routes.length ? ' · ' + bus.snapshot().routes.length : '');
@@ -735,11 +744,17 @@ function stopSound(announce = false) {
   if (announce && active) notify('Stopped. Tap an instrument to play again.');
 }
 
-function closeInstrument() {
-  loadSequence.cancel(); cancelStaging(); retire(active); active = null;
-  $('settings').close(); $('loading').hidden = true;
+function closeInstrument(target = active) {
+  // A tab's × closes that instrument; the menu row closes the selected one. retire() releases
+  // its held notes and removes its wires either way. Closing one that is not selected leaves
+  // the selection and any instrument still loading alone; closing the selected one selects
+  // its neighbour in the rack, the way closing a browser tab does.
+  const selected = target === active, index = sessions.indexOf(target);
+  if (selected) { loadSequence.cancel(); cancelStaging(); active = null; $('loading').hidden = true; }
+  retire(target); $('settings').close();
   renderRack(); sendState();
-  if (sessions.length) { focusSession(sessions[sessions.length - 1]); return; }
+  if (active) return;
+  if (sessions.length) { focusSession(sessions[index < 0 ? sessions.length - 1 : Math.min(index, sessions.length - 1)]); return; }
   $('frameMount').hidden = true; $('welcome').hidden = false; $('transport').hidden = false;
   $('stopButton').disabled = true; $('instrumentName').textContent = 'No instrument';
   $('audioLabel').textContent = 'Ready'; $('audioLight').classList.remove('running');
@@ -789,7 +804,7 @@ $('copyAppLink').onclick = async () => {
   catch { $('unsupportedText').textContent = 'Use this browser’s Share or Copy link action, then open the link in Chrome.'; }
 };
 $('stopButton').onclick = () => stopSound(true);
-$('closeInstrument').onclick = closeInstrument;
+$('closeInstrument').onclick = () => closeInstrument();
 $('reloadButton').onclick = async () => {
   if (!active) return;
   const source = active.source, name = active.name;

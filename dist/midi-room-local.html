@@ -52,6 +52,11 @@ body{height:100vh;height:100svh;}
 .rack-tabs{display:flex;align-items:center;gap:7px;flex:1;min-width:0;overflow-x:auto;scrollbar-width:thin;}
 .rack-tab{position:relative;display:flex;align-items:center;gap:7px;flex:0 0 auto;max-width:190px;height:44px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:#1c1f25;border:1px solid var(--border);border-radius:9px;padding:0 12px;color:#aeb3bf;font-size:.8rem;}
 .rack-tab::before{content:'';width:5px;height:5px;flex-shrink:0;border-radius:50%;background:#535a67;}.rack-tab.sounding::before{background:var(--green);}.rack-tab.selected{border-color:var(--accent);color:var(--ink);background:#28221c;}
+/* The tab's ×: 28px square so a thumb can hit it; shown on hover or focus, always on touch. */
+.rack-item{position:relative;display:flex;flex:0 0 auto;align-items:center}.rack-item .rack-tab{padding-right:38px}
+.rack-close{position:absolute;right:6px;top:50%;width:28px;height:28px;margin-top:-14px;display:flex;align-items:center;justify-content:center;padding:0;border:0;border-radius:7px;background:transparent;color:#aeb3bf;font:inherit;font-size:1.05rem;line-height:1;opacity:0;cursor:pointer}
+.rack-item:hover .rack-close,.rack-close:focus-visible,.rack-item:focus-within .rack-close{opacity:1}.rack-close:hover,.rack-close:focus-visible{background:#343843;color:var(--ink)}
+@media(pointer:coarse){.rack-close{opacity:1}}
 .add-button{flex:0 0 44px;min-height:44px;border:1px dashed #5b5147;border-radius:9px;background:transparent;color:var(--accent);font-size:1.5rem;}
 #frameMount iframe.parked{position:absolute;inset:0;visibility:hidden;pointer-events:none;}
 .full{width:100%;margin:16px 0 6px;}.wire-selectors{display:grid;grid-template-columns:minmax(0,1fr) 20px minmax(0,1fr);align-items:end;gap:8px;margin:18px 0;}.wire-selectors>span{align-self:center;color:var(--accent);}.wire-selectors select{text-overflow:ellipsis;}
@@ -2576,7 +2581,16 @@ function renderRack() {
     tab.setAttribute('aria-label', sessionName(session) + (session === active ? ' · keyboard focus' : ' · select for keyboard'));
     tab.classList.toggle('selected', session === active);
     tab.onclick = () => { focusSession(session); post(session, {type: 'resume'}); };
-    session.tab = tab; $('rackTabs').append(tab);
+    // The only way to close an instrument used to be Player options, which closes the
+    // selected one — so closing the second of three meant selecting it first. The × is a
+    // sibling of the tab, never inside it: a button inside a button is invalid HTML and its
+    // click would also select the tab it was trying to close. Same close as the menu row.
+    const close = document.createElement('button');
+    close.type = 'button'; close.className = 'rack-close'; close.textContent = '×';
+    close.setAttribute('aria-label', 'Close ' + sessionName(session));
+    close.onclick = () => { closeInstrument(session); if (active?.tab) active.tab.focus(); };
+    const item = document.createElement('span'); item.className = 'rack-item'; item.append(tab, close);
+    session.tab = tab; $('rackTabs').append(item);
   }
   $('addButton').disabled = sessions.length >= MAX_INSTRUMENTS;
   $('patchButton').textContent = 'Wires' + (bus.snapshot().routes.length ? ' · ' + bus.snapshot().routes.length : '');
@@ -2769,11 +2783,17 @@ function stopSound(announce = false) {
   if (announce && active) notify('Stopped. Tap an instrument to play again.');
 }
 
-function closeInstrument() {
-  loadSequence.cancel(); cancelStaging(); retire(active); active = null;
-  $('settings').close(); $('loading').hidden = true;
+function closeInstrument(target = active) {
+  // A tab's × closes that instrument; the menu row closes the selected one. retire() releases
+  // its held notes and removes its wires either way. Closing one that is not selected leaves
+  // the selection and any instrument still loading alone; closing the selected one selects
+  // its neighbour in the rack, the way closing a browser tab does.
+  const selected = target === active, index = sessions.indexOf(target);
+  if (selected) { loadSequence.cancel(); cancelStaging(); active = null; $('loading').hidden = true; }
+  retire(target); $('settings').close();
   renderRack(); sendState();
-  if (sessions.length) { focusSession(sessions[sessions.length - 1]); return; }
+  if (active) return;
+  if (sessions.length) { focusSession(sessions[index < 0 ? sessions.length - 1 : Math.min(index, sessions.length - 1)]); return; }
   $('frameMount').hidden = true; $('welcome').hidden = false; $('transport').hidden = false;
   $('stopButton').disabled = true; $('instrumentName').textContent = 'No instrument';
   $('audioLabel').textContent = 'Ready'; $('audioLight').classList.remove('running');
@@ -2823,7 +2843,7 @@ $('copyAppLink').onclick = async () => {
   catch { $('unsupportedText').textContent = 'Use this browser’s Share or Copy link action, then open the link in Chrome.'; }
 };
 $('stopButton').onclick = () => stopSound(true);
-$('closeInstrument').onclick = closeInstrument;
+$('closeInstrument').onclick = () => closeInstrument();
 $('reloadButton').onclick = async () => {
   if (!active) return;
   const source = active.source, name = active.name;

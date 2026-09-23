@@ -328,14 +328,54 @@ test('two of the same instrument are told apart everywhere the room names them',
   const menu = h.nodes.get('wireFrom').options.map(option => option.text);
   assert.equal(new Set(menu).size, menu.length, 'every source in the From menu reads differently');
   assert.deepEqual(menu.filter(text => text.startsWith('Lucky')), ['Lucky Dreamer 1','Lucky Dreamer 2']);
-  assert.deepEqual(h.nodes.get('rackTabs').children.map(tab => tab.textContent), ['Lucky Dreamer 1','Lucky Dreamer 2','Field Keys']);
+  assert.deepEqual(h.nodes.get('rackTabs').children.map(item => item.children[0].textContent), ['Lucky Dreamer 1','Lucky Dreamer 2','Field Keys']);
   assert.equal(h.nodes.get('wireList').children[0].children[0].children[0].textContent, 'Lucky Dreamer 1 → Field Keys');
   // The refusal a second clock earns now says which twin is already in the seat.
   assert.equal(h.app.connectWire(b.nonce,c.nonce,'field'),false);
   assert.match(h.nodes.get('wireStatus').textContent, /already follows another clock/);
   // One of a kind is still one plain name: close a twin and the survivor stops counting.
   h.app.focusSession(a); h.app.closeInstrument();
-  assert.deepEqual(h.nodes.get('rackTabs').children.map(tab => tab.textContent), ['Lucky Dreamer','Field Keys']);
+  assert.deepEqual(h.nodes.get('rackTabs').children.map(item => item.children[0].textContent), ['Lucky Dreamer','Field Keys']);
+});
+
+test('each rack tab carries its own close button that closes that instrument and nothing else', async () => {
+  const h = harness();
+  const a = await h.activate(), b = await h.activate(new File(['<html>b</html>'],'b.html'),true), c = await h.activate(new File(['<html>c</html>'],'c.html'),true);
+  a.port.receive({type:'instrument-ready',name:'Lucky Dreamer',send:['midi'],receive:['midi']});
+  b.port.receive({type:'instrument-ready',name:'Improvisator',send:['midi'],receive:['midi']});
+  c.port.receive({type:'instrument-ready',name:'Field Keys',send:[],receive:['midi']});
+  h.app.connectWire(a.nonce,b.nonce,'notes');
+  h.app.focusSession(a);
+  const items = () => h.nodes.get('rackTabs').children;
+  const closeOf = name => items().find(item => item.children[0].textContent === name).children[1];
+  // A real button beside the tab (never inside it), named for the instrument it closes.
+  for (const item of items()) {
+    const [tab, close] = item.children;
+    assert.equal(close.tagName, 'button'); assert.equal(close.type, 'button'); assert.equal(close.className, 'rack-close');
+    assert.equal(close.attributes['aria-label'], 'Close ' + tab.textContent);
+    assert.equal(tab.children.length, 0, 'the close button is not nested in the tab button');
+  }
+  // Closing a tab that is not selected closes only it, leaves the selection alone, and its
+  // held notes are released the way the menu close releases them (the wire is cancelled).
+  const before = b.port.messages.length;
+  closeOf('Improvisator').click();
+  assert.equal(b.retired, true); assert.equal(a.retired, false); assert.equal(c.retired, false);
+  assert.equal(h.app.active, a, 'the selection did not move');
+  assert.equal(h.app.bus.snapshot().routes.length, 0);
+  assert.ok(b.port.messages.slice(before).some(m => m.type === 'dispose'));
+  assert.deepEqual(items().map(item => item.children[0].textContent), ['Lucky Dreamer','Field Keys']);
+  assert.equal(a.tab.focused, true, 'keyboard focus lands on the selected tab, not on nothing');
+  // Closing the selected tab selects its neighbour; closing the last one shows the welcome.
+  closeOf('Lucky Dreamer').click();
+  assert.equal(a.retired, true); assert.equal(h.app.active, c);
+  assert.equal(items()[0].children[0].attributes['aria-pressed'], 'true');
+  closeOf('Field Keys').click();
+  assert.equal(h.app.sessions.length, 0); assert.equal(h.nodes.get('welcome').hidden, false);
+  // The Player options row still closes the selected instrument: it must not receive the
+  // click event as the instrument to close.
+  const d = await h.activate(new File(['<html>d</html>'],'d.html'),true);
+  h.nodes.get('closeInstrument').onclick({type:'click'});
+  assert.equal(d.retired, true); assert.equal(h.app.sessions.length, 0);
 });
 
 test('close removes only the selected slot and sends destination cancellation before teardown', async () => {

@@ -40,6 +40,11 @@ body{height:100vh;height:100svh;}
 .rack-tabs{display:flex;align-items:center;gap:7px;flex:1;min-width:0;overflow-x:auto;scrollbar-width:thin;}
 .rack-tab{position:relative;display:flex;align-items:center;gap:7px;flex:0 0 auto;max-width:190px;height:44px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:#1c1f25;border:1px solid var(--border);border-radius:9px;padding:0 12px;color:#aeb3bf;font-size:.8rem;}
 .rack-tab::before{content:'';width:5px;height:5px;flex-shrink:0;border-radius:50%;background:#535a67;}.rack-tab.sounding::before{background:var(--green);}.rack-tab.selected{border-color:var(--accent);color:var(--ink);background:#28221c;}
+/* The tab's ×: 28px square so a thumb can hit it; shown on hover or focus, always on touch. */
+.rack-item{position:relative;display:flex;flex:0 0 auto;align-items:center}.rack-item .rack-tab{padding-right:38px}
+.rack-close{position:absolute;right:6px;top:50%;width:28px;height:28px;margin-top:-14px;display:flex;align-items:center;justify-content:center;padding:0;border:0;border-radius:7px;background:transparent;color:#aeb3bf;font:inherit;font-size:1.05rem;line-height:1;opacity:0;cursor:pointer}
+.rack-item:hover .rack-close,.rack-close:focus-visible,.rack-item:focus-within .rack-close{opacity:1}.rack-close:hover,.rack-close:focus-visible{background:#343843;color:var(--ink)}
+@media(pointer:coarse){.rack-close{opacity:1}}
 .add-button{flex:0 0 44px;min-height:44px;border:1px dashed #5b5147;border-radius:9px;background:transparent;color:var(--accent);font-size:1.5rem;}
 #frameMount iframe.parked{position:absolute;inset:0;visibility:hidden;pointer-events:none;}
 .full{width:100%;margin:16px 0 6px;}.wire-selectors{display:grid;grid-template-columns:minmax(0,1fr) 20px minmax(0,1fr);align-items:end;gap:8px;margin:18px 0;}.wire-selectors>span{align-self:center;color:var(--accent);}.wire-selectors select{text-overflow:ellipsis;}
