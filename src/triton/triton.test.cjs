@@ -166,6 +166,29 @@ await test('All connected MIDI sources receive; stale disconnected port callback
 await test('MIDI sustain and same note are isolated by input and channel',()=>{
   const e=env(candidate),engine=e.world.TritonEngine;e.boot();engine.midi([144,60,90],'one');engine.midi([144,60,90],'two');engine.midi([176,64,127],'one');engine.midi([128,60,0],'one');assert.equal(engine.report().ownedVoices,2);engine.midi([128,60,0],'two');assert.equal(engine.report().ownedVoices,1);engine.midi([176,64,0],'one');assert.equal(engine.report().ownedVoices,0);
 });
+await test('Improvisator: a keyboard the room already has plays the MELODY sound without a second tap; the rack face keeps its patch',async()=>{
+  // wish 4a18bc56. Before: the room's grant bound nothing (0 requests, 0 voices) and, after
+  // the in-frame Connect tap, notes played PROGRAMS[12] "Ice Crystal Keys" — a sound the
+  // Improvisator never shows — instead of any of its four loaded sounds.
+  const improvisator=fs.readFileSync(path.join(project,'dist/instruments/improvisator.html'),'utf8');
+  const e=env(improvisator),engine=e.world.TritonEngine;e.world.document.body.dataset.instrument='improvisator';e.boot();
+  e.run('var played=[];var _sv=spawnVoice;spawnVoice=function(p){played.push(p&&p.name);return _sv.apply(this,arguments);}');
+  let requests=0;const keyboard={id:'hw-keys',state:'connected',open:()=>Promise.resolve()},cable={id:'wire:r1',state:'connected',open:()=>Promise.resolve()};
+  const access={inputs:new Map([['hw-keys',keyboard]])};e.world.navigator.requestMIDIAccess=async()=>{requests++;return access;};
+  e.world.document.fire('window:midiroom:connected',{detail:{inputCount:1}});await e.flush();
+  assert.equal(requests,1);assert.equal(typeof keyboard.onmidimessage,'function');
+  const melody=e.run('PROGRAMS[SoulPilot.base.lead].name');assert.notEqual(melody,e.run('cur.name'));
+  keyboard.onmidimessage({data:[144,60,90]});assert.equal(engine.report().ownedVoices,1);assert.equal(e.run('JSON.stringify(played)'),JSON.stringify([melody]));
+  keyboard.onmidimessage({data:[128,60,0]});assert.equal(engine.report().ownedVoices,0,'a keyboard note is gated: note-off releases it');
+  assert.equal(engine.metadata().name,melody);assert.match(e.el('tritonStatus').textContent,/MELODY/);
+  // A different MELODY choice is what the next note plays.
+  e.run('SoulPilot.base.lead=PROGRAMS.findIndex((p,i)=>i!==SoulPilot.base.lead&&p.cat==="LEAD")');const next=e.run('PROGRAMS[SoulPilot.base.lead].name');
+  access.inputs.set('wire:r1',cable);await access.onstatechange();e.run('played.length=0');cable.onmidimessage({data:[146,64,90]});assert.equal(e.run('JSON.stringify(played)'),JSON.stringify([next]));
+  // The TRITON Rack face still plays its selected patch.
+  const rack=env(candidate);rack.boot();rack.run('var played=[];var _sv=spawnVoice;spawnVoice=function(p){played.push(p&&p.name);return _sv.apply(this,arguments);}');
+  rack.world.TritonEngine.midi([144,60,90],'keys');assert.equal(rack.run('JSON.stringify(played)'),JSON.stringify([rack.run('cur.name')]));
+  observations.push({action:'room grants MIDI; keyboard note 60 at the Improvisator',requests,melody,rackPlays:rack.run('cur.name')});
+});
 const proof={testedAt:new Date().toISOString(),artifactSha256:crypto.createHash('sha256').update(candidate).digest('hex'),method:'Node VM execution of original and candidate implementation with explicit DOM, AudioContext and timer doubles',tests:results,observations,pass:results.every(r=>r.pass),notRun:['Physical MIDI controller','Listening/audio output','Actual browser layout','Phone/Spck','Real offline export waveform']};
 fs.writeFileSync(path.join(project,'verification/triton-regressions.json'),JSON.stringify(proof,null,2)+'\n');console.log(results.filter(r=>r.pass).length+'/'+results.length+' passed');if(!proof.pass)process.exitCode=1;
 }

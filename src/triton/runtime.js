@@ -8,8 +8,18 @@
   const logStatus=text=>{if(status)status.textContent=text;};
   function busy(){return typeof exporting!=='undefined'&&exporting;}
   function prune(){for(const [key,entry] of owners)if(entry.refs.every(v=>!v||v.killed))owners.delete(key);}
+  /* wish 4a18bc56: the Improvisator hides the TRITON patch browser, so `cur` there is a
+     program its page never shows (PROGRAMS[12], "Ice Crystal Keys", from boot). A keyboard
+     or a cable played that instead of any of the four sounds on screen. On that face the
+     notes play the sound loaded in the MELODY slot — the one a player plays along with —
+     and the metadata a Drum Pad or the room reads describes that same sound. */
+  const improvisator=()=>document.body?.dataset?.instrument==='improvisator';
+  function keysProgram(){
+    const lead=improvisator()?window.SoulPilot?.base?.lead:null;
+    return (Number.isInteger(lead)&&PROGRAMS[lead])||cur||PROGRAMS[state.progIdx];
+  }
   function voiceProfile(){
-    const p=cur||PROGRAMS[state.progIdx], drum=state.mode!=='COMBI'&&p.cat==='DRUMS', kit=p.kit||'std';
+    const p=keysProgram(), drum=state.mode!=='COMBI'&&p.cat==='DRUMS', kit=p.kit||'std';
     const labels=kit==='perc'?['Low hand drum','Hand slap','Hand slap','Claves','Cowbell','Mid hand drum','Shaker','High hand drum','Shaker','Bongo','Tambourine','Cowbell']:
       ['Kick','Snare','Snare','Clap','Crash','Low tom','Closed hat','Mid tom','Closed hat','High tom','Open hat','Crash'];
     /* wish df6454ef: a DRUMS program wearing a produced kit (dkit) publishes all twelve zones, each named
@@ -88,7 +98,7 @@
     else if(state.mode==='COMBI')COMBIS[state.combiIdx].timbres.forEach(tb=>{
       if(event.note>=tb.lo&&event.note<=tb.hi){const v=spawnVoice(PROGRAMS[tb.p],event.note+tb.tr,event.velocity*tb.lvl,when,null);if(v)refs.push(v);}
     });
-    else{const v=spawnVoice(cur,event.note,event.velocity,when,null);if(v)refs.push(v);}
+    else{const v=spawnVoice(keysProgram(),event.note,event.velocity,when,null);if(v)refs.push(v);}
     if(!refs.length)return false;
     owners.set(key,{id:event.id,routeId:event.routeId,note:event.note,mode:percussion||profile.kind==='drums'?'oneshot':'gate',group,refs});
     return true;
@@ -140,8 +150,21 @@
       catch(error){if(inputs.get(id)===binding)inputs.delete(id);port.onmidimessage=null;releaseSource(id);midiError=error.message;}
     }
     for(const [id,binding] of inputs)if(!seen.has(id)){binding.port.onmidimessage=null;inputs.delete(id);releaseSource(id);}
-    logStatus(midiError?'MIDI: '+midiError:inputs.size+' MIDI input(s) · local tempo '+state.tempo+' BPM');
+    logStatus(midiError?'MIDI: '+midiError:inputs.size+' MIDI input(s) · '+(improvisator()?'your keys play the MELODY sound':'local tempo '+state.tempo+' BPM'));
   }
+  /* The room asks for MIDI once, for every instrument in it, and the bridge says so with
+     'midiroom:connected' (dist/bridge.js) — also when a cable to this instrument appears.
+     Until now the inputs bound only after a second tap on this page's own Connect button,
+     so a keyboard the room already had played nothing here. Listening costs no permission
+     prompt: the event means access is already granted, so the request resolves at once.
+     Standalone there is no room, the event never fires, and the button works as before. */
+  function bindRoom(){
+    if(access){bindInputs();return;}
+    if(connecting||!navigator.requestMIDIAccess)return;
+    connecting=(async()=>{try{access=await navigator.requestMIDIAccess({sysex:false});access.onstatechange=bindInputs;await bindInputs();return true;}
+      catch(error){midiError=error.message;logStatus('MIDI: '+error.message);return false;}finally{connecting=null;}})();
+  }
+  window.addEventListener('midiroom:connected',bindRoom);
   function connect(){
     audio();
     if(!navigator.requestMIDIAccess){logStatus('Web MIDI unavailable · touch keys remain playable');return Promise.resolve(false);}

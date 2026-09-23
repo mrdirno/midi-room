@@ -1,6 +1,6 @@
 {
-  "testedAt": "2026-09-23T06:42:33.128Z",
-  "artifactSha256": "9d6e8d1d1a680df86dad35df65274d0f9eec478e158b68f79c5dc2306a224212",
+  "testedAt": "2026-09-23T06:44:32.215Z",
+  "artifactSha256": "6410681a8a4b52d2ff05bf201925a8cbe6baca3cd880a8b4b0473f6c2108d44e",
   "method": "Node VM execution of original and candidate implementation with explicit DOM, AudioContext and timer doubles",
   "tests": [
     {
@@ -86,6 +86,10 @@
     {
       "name": "MIDI sustain and same note are isolated by input and channel",
       "pass": true
+    },
+    {
+      "name": "Improvisator: a keyboard the room already has plays the MELODY sound without a second tap; the rack face keeps its patch",
+      "pass": true
     }
   ],
   "observations": [
@@ -163,6 +167,12 @@
         "sources": 1,
         "latestStop": 0
       }
+    },
+    {
+      "action": "room grants MIDI; keyboard note 60 at the Improvisator",
+      "requests": 1,
+      "melody": "Nylon Dream",
+      "rackPlays": "Ice Crystal Keys"
     }
   ],
   "pass": true,
