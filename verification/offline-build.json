@@ -1,5 +1,5 @@
 {
-  "cache_version": "242bda57382b0248",
+  "cache_version": "81b0a36fa6213fd7",
   "files": [
     "index.html",
     "style.css",
@@ -28,6 +28,6 @@
     "licenses/FAUST-COPYING.txt",
     "licenses/HOST-MIT.txt"
   ],
-  "bytes": 4859233,
+  "bytes": 4861501,
   "scope": "Relative to sw.js directory; built-ins and shell only. Imported private instruments, maps and exports excluded."
 }

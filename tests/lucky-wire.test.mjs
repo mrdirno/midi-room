@@ -35,8 +35,13 @@ function publisher(block = current) {
   // reset() is what PLAY and pause do to the publisher before the engine's next report; land(bar) is
   // what every seeking swap (PLAY, a resume, the lead-in switch, the progress bar) tells it. The old
   // block has no landing, so there land() does nothing, exactly as origin/main did nothing.
-  return { S, sent, context, publish: t => { at = t; context.publish(t); }, reset: () => context.reset(),
-    land: bar => context.land(bar), onsets };
+  // A report carries the number of the seek whose engine posted it (the page stamps each swap's score
+  // and the engine echoes it). By default that is the latest seek: the engine has taken it. A report
+  // that was already in flight is published with seek(), read before the land() it predates. The old
+  // block takes one argument and never sees the number.
+  return { S, sent, context, publish: (t, seek) => { at = t; context.publish(t, seek === undefined ? context.busSeek : seek); },
+    reset: () => context.reset(), land: bar => context.land(bar), onsets, seek: () => context.busSeek,
+    playhead: t => { at = t; } };
 }
 
 const band = (bpm, steps = 64) => ({ bpm, secPerStep: 60 / bpm / 4,
@@ -175,18 +180,23 @@ test('a report already in flight when the swap went out does not publish the new
   // song's position is queued behind it. Published, it would send the new song from 0 to there.
   const p = publisher();
   p.S.world = bars(120);
+  const before = p.seek();
   p.reset(); p.land(0);
-  p.publish(37.25);                                          // where the old song was
+  p.publish(37.25, before);                                  // where the old song was
   assert.equal(p.onsets().length, 0, `a stale report sent ${p.onsets().length} notes`);
   p.publish(0.021);                                          // the new song, 21 ms after its start
   assert.deepEqual(notesSince(p), owed(p.S.world, 0, 0.021), 'then the new song starts on its downbeat');
-  // A seek the engine never carried out (superseded in its queue) must not silence the wire:
-  // after six reports from elsewhere the publisher goes on, owing nothing behind the report.
+  // A seek the engine never carried out must not silence the wire. A rebuild's swap, sent under the
+  // same seek number, replaced it in the engine's one-deep queue, so the reports carry the current
+  // number from where the song really is. The first of them is enough: nothing behind it is owed.
+  // (Before reports carried a number, a stale report looked the same, and the wire waited six.)
   const q = publisher();
   q.S.world = bars(120);
   q.reset(); q.land(12);
-  for (let k = 0; k < 6; k++) q.publish(3 + k * 0.05);
-  assert.deepEqual(notesSince(q), owed(q.S.world, Math.ceil((3.25 - 0.0125) / 0.125), 3.25), 'the wire resumes where the song really is');
+  q.publish(3);
+  assert.deepEqual(notesSince(q), owed(q.S.world, Math.ceil((3 - 0.0125) / 0.125), 3), 'the wire goes on at the first report');
+  for (let k = 1; k < 6; k++) q.publish(3 + k * 0.05);
+  assert.deepEqual(notesSince(q), owed(q.S.world, Math.ceil((3 - 0.0125) / 0.125), 3.25), 'the wire resumes where the song really is');
 });
 
 test('the page tells the publisher where a seeking swap comes down, and a rebuild tells it nothing', () => {
@@ -273,8 +283,9 @@ test('a jump to the next bar, clicked inside the 400 ms already sent, sends that
     p.reset(); p.land(0);
     let k = 0;
     for (; 0.013 + k * every < line - 0.2; k++) p.publish(0.013 + k * every);   // from the top to 0.2 s before the line
+    const old = p.seek();
     p.land(bar);                                               // click the next bar
-    p.publish(0.013 + k * every);                              // a report of the old place was already in flight
+    p.publish(0.013 + k * every, old);                         // a report of the old place was already in flight
     let last = 0;
     for (let u = line + 0.021; u < line + 1; u += every) { p.publish(u); last = u; }   // the engine, from the line
     return { p, last };
@@ -294,7 +305,8 @@ test('a jump to the next bar, clicked inside the 400 ms already sent, sends that
     assert.deepEqual(after, before, `seed ${seed}: the next bar clicked 0.2 s before its line`);
   }
   // A seek the engine never carried out is the same case: the song goes on forward from where it was.
-  // After six reports from there the wire goes on, and what it had already sent stays sent.
+  // Its reports carry the current number (a rebuild replaced the seek in the engine's queue), the
+  // first one lets the wire go on, and what it had already sent stays sent.
   for (const block of [a7b9370, current]) {
     const p = publisher(block);
     p.S.world = bars(120);
@@ -310,8 +322,8 @@ test('a jump to the next bar, clicked inside the 400 ms already sent, sends that
 
 test('a report of the old place inside the new bar\'s first quarter second starts no burst', () => {
   // Click the bar that is playing, 120 ms into it: the song seeks back to its line. The report the
-  // engine had already posted says 170 ms, inside the window a landing is accepted in, and nothing
-  // can tell it from the real first report. The landing then remembered 170 ms as the last place,
+  // engine had already posted says 170 ms, inside the window a landing is accepted in, and no time
+  // can tell it from the real first report; only its seek number can. The landing then remembered 170 ms as the last place,
   // the engine's real first report said 21 ms, and the loop test read that as the song coming round:
   // every note from bar 0 went out at once, as a7b9370 also did, and 6-12 of them twice. The last
   // place a landing leaves is its bar line, which every real report after it reaches.
@@ -319,9 +331,9 @@ test('a report of the old place inside the new bar\'s first quarter second start
   p.S.world = bars(120);
   p.reset(); p.land(0);
   for (let k = 0; k <= 42; k++) p.publish(0.02 + k * 0.05);      // 120 ms into bar 1
-  const mark = p.onsets().length;
+  const mark = p.onsets().length, old = p.seek();
   p.land(1);                                                     // click bar 1
-  p.publish(0.02 + 43 * 0.05);                                   // the old place, 170 ms in: in the window
+  p.publish(0.02 + 43 * 0.05, old);                              // the old place, 170 ms in: in the window
   let last = 0;
   for (let u = 2.021; u < 3; u += 0.05) { p.publish(u); last = u; }
   assert.deepEqual(notesSince(p, mark), owed(p.S.world, 16, last), 'bar 1 from its line, each note once, nothing from bar 0');
@@ -331,9 +343,10 @@ test('a report of the old place inside the new bar\'s first quarter second start
   q.S.world = bars(120);
   q.reset(); q.land(0);
   for (let k = 0; k < 3; k++) q.publish(0.013 + k * 0.05);
+  const first = q.seek();
   q.reset(); q.S.world = bars(120); q.land(0);                   // ROLL again
   const roll = q.onsets().length;
-  q.publish(0.163);                                              // the first song's report
+  q.publish(0.163, first);                                       // the first song's report
   let end = 0;
   for (let u = 0.009; u < 1; u += 0.05) { q.publish(u); end = u; }
   assert.deepEqual(notesSince(q, roll), owed(q.S.world, 0, end), 'the second song from its top, each note once');
@@ -341,4 +354,189 @@ test('a report of the old place inside the new bar\'s first quarter second start
   const wrap = q.onsets().length;
   q.publish(0.012);
   assert.ok(q.onsets().length > wrap, 'the top of the song goes out again when the playhead goes back');
+});
+
+// The refute pass on 1332b61 found the window it relied on could be beaten by a second report. With
+// TWO reports of the old place in flight after a click on the bar that is playing, the second set the
+// last place back to the old one; the engine's real first report then read as the loop coming round,
+// and every note from bar 0 went out at once: 144-234 note-ons on six real seeds where 25-44 were owed,
+// 6-13 of them twice. ROLL twice inside 250 ms doubled 5-15. No time can tell such a report from the
+// real one, so each report now carries the number of the seek whose engine posted it. The bar these
+// tests hold it to: a report from before the seek leaves the cable exactly as if it had never arrived.
+const PERIOD = 2304 / 44100;                                     // the worklet's report period
+// A seat (part + step) names one note in the music whatever time it was sent for, and the test context
+// maps every drum slot to one note number, so (note, time) cannot tell a kick from a hat on the same
+// step. These tests read the seat off a copy of the block whose note-on line also reports it.
+const EMIT = "mr.emit({kind:'midi',data:[0x90|n.ch,n.note,n.vel],at:on});";
+const withSeats = block => {
+  assert.equal(block.split(EMIT).length, 2, 'the note-on line is still one line');
+  return block.replace(EMIT, "mr.emit({kind:'midi',data:[0x90|n.ch,n.note,n.vel],at:on,seat:n.seat});");
+};
+const noteOns = (p, mark = 0) => p.sent.slice(mark).filter(e => e.kind === 'midi' && (e.data[0] & 0xf0) === 0x90);
+const once = list => list.length === new Set(list).size;
+const realBand = (() => { let x = null; return seed => { if (!x) ({ x } = createRequire(import.meta.url)('../src/lucky-cloud/tests/engine-loader.cjs').load()); return x.buildBand(seed); }; })();
+const SEEDS = [12345, 7919, 424242, 90210, 31337, 2718281];
+
+// Play from the top to `until`, click `bar`, let `stale` reports of the old place arrive, then the
+// engine from the bar line. Returns each note-on sent after the click with its seat in the music.
+function click(block, world, until, bar, stale, firstLate = 0.021) {
+  const p = publisher(withSeats(block));
+  p.S.world = world;
+  p.reset(); p.land(0);
+  let t = 0.013;
+  for (; t < until; t += PERIOD) p.publish(t);
+  const mark = p.sent.length, old = p.seek();
+  p.land(bar);
+  for (let k = 0; k < stale; k++) p.publish(t + k * PERIOD, old);  // posted before the engine took the click
+  const line = bar * world.steps * world.secPerStep;
+  for (let u = line + firstLate; u < line + 2; u += PERIOD) p.publish(u);
+  const after = noteOns(p, mark);
+  return { keys: after.map(e => e.data[1] + '@' + Math.round((e.at / 1000 + e.playhead) * 1000)), seats: after.map(e => e.seat) };
+}
+
+test('one, two or three reports still in flight after a click change nothing on the cable', () => {
+  for (const seed of SEEDS) {
+    const world = realBand(seed), bar = world.steps * world.secPerStep, n = 5;
+    for (const [name, until, target] of [
+      ['the bar that is playing, clicked 120 ms in', n * bar + 0.12, n],
+      ['the next bar, clicked 0.2 s before its line', (n + 1) * bar - 0.2, n + 1],
+      ['three bars back', n * bar + 0.7, n - 3]]) {
+      const clean = click(current, world, until, target, 0);
+      assert.ok(clean.keys.length >= 10, `seed ${seed}, ${name}: only ${clean.keys.length} notes after the click`);
+      assert.ok(once(clean.seats), `seed ${seed}, ${name}: a note went out twice after the click`);
+      for (const stale of [1, 2, 3]) {
+        assert.deepEqual(click(current, world, until, target, stale), clean, `seed ${seed}, ${name}: ${stale} report(s) in flight`);
+      }
+    }
+  }
+  // The control: the block before this change passes with one report in flight and fails with two.
+  const old = fs.readFileSync(new URL('./fixtures/lucky-wire-a7b9370.js', import.meta.url), 'utf8');
+  const world = realBand(12345), bar = world.steps * world.secPerStep;
+  const burst = click(old, world, 5 * bar + 0.12, 5, 2), owedNow = click(current, world, 5 * bar + 0.12, 5, 0);
+  assert.ok(burst.keys.length > 3 * owedNow.keys.length && !once(burst.seats),
+    'origin/main sends the burst from bar 0 on the same click, with notes twice, so this test can see one');
+});
+
+test('ROLL twice inside 250 ms: the first song\'s reports in flight send nothing of the second', () => {
+  for (let i = 0; i < 6; i++) {
+    const run = stale => {
+      const p = publisher(withSeats(current));
+      p.S.world = realBand(SEEDS[i]);
+      p.reset(); p.land(0);
+      for (let t = 0.013; t < 0.15; t += PERIOD) p.publish(t);
+      const first = p.seek();
+      p.reset(); p.S.world = realBand(SEEDS[(i + 1) % 6]); p.land(0);   // ROLL -> play(0)
+      const mark = p.onsets().length;
+      for (let k = 0; k < stale; k++) p.publish(0.169 + k * PERIOD, first);
+      for (let t = 0.009; t < 2; t += PERIOD) p.publish(t);
+      return { keys: p.onsets().slice(mark).map(key), seats: noteOns(p).slice(mark).map(e => e.seat) };
+    };
+    const clean = run(0);
+    assert.ok(once(clean.seats), 'the second song, each note once');
+    for (const stale of [1, 2, 3]) assert.deepEqual(run(stale), clean, `seed ${SEEDS[i]}: ${stale} report(s) of the first song in flight`);
+  }
+});
+
+test('after reports in flight, a first report off the note grid still sends the downbeat', () => {
+  // bars(120) has a note every 125 ms, so each of these first reports falls between two notes.
+  for (const late of [0.0027, 0.02, 0.05, 0.093]) {
+    for (const stale of [1, 2, 3]) {
+      const p = publisher();
+      p.S.world = bars(120);
+      p.reset(); p.land(0);
+      let t = 0.013;
+      for (; t < 2.12; t += 0.05) p.publish(t);                   // 120 ms into bar 1
+      const mark = p.onsets().length, old = p.seek();
+      p.land(1);                                                  // click bar 1: the song seeks back to 2 s
+      for (let k = 0; k < stale; k++) p.publish(t + k * 0.05, old);
+      const first = 2 + late;
+      p.publish(first);
+      assert.deepEqual(notesSince(p, mark), owed(p.S.world, 16, first), `first report ${Math.round(late * 1000)} ms late, ${stale} in flight`);
+      let last = first;
+      for (let u = first + 0.05; u < first + 1; u += 0.05) { p.publish(u); last = u; }
+      assert.deepEqual(notesSince(p, mark), owed(p.S.world, 16, last), `and the second after it, each note once`);
+    }
+  }
+});
+
+test('after a click with reports in flight, the loop still comes round and plays the top once', () => {
+  const world = bars(120, 6);                                     // 6 bars, 12 s
+  const p = publisher();
+  p.S.world = world;
+  p.reset(); p.land(0);
+  let t = 0.013;
+  for (; t < 6.12; t += 0.05) p.publish(t);                      // 120 ms into bar 3
+  const mark = p.onsets().length, old = p.seek();
+  p.land(3);
+  for (let k = 0; k < 3; k++) p.publish(t + k * 0.05, old);
+  for (let u = 6.021; u < world.duration; u += 0.05) p.publish(u);
+  assert.deepEqual(notesSince(p, mark), Array.from({ length: 48 }, (_, i) => 20 + 48 + i), 'bars 3-5 once each after the click');
+  const wrap = p.onsets().length;
+  for (let u = 0.013; u < 4.5; u += 0.05) p.publish(u);          // the loop comes round
+  const second = notesSince(p, wrap);
+  assert.deepEqual(second.filter(note => note < 20 + 32), Array.from({ length: 32 }, (_, i) => 20 + i), 'the top, each note once');
+});
+
+test('with the switch off, PLAY through the page\'s own wrappers puts on the cable what origin/main did', () => {
+  // The whole path a report takes, not only the publisher: the lead-in play wrapper, the sendSwap
+  // wrapper that numbers the seek, the glue that stamps the number on the swapped score, and the hook
+  // that hands the engine's report to the publisher. Only the app's sendSwap, the page's S.send and the
+  // engine are stand-ins, each written to match its source (asserted below). If the number the page
+  // sends is not the number the publisher expects, the cable goes silent and this fails.
+  const lift = (prefix, lines = 1) => { const i = source.findIndex(l => l.startsWith(prefix)); assert.ok(i >= 0, prefix); return source.slice(i, i + lines).join('\n'); };
+  const glueAt = source.findIndex(l => l.startsWith('function cloudTransportMessage(tp,m){'));
+  const glue = source.slice(glueAt, source.indexOf('}', glueAt) + 1).join('\n');
+  const hookAt = source.findIndex(l => l.startsWith('var originalOnEngineMsg=onEngineMsg;'));
+  const hook = source.slice(hookAt, hookAt + 5).join('\n');
+  assert.ok(hook.includes("busPublish(m.t,m.cloudSeek)"), 'the hook hands the report\'s number to the publisher');
+  const lifecycle = source.join('\n');
+  assert.equal(lifecycle.split('cloudSeek:busSeek').length - 1, 2, 'both S.send paths (worklet, ScriptProcessor) carry the seek number');
+  const patch = JSON.parse(fs.readFileSync(new URL('../src/lucky-cloud/engine-patches.json', import.meta.url), 'utf8')).patches.find(p => p.id === 'wish-44813890-report-names-its-seek');
+  assert.ok(patch && patch.new.includes('cloudSeek: rep.world.cloudSeek'), 'the engine reports the number of the score it is playing');
+  const run = (seed, skip) => {
+    const p = publisher();
+    const c = p.context;
+    c.MidiRoom = c.window.MidiRoom; c.MidiRoom.skipLeadIn = skip;
+    vm.runInContext(glue + `
+      var engine = { fadeTo: 1, world: null, msg: function (m) { if (m.type === 'swap') engine.world = m.world; } };
+      function onEngineMsg() {}
+      function auditionStop() {}
+      function scoreFor(w) { return { seed: w.seed, bars: w.bars, steps: w.steps, secPerStep: w.secPerStep }; }
+      function sendSwap(bar, follow) { if (!S.send) return; S.send({ type: 'swap', world: scoreFor(S.world), bar: bar === undefined ? S.bar : bar, follow: follow === true }); }
+      S.send = function (m) { cloudTransportMessage(engine, Object.assign({}, m, { cloudSeek: busSeek })); };
+      function play(fromBar) { S.playing = true; sendSwap(fromBar === undefined ? S.bar : fromBar, false); }
+      ${hook}
+      ${lift('var originalSendSwap=sendSwap;', 2)}
+      ${lift('var originalPlay=play;')}
+      ${lift('function leadInEnd(){')}
+      ${lift('play=function(fromBar){')}
+      globalThis.report = function (t) { onEngineMsg({ type: 'pos', t: t, cloudSeek: engine.world && engine.world.cloudSeek }); };`, c);
+    const world = realBand(seed);
+    p.S.world = world; p.S.bar = 0; p.S.playing = false;
+    c.play(0);
+    const from = world.steps * world.secPerStep * (skip ? c.leadInEnd() : 0);
+    for (let t = from + 0.0137; t < from + 6; t += PERIOD) { p.playhead(t); c.report(t); }
+    return p.onsets().map(key);
+  };
+  const reference = fs.readFileSync(new URL('./fixtures/lucky-wire-a7b9370.js', import.meta.url), 'utf8');
+  for (const seed of [12345, 7919]) {
+    const world = realBand(seed);
+    const q = publisher(reference);
+    q.S.world = world;
+    q.reset();
+    for (let t = 0.0137; t < 6; t += PERIOD) q.publish(t);
+    const before = q.onsets().map(key), after = run(seed, false);
+    assert.ok(before.length > 20, `seed ${seed}: origin/main sent ${before.length} notes in six seconds`);
+    assert.deepEqual(after, before, `seed ${seed}: switch off, the cable differs from origin/main`);
+    // and with the switch on, the same song starts on section A's downbeat, which goes out first
+    const on = run(seed, true);
+    const skipTo = world.sections.find(s => s.name !== 'in' && s.name !== 'intro').startBar * world.steps * world.secPerStep;
+    assert.ok(skipTo > 0, `seed ${seed} has an intro to skip`);
+    assert.ok(on.length > 20, `seed ${seed}: switch on sent ${on.length} notes`);
+    const firstAt = Math.min(...on.map(k => +k.split('@')[1]));
+    // A note due before the first report goes out at once, so its place reads as that report's time;
+    // the humanizer may put section A's downbeat up to 15 ms ahead of its line. Nothing from the intro.
+    assert.ok(firstAt >= Math.round(skipTo * 1000) - 16 && firstAt <= Math.round((skipTo + 0.0137) * 1000) + 1,
+      `seed ${seed}: switch on, the first note is at ${firstAt} ms, section A starts at ${Math.round(skipTo * 1000)} ms`);
+  }
 });

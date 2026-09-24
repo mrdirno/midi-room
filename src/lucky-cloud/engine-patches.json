@@ -7,6 +7,13 @@
    "old": "    if (ivOk && got !== wantIv && !ivOk[got]) continue;",
    "new": "    if (ivOk && got !== wantIv && !ivOk[got] && Math.abs(got - wantIv) > 1) continue;",
    "count": 1
+  },
+  {
+   "id": "wish-44813890-report-names-its-seek",
+   "why": "A position report says which seek set up the engine it reports. The page numbers every seek and stamps that number on the score it sends (lifecycle.js: S.send and cloudTransportMessage). The score rides the handover, through the one-deep queue, into the engine that plays it, so rep.world is the one place that knows which seek a report belongs to. Without it, a report posted before the engine took a seek cannot be told from the first report after it: click the bar that is playing in its first quarter second, and both say a time inside that bar. With two such reports in flight, the MIDI publisher took the old place as the song's last position, the real first report read as the loop coming round, and every note from bar 0 went down the room cables at once: 144-234 note-ons on six real seeds where 25-44 were owed, 6-13 of them twice. One field is added to a message; nothing that renders sound reads it.",
+   "old": "    this.post({ type: 'pos', t: rep.clock / this.sr, dur: rep.world.duration,",
+   "new": "    this.post({ type: 'pos', t: rep.clock / this.sr, dur: rep.world.duration, cloudSeek: rep.world.cloudSeek,",
+   "count": 1
   }
  ]
 }

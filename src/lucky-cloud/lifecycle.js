@@ -103,8 +103,15 @@ function cloudRenderBlock(tp,meta,L,R,n,frame){
 }
 // A host may suspend immediately, before Transport's fade-to-stop completes.
 // A subsequent Play starts a fresh transport lane; ordinary live rolls still crossfade.
+// A swap's score is stamped with the number of the seek it was sent under (busSeek, below). The
+// score is what rides the handover, through the engine's one-deep queue, into the engine that
+// plays it, and that engine's position reports carry the number back (engine-patches.json). So a
+// report says which seek it belongs to, which its time alone cannot. The score is fresh for every
+// message on both paths (a structured clone in the worklet; scoreFor() builds a new object each
+// call on the ScriptProcessor path), so the stamp never reaches a score an engine already holds.
 function cloudTransportMessage(tp,m){
  if((m.type==='load'||m.type==='swap')&&tp.fadeTo===0){tp.playing=false;tp.fade=0;tp.eng.reset();if(tp.spare)tp.spare.reset();tp.xfOn=false;tp.queued=null;}
+ if(m.type==='swap'&&m.world&&m.cloudSeek!==undefined)m.world.cloudSeek=m.cloudSeek;
  tp.msg(m);
 }
 WORKLET_GLUE='\n'+cloudTransportMessage.toString()+'\n'+cloudRenderBlock.toString()+'\nclass KnockProcessor extends AudioWorkletProcessor { constructor(opts){super();var tables=opts.processorOptions.tables;this.intent=0;this.tp=new Transport(new Engine(sampleRate,{tables:tables,seed:1}),sampleRate,m=>this.port.postMessage(Object.assign({},m,{cloudIntent:this.intent})),()=>new Engine(sampleRate,{tables:tables,seed:2}));this.health={next:null,peak:0,nonFinite:0,clamps:0,frames:0,lateRecoveries:0};this.tick=0;this.dead=false;this.port.onmessage=e=>{this.intent=e.data.cloudIntent;if(e.data.type==="destroy"){this.dead=true;this.tp.msg({type:"stop"});}else cloudTransportMessage(this.tp,e.data);};}process(inputs,outputs){var o=outputs[0];if(this.dead){o[0].fill(0);if(o[1])o[1].fill(0);return false;}cloudRenderBlock(this.tp,this.health,o[0],o[1]||o[0],o[0].length,currentFrame);this.tick+=o[0].length;if(this.tick>=sampleRate/4){this.tick=0;this.port.postMessage({type:"health",value:this.health});}return true;}}registerProcessor("knock",KnockProcessor);';
@@ -119,10 +126,10 @@ function ensureAudio(){
  S.audioPromise=Promise.resolve(resumed).then(function(){return startWorklet(ctx);}).catch(function(e){if(C.destroyed)throw e;return startWorkletData(ctx);}).catch(function(e){if(C.destroyed)throw e;return startScriptProcessor(ctx,e);}).then(function(){if(C.destroyed||S.ctx!==ctx)throw Error('Instrument closed');return ctx;}).catch(function(e){resetAudio();throw e;});
  return S.audioPromise;
 }
-function finishWorklet(ctx){if(C.destroyed||ctx!==S.ctx)throw Error('Instrument closed');var node=new AudioWorkletNode(ctx,'knock',{numberOfInputs:0,numberOfOutputs:1,outputChannelCount:[2],processorOptions:{tables:S.tables}});node.connect(ctx.destination);node.port.onmessage=function(e){if(!C.destroyed&&ctx===S.ctx)onEngineMsg(e.data);};node.onprocessorerror=function(){pause();resetAudio();toast('Audio stopped. Press Play to restart.');};S.node=node;S.send=function(m){if(!C.destroyed&&ctx===S.ctx)node.port.postMessage(Object.assign({},m,{cloudIntent:C.intent}));};S.mode='worklet';S.ready=true;return ctx;}
+function finishWorklet(ctx){if(C.destroyed||ctx!==S.ctx)throw Error('Instrument closed');var node=new AudioWorkletNode(ctx,'knock',{numberOfInputs:0,numberOfOutputs:1,outputChannelCount:[2],processorOptions:{tables:S.tables}});node.connect(ctx.destination);node.port.onmessage=function(e){if(!C.destroyed&&ctx===S.ctx)onEngineMsg(e.data);};node.onprocessorerror=function(){pause();resetAudio();toast('Audio stopped. Press Play to restart.');};S.node=node;S.send=function(m){if(!C.destroyed&&ctx===S.ctx)node.port.postMessage(Object.assign({},m,{cloudIntent:C.intent,cloudSeek:busSeek}));};S.mode='worklet';S.ready=true;return ctx;}
 function startWorklet(ctx){if(C.destroyed||ctx!==S.ctx||!ctx.audioWorklet)return Promise.reject(Error('AudioWorklet unavailable'));var url=cloudURL(new Blob([engineSource()+WORKLET_GLUE],{type:'application/javascript'}));return bounded(ctx.audioWorklet.addModule(url),15000,'Audio worklet').then(function(){return finishWorklet(ctx);}).finally(function(){revoke(url);});}
 function startWorkletData(ctx){if(C.destroyed||!ctx.audioWorklet)return Promise.reject(Error('AudioWorklet unavailable'));return bounded(ctx.audioWorklet.addModule('data:application/javascript;charset=utf-8,'+encodeURIComponent(engineSource()+WORKLET_GLUE)),15000,'Audio worklet').then(function(){return finishWorklet(ctx);});}
-function startScriptProcessor(ctx,why){if(C.destroyed||ctx!==S.ctx||!ctx.createScriptProcessor)throw(why||Error('Audio unavailable'));var transportIntent=C.intent,tp=new Transport(new Engine(ctx.sampleRate,{tables:S.tables,seed:1}),ctx.sampleRate,function(m){onEngineMsg(Object.assign({},m,{cloudIntent:transportIntent}));},function(){return new Engine(ctx.sampleRate,{tables:S.tables,seed:2});}),node=ctx.createScriptProcessor(2048,0,2),health={next:null,peak:0,nonFinite:0,clamps:0,frames:0,lateRecoveries:0};node.onaudioprocess=function(e){if(C.destroyed)return;cloudRenderBlock(tp,health,e.outputBuffer.getChannelData(0),e.outputBuffer.getChannelData(1),e.outputBuffer.length,Math.round(e.playbackTime*ctx.sampleRate));C.health=health;C.lateRecoveries=health.lateRecoveries;};node.connect(ctx.destination);S.node=node;S.tp=tp;S.send=function(m){if(!C.destroyed&&ctx===S.ctx){transportIntent=C.intent;cloudTransportMessage(tp,m);}};S.mode='script';S.ready=true;return ctx;}
+function startScriptProcessor(ctx,why){if(C.destroyed||ctx!==S.ctx||!ctx.createScriptProcessor)throw(why||Error('Audio unavailable'));var transportIntent=C.intent,tp=new Transport(new Engine(ctx.sampleRate,{tables:S.tables,seed:1}),ctx.sampleRate,function(m){onEngineMsg(Object.assign({},m,{cloudIntent:transportIntent}));},function(){return new Engine(ctx.sampleRate,{tables:S.tables,seed:2});}),node=ctx.createScriptProcessor(2048,0,2),health={next:null,peak:0,nonFinite:0,clamps:0,frames:0,lateRecoveries:0};node.onaudioprocess=function(e){if(C.destroyed)return;cloudRenderBlock(tp,health,e.outputBuffer.getChannelData(0),e.outputBuffer.getChannelData(1),e.outputBuffer.length,Math.round(e.playbackTime*ctx.sampleRate));C.health=health;C.lateRecoveries=health.lateRecoveries;};node.connect(ctx.destination);S.node=node;S.tp=tp;S.send=function(m){if(!C.destroyed&&ctx===S.ctx){transportIntent=C.intent;cloudTransportMessage(tp,Object.assign({},m,{cloudSeek:busSeek}));}};S.mode='script';S.ready=true;return ctx;}
 function play(fromBar){if(C.destroyed)return Promise.resolve(false);if(!S.world){S.seed=S.seed||1;rebuildWorld();enterApp();paintSong();}var intent=++C.intent;S.solo=null;S.playing=true;syncPlay();paintBand();return ensureAudio().then(function(){if(C.destroyed||intent!==C.intent||!S.playing||S.solo)return false;sendSwap(fromBar===undefined?S.bar:fromBar,false);return true;}).catch(function(e){if(intent===C.intent&&!C.destroyed){S.playing=false;syncPlay();toast('Audio could not start. Press Play to try again.',4000);}return false;});}
 function toggleSolo(lane){if(C.destroyed||!S.world||LANE_ORDER.indexOf(lane)<0)return;if(S.solo===lane){pause();return;}var score=soloScore(lane);if(!score)return;var intent=++C.intent;S.solo=lane;S.playing=true;syncPlay();paintBand();return ensureAudio().then(function(){if(C.destroyed||intent!==C.intent||S.solo!==lane)return;S.send({type:'load',world:score});}).catch(function(){if(intent===C.intent)pause();});}
 function rollAll(){if(C.destroyed)return;var a=new Uint32Array(1);if(globalThis.crypto&&crypto.getRandomValues)crypto.getRandomValues(a);else a[0]=(Math.random()*4294967296)>>>0;S.seed=a[0];S.roll={};S.bar=0;S.solo=null;rebuildWorld();play(0);paintSoon();writeAddress();saveSessionSoon();}
@@ -199,7 +206,7 @@ ABOUT='<h2>LUCKY DREAMER</h2><p>A whole-band cloud instrument by Aldrin Payopay,
    audibly loose. Emitting 400ms early with a timestamp is the difference
    between a wire and a rumour. Nothing is sent unless a listener has drawn
    a wire; the room fans only to matching routes. */
-var busList=null,busWorld=null,busCursor=-1,busLast=-1,busBpm=0,busSaid=-1e9,busSeats=Object.create(null),busFrom=-1,busWait=0;
+var busList=null,busWorld=null,busCursor=-1,busLast=-1,busBpm=0,busSaid=-1e9,busSeats=Object.create(null),busFrom=-1,busSeek=0;
 function busScore(w){
  var out=[],melCh=0,pi,i;
  for(pi=0;pi<w.roster.length;pi++){
@@ -236,12 +243,16 @@ function busScore(w){
  out.sort(function(a,b){return a.at-b.at;});
  return out;
 }
-function busReset(){busList=null;busWorld=null;busCursor=-1;busLast=-1;busBpm=0;busSaid=-1e9;busSeats=Object.create(null);busFrom=-1;busWait=0;}
+/* busSeek is left alone here on purpose: a report stamped by any earlier seek has to stay stale after PLAY,
+   a pause or ROLL, and restarting the count would make an old number current again. */
+function busReset(){busList=null;busWorld=null;busCursor=-1;busLast=-1;busBpm=0;busSaid=-1e9;busSeats=Object.create(null);busFrom=-1;}
 /* Where the song is about to come down, in seconds: the start of `bar`, clamped exactly as the engine's
    handover clamps it before seekBar. Called by the sendSwap wrapper below for every swap that SEEKS —
    PLAY, a resume, the lead-in switch, the progress bar, an address or session opened while playing.
-   A follow swap (a rebuild) aligns to the running clock and moves nothing, so it never lands here. */
-function busLand(bar){var w=S.world;busFrom=-1;busWait=0;if(!w||!(w.secPerStep>0)||!(w.steps>0))return;busFrom=Math.max(0,Math.min(Math.floor(bar)||0,(w.bars|0)-1))*w.steps*w.secPerStep;}
+   A follow swap (a rebuild) aligns to the running clock and moves nothing, so it never lands here.
+   Each seek also takes the next number. The swap goes out stamped with it, and from here on only a
+   report carrying it back is believed (busPublish). */
+function busLand(bar){var w=S.world;busSeek++;busFrom=-1;if(!w||!(w.secPerStep>0)||!(w.steps>0))return;busFrom=Math.max(0,Math.min(Math.floor(bar)||0,(w.bars|0)-1))*w.steps*w.secPerStep;}
 /* Transport, so PLAY and STOP here mean PLAY and STOP over there. It also
    closes the one gap the note scheduler leaves open: notes are published
    400ms early, so a stop would otherwise be followed by up to 400ms of
@@ -255,12 +266,25 @@ function busTransport(action,bpm){
  if(bpm)e.bpm=Math.max(20,Math.min(300,Math.round(bpm)));
  mr.emit(e);
 }
-function busPublish(t){
+function busPublish(t,seek){
  var mr=window.MidiRoom;
  if(C.destroyed||!mr||typeof mr.emit!=='function')return;
  /* only the whole band: a solo or an audition is a different score in the
     engine than S.world, and publishing S.world then would be a lie. */
  if(!S.playing||S.solo||!S.world)return;
+ /* Believe a report only from the engine that carried out the latest seek. A report posted before
+    the engine took the seek still says where the song WAS, and nothing in its time gives it away:
+    click the bar that is playing in its first quarter second, or press ROLL twice inside 250 ms,
+    and the old place sits right where the new song's first report will. The guard before this one
+    was a time window. One such report got through it and timed the landing from the old place: the
+    4-5 notes between the bar line and there went out at once, up to 137 ms off their beats. Two sank
+    it. The second set the last place back to the old one, the real first report then read as the
+    loop coming round, and every note from bar 0 went out at once: 144-234 note-ons on six real seeds
+    where 25-44 were owed, 6-13 of them twice; ROLL twice doubled 5-15. So every seek is numbered (busLand), the number rides
+    the score into the engine that plays it (cloudTransportMessage), and each report carries it back
+    (engine-patches.json). A report with any other number, or none, moves nothing: not the last
+    place, not the tempo clock, not the landing. */
+ if(seek!==busSeek)return;
  if(busWorld!==S.world){
   /* Keep the cursor. It is the high-water mark of what has already gone down the
      wire, and a new world does not un-send those notes — it only re-times the same
@@ -289,12 +313,6 @@ function busPublish(t){
  if(S.world.bpm&&(S.world.bpm!==busBpm||t-busSaid>=S.world.secPerStep*16||t<busSaid)){
   busBpm=S.world.bpm;busSaid=t;busTransport('tempo',busBpm);
  }
- /* The loop came round. Test it against the PREVIOUS playhead, never against
-    the cursor: the cursor sits a whole horizon ahead of the playhead by
-    design, so `t < busCursor` is true on every single report and rewinds the
-    cursor every 50ms. Measured before this line was written that way: 12 of
-    12 seeds re-sent the same notes, 10,199 duplicates in one loop of the
-    first. */
  /* Where the song came down, not where it was first reported. Every seek lands on the START of a bar
     (busLand), and everything from that bar line on is owed to the wire once; nothing before it is.
     Unguarded, a start anywhere but the top sent every earlier note at once: 36 note-ons for the 4
@@ -303,17 +321,20 @@ function busPublish(t){
     its report counter runs on across a load, so the first report comes one audio block to 50 ms
     after it (3-51 ms in Chromium, ~93 ms on the ScriptProcessor path). The downbeat lay before that
     report, so every song's first kick and bass note never reached a room cable (seed 12345: 14
-    note-ons -> 12), and it was reverted. A report more than a quarter second past the bar line, or
-    before it, was already in flight when the swap went out: it says where the song WAS, and
-    publishing the new song from there sends a stretch of it at once, so it is dropped. The bound
-    covers the slowest real landing (a ScriptProcessor block plus a queued crossfade, ~190 ms). Six
-    such reports in a row mean the seek was superseded in the engine's queue; then nothing behind the
-    report is owed. A tenth of a step of grace before the line keeps the downbeat whole: the humanizer
-    plays hits a little early (12,960 of 13,555 early offsets over 30 seeds are under a tenth of a
-    step; the next cluster starts at 0.15), and 54 of 60 seeds put part of section A's first downbeat
-    up to 15 ms ahead of its bar line, where the engine re-strikes the pitched ones on landing. */
+    note-ons -> 12), and it was reverted. A tenth of a step of grace before the line keeps the
+    downbeat whole: the humanizer plays hits a little early (12,960 of 13,555 early offsets over 30
+    seeds are under a tenth of a step; the next cluster starts at 0.15), and 54 of 60 seeds put part
+    of section A's first downbeat up to 15 ms ahead of its bar line, where the engine re-strikes the
+    pitched ones on landing.
+    The seek number above has already turned away every report from before the seek, so the first
+    one here is from the engine that took it: on the bar line or just past it (the slowest real
+    landing, a ScriptProcessor block plus a queued crossfade, is ~190 ms). One far from the line
+    means the seek never happened. A rebuild's swap, sent under the same number, replaced it in the
+    engine's one-deep queue, and the song went on from where it was; then nothing behind that report
+    is owed, and the wire goes on from it at once. The old window waited six reports to be sure,
+    because it could not tell this case from a stale report. The number can, so it does not wait. */
  if(busFrom>=0){
-  if(t<busFrom-1e-3||t>busFrom+0.25){if(++busWait<6)return;busFrom=t;}
+  if(t<busFrom-1e-3||t>busFrom+0.25)busFrom=t;
   /* Forget what already went out only when the engine will play it again (a seek back), or when
      there is no last place to compare with: PLAY resets busLast, and so does every new world, which
      is how a song opened from an address or a session arrives. A seek FORWARD in the same song plays
@@ -322,17 +343,20 @@ function busPublish(t){
      line: 5-7 notes on six real seeds, where a7b9370 sent each once. */
   if(!(busLast>=0&&busFrom>=busLast-1e-3))busSeats=Object.create(null);
   for(var j=0,grace=Math.max(1e-3,S.world.secPerStep*0.1);j<busList.length&&busList[j].at<busFrom-grace;j++)busSeats[busList[j].seat]=1;
-  /* The last place a landing leaves is its bar line, not this report, because this report can be
-     the OLD place. Click the bar that is playing in its first quarter second and the report already
-     in flight falls inside the window, where nothing tells it from the real one. Kept as the last
-     place, the engine's real first report came earlier, read as the loop coming round, and every
-     note from bar 0 went out at once, 6-12 of them twice. Every real report after a landing is at or
-     past the line, and the loop coming round is still earlier than it. */
-  busLast=busFrom;busFrom=-1;busWait=0;
- }else{
-  if(busLast>=0&&t<busLast-1e-3){busCursor=t-1e-3;busSeats=Object.create(null);}
-  busLast=t;
+  /* A seek back is not the loop coming round. Compared with the place before the seek, the landing
+     report is earlier and would read as the loop, clearing every seat and sending every note from
+     bar 0 at once. Compared with the bar line, it is on or past it, and the loop coming round later
+     is still earlier than every place after it. */
+  busLast=busFrom;busFrom=-1;
  }
+ /* The loop came round. Test it against the PREVIOUS playhead, never against
+    the cursor: the cursor sits a whole horizon ahead of the playhead by
+    design, so `t < busCursor` is true on every single report and rewinds the
+    cursor every 50ms. Measured before this line was written that way: 12 of
+    12 seeds re-sent the same notes, 10,199 duplicates in one loop of the
+    first. */
+ if(busLast>=0&&t<busLast-1e-3){busCursor=t-1e-3;busSeats=Object.create(null);}
+ busLast=t;
  var horizon=t+0.4,base=mr.now();
  for(var i=0;i<busList.length;i++){
   var n=busList[i];
@@ -358,7 +382,7 @@ function busPublish(t){
 var originalOnEngineMsg=onEngineMsg;
 onEngineMsg=function(m){
  originalOnEngineMsg(m);
- if(m&&m.type==='pos')busPublish(m.t);
+ if(m&&m.type==='pos')busPublish(m.t,m.cloudSeek);
 };
 /* Every seek the page asks for goes through sendSwap, so this is where the publisher learns where the
    song will come down. follow===true is the rebuild path (it aligns to the running clock); anything
